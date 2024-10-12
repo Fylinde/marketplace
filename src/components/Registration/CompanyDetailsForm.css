@@ -1,0 +1,54 @@
+.company-details-form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+  }
+  
+  .company-details-form h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .company-details-form label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .company-details-form select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  .agreement {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .agreement input {
+    margin-right: 10px;
+  }
+  
+  .agreement label {
+    font-size: 14px;
+  }
+  
+  .company-details-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007185;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .company-details-form button:hover {
+    background-color: #005f73;
+  }
+  

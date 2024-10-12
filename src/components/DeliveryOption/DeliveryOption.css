@@ -1,0 +1,16 @@
+.delivery-option {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+    cursor: pointer;
+  }
+  
+  .delivery-option span {
+    font-size: 10px;
+  }
+  
+  .delivery-option span:nth-child(2) {
+    font-size: 13px;
+    font-weight: 800;
+  }
+  

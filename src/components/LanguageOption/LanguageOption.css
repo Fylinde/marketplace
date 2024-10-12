@@ -1,0 +1,33 @@
+.language-option {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+  cursor: pointer;
+  position: relative;
+}
+
+.language-option img {
+  width: 20px;
+  margin-right: 5px;
+}
+
+.language-dropdown {
+  position: absolute;
+  background-color: white;
+  min-width: 350px;
+  border: 1px solid #ccc;
+  top: 100%; /* Ensure dropdowns open below the trigger */
+  right: 0; /* Aligns the dropdown correctly */
+  z-index: 1000;
+  color: black;
+  padding: 10px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+
+.language-option:hover .language-dropdown {
+  visibility: visible;
+  opacity: 1;
+}

@@ -1,0 +1,52 @@
+.nav-option {
+  position: relative;
+  padding: 10px 20px;
+  color: white;
+}
+
+.account-section {
+  position: relative;
+}
+
+.dropdown-content {
+  display: block;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 15px;
+  width: 250px;
+  z-index: 1000;
+}
+
+.dropdown-header {
+  font-size: 14px;
+  color: black;
+}
+
+.dropdown-columns {
+  display: flex;
+  justify-content: space-between;
+}
+
+.dropdown-column {
+  width: 100%;
+  font-size: 12px;
+}
+
+.dropdown-content ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.dropdown-content a {
+  color: black;
+  text-decoration: none;
+  display: block;
+  margin: 5px 0;
+}
+
+.dropdown-content a:hover {
+  text-decoration: underline;
+}

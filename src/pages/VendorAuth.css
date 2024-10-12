@@ -1,0 +1,28 @@
+/* src/pages/VendorAuth.css */
+
+.vendor-auth {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .vendor-auth form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .vendor-auth input {
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+  
+  .vendor-auth button {
+    padding: 10px;
+    background-color: #007185;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  

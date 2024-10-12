@@ -1,0 +1,66 @@
+/* src/pages/ProductDetailPage.css */
+
+.product-detail {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  .product-info {
+    width: 50%;
+  }
+  
+  .product-info h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .buy-now-button, .add-to-cart-button, .make-offer-button {
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px 20px;
+    background-color: #007185;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .buy-now-button:hover, .add-to-cart-button:hover, .make-offer-button:hover {
+    background-color: #005f5f;
+  }
+  
+  .product-detail .image-gallery .image-gallery-slide img {
+    height: 500px;
+    object-fit: contain;
+  }
+  
+  .product-detail .image-gallery .image-gallery-thumbnails img {
+    border-radius: 8px;
+  }
+  
+  /* Contact Seller Section */
+  .contact-seller {
+    margin-top: 30px;
+  }
+  
+  .contact-seller h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  
+  .chat-button, .whatsapp-button, .call-button {
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .chat-button:hover, .whatsapp-button:hover, .call-button:hover {
+    background-color: #005f5f;
+  }
+  

@@ -1,0 +1,12 @@
+.logo img {
+    width: 80px; /* Adjust the width as needed */
+    height: auto; /* Ensure the aspect ratio is maintained */
+    object-fit: contain;
+    margin-right: 20px;
+    padding: 5px; /* Optional: Add padding if needed */
+}
+
+.logo {
+    display: flex;
+    align-items: center; /* Align the logo vertically with any accompanying text or elements */
+}

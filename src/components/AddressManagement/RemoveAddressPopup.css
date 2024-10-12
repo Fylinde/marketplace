@@ -1,0 +1,51 @@
+.remove-address-popup {
+    padding: 20px;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-width: 500px;
+    margin: 20px auto;
+  }
+  
+  .remove-address-popup h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #d9534f;
+  }
+  
+  .remove-address-popup p {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .remove-address-popup .actions {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .remove-address-popup button {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .remove-address-popup .confirm-button {
+    background-color: #d9534f;
+    color: white;
+  }
+  
+  .remove-address-popup .confirm-button:hover {
+    background-color: #c9302c;
+  }
+  
+  .remove-address-popup .cancel-button {
+    background-color: #ddd;
+    color: #555;
+  }
+  
+  .remove-address-popup .cancel-button:hover {
+    background-color: #ccc;
+  }
+  

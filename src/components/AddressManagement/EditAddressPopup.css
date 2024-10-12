@@ -1,0 +1,63 @@
+.edit-address-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: 400px;
+    z-index: 1000;
+  }
+  
+  .edit-address-popup h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-align: center;
+  }
+  
+  .edit-address-popup form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .edit-address-popup input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .edit-address-popup button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .edit-address-popup button:hover {
+    background-color: #0056b3;
+  }
+  
+  .edit-address-popup button[type="submit"] {
+    background-color: #28a745;
+  }
+  
+  .edit-address-popup button[type="submit"]:hover {
+    background-color: #218838;
+  }
+  
+  .edit-address-popup button[type="button"] {
+    background-color: #6c757d;
+  }
+  
+  .edit-address-popup button[type="button"]:hover {
+    background-color: #5a6268;
+  }
+  

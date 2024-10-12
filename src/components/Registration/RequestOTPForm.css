@@ -1,0 +1,64 @@
+.auth-container {
+    max-width: 350px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    text-align: center;
+  }
+  
+  .auth-logo {
+    width: 100px;
+    margin-bottom: 20px;
+  }
+  
+  .auth-container h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .auth-container p {
+    font-size: 14px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  
+  .phone-input {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  .country-code {
+    width: 30%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+  }
+  
+  .phone-input input {
+    width: 70%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+  }
+  
+  .auth-button {
+    background-color: #f0c14b;
+    border: 1px solid #a88734;
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  
+  .auth-button.cancel-button {
+    background-color: #ddd;
+    color: #333;
+  }
+  
+  .auth-button:hover {
+    background-color: #e2ae32;
+  }
+  

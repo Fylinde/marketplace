@@ -1,0 +1,38 @@
+/* src/components/MainContent/HeroSection.css */
+
+.hero-section {
+    margin-bottom: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .carousel-slide {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 40px;
+    border-radius: 12px;
+    color: #fff;
+  }
+  
+  .carousel-content {
+    max-width: 40%;
+  }
+  
+  .carousel-button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  
+  .carousel img {
+    width: 50%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+  

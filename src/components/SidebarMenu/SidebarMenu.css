@@ -1,0 +1,33 @@
+.sidebar-menu {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 10px;
+  position: relative;
+}
+
+.sidebar-dropdown {
+  position: absolute;
+  background-color: white;
+  min-width: 350px;
+  border: 1px solid #ccc;
+  z-index: 1000;
+  top: 100%; /* Ensure dropdowns open below the trigger */
+  left: 0; /* Aligns the dropdown correctly */
+  right: auto;
+  max-width: 350px;
+  color: black;
+  padding: 10px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+
+.sidebar-menu:hover .sidebar-dropdown {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+

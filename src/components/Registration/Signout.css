@@ -1,0 +1,109 @@
+.signout-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .signout-logo img {
+    width: 150px;
+    margin-bottom: 20px;
+  }
+  
+  .signout-box {
+    width: 400px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fff;
+  }
+  
+  .signout-status {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .signout-success-icon {
+    font-size: 40px;
+    color: green;
+    margin-right: 10px;
+  }
+  
+  .signout-message h2 {
+    margin: 0;
+    font-size: 24px;
+    color: green;
+  }
+  
+  .signout-message p {
+    margin: 0;
+    color: #333;
+  }
+  
+  .switch-accounts h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .account {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  .account-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .account-icon {
+    font-size: 30px;
+    margin-right: 10px;
+    color: #666;
+  }
+  
+  .account-info p {
+    margin: 0;
+    font-size: 14px;
+  }
+  
+  .signout-link {
+    color: blue;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  
+  .add-account {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  }
+  
+  .add-account-icon {
+    font-size: 24px;
+    margin-right: 10px;
+    color: #666;
+  }
+  
+  .learn-more {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .learn-more a {
+    color: blue;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  

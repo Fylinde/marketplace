@@ -1,0 +1,16 @@
+.cart {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+    cursor: pointer;
+  }
+  
+  .cart img {
+    width: 30px;
+    margin-right: 10px;
+  }
+  
+  .cart span {
+    font-weight: 800;
+  }
+  

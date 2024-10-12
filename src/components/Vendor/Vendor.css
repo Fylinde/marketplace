@@ -1,0 +1,164 @@
+/* src/components/Vendor/Vendor.css */
+
+.vendor-dashboard {
+    padding: 20px;
+  }
+  
+  .dashboard-sections {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .section {
+    width: 30%;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border: 1px solid #ddd;
+  }
+  
+  .section h3 {
+    margin-top: 0;
+  }
+  
+  .section a {
+    color: #007185;
+    text-decoration: none;
+  }
+  
+
+  /* src/components/Vendor/Vendor.css */
+
+.vendor-storefront {
+    padding: 20px;
+  }
+  
+  .vendor-products {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .product-card {
+    width: 23%;
+    margin: 1%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: white;
+    text-align: center;
+  }
+  
+  .product-card img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .product-card h3 {
+    font-size: 1.2em;
+  }
+  
+  .product-card p {
+    font-size: 1em;
+    color: #007185;
+  }
+  
+
+
+  /* src/components/Vendor/Vendor.css */
+
+.product-management {
+    padding: 20px;
+  }
+  
+  .add-product form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .add-product input, .add-product textarea {
+    margin-bottom: 10px;
+    padding: 8px;
+  }
+  
+  .add-product button {
+    padding: 10px;
+    background-color: #007185;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .product-list ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .product-list li {
+    margin-bottom: 10px;
+  }
+  
+  .product-list button {
+    margin-left: 10px;
+    padding: 5px;
+    background-color: #ff9900;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+
+
+
+  /* src/components/Vendor/Vendor.css */
+
+.order-management {
+    padding: 20px;
+  }
+  
+  .order-management table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .order-management th, .order-management td {
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  
+  .order-management button {
+    padding: 5px 10px;
+    background-color: #007185;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+
+
+
+  /* src/components/Vendor/Vendor.css */
+
+.vendor-analytics {
+    padding: 20px;
+  }
+  
+  .analytics-cards {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .card {
+    width: 30%;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  .card h3 {
+    margin-bottom: 10px;
+  }
+  
+  .card p {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+  

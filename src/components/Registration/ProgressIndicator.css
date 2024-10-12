@@ -1,0 +1,33 @@
+.progress-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .progress-indicator .step {
+    text-align: center;
+    flex: 1;
+  }
+  
+  .progress-indicator .step .circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ccc;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .progress-indicator .step.active .circle {
+    background-color: #0073bb;
+  }
+  
+  .progress-indicator .step span {
+    display: block;
+    margin-top: 5px;
+    color: #333;
+  }
+  
