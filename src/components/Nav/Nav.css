@@ -1,7 +1,29 @@
-.nav-option {
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: relative;
-  padding: 10px 20px;
-  color: white;
+}
+
+.nav-option {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  position: relative;
+}
+
+.nav-option span {
+  font-size: 10px;
+}
+
+.nav-option span:nth-child(2) {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.nav-option:hover .dropdown-content {
+  visibility: visible;
+  opacity: 1;
 }
 
 .account-section {
@@ -9,15 +31,18 @@
 }
 
 .dropdown-content {
-  display: block;
   position: absolute;
-  top: 100%;
-  left: 0;
   background-color: white;
+  min-width: 350px;
   border: 1px solid #ccc;
-  padding: 15px;
-  width: 250px;
   z-index: 1000;
+  color: black;
+  top: 40px;
+  right: 0;
+  padding: 10px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .dropdown-header {
@@ -33,6 +58,8 @@
 .dropdown-column {
   width: 100%;
   font-size: 12px;
+  flex: 1;
+  margin-right: 20px;
 }
 
 .dropdown-content ul {
@@ -47,6 +74,52 @@
   margin: 5px 0;
 }
 
+.dropdown-column h4 {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.dropdown-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .dropdown-content a:hover {
   text-decoration: underline;
+}
+
+.dropdown-column ul li {
+  margin-bottom: 8px;
+}
+
+.dropdown-column ul li a {
+  color: #007185;
+  text-decoration: none;
+}
+
+.dropdown-column ul li a:hover {
+  text-decoration: underline;
+}
+
+/* Sidebar Dropdown Fix */
+.sidebar-dropdown {
+  position: absolute;
+  left: 0;
+  right: auto;
+  top: 100%;
+  max-width: 350px;
+  background-color: white;
+  color: black;
+  border: 1px solid #ccc;
+  z-index: 1000;
+  padding: 10px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar-menu:hover .sidebar-dropdown {
+  visibility: visible;
+  opacity: 1;
 }

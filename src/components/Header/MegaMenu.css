@@ -1,0 +1,55 @@
+/* MegaMenu.css */
+.mega-menu {
+    background-color: #f4f4f4;
+    padding: 10px 20px;
+  }
+  
+  .menu-categories {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .menu-item {
+    position: relative;
+  }
+  
+  .menu-item a {
+    color: #0044cc;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .menu-item:hover .submenu {
+    display: block;
+  }
+  
+  .submenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    z-index: 1;
+  }
+  
+  .submenu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .submenu ul li {
+    padding: 8px 0;
+  }
+  
+  .submenu ul li a {
+    color: #333;
+    text-decoration: none;
+  }
+  
+  .submenu ul li a:hover {
+    color: #007aff;
+  }
+  

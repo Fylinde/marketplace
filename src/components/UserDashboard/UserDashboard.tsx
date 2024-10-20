@@ -1,19 +1,69 @@
-import React from 'react';
-import { useNavigate  } from 'react-router-dom'; // Assuming you're using react-router for navigation
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { setAuthData, logout } from '../../redux/slices/authSlice';
+import { selectUserFullName } from '../../redux/slices/authSlice';
+
 import './UserDashboard.css';
 
 const UserDashboard: React.FC = () => {
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const location = useLocation();
 
-  // Redirect to the Address Management page
+  // Access tokens and user from Redux store
+  const accessToken = useSelector((state: RootState) => state.auth.access_token );
+  const user = useSelector((state: RootState) => state.auth.user);
+  const userFullName = useSelector(selectUserFullName);
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const access_token = queryParams.get('access_token');
+    const refresh_token = queryParams.get('refresh_token');
+  
+    if (access_token && refresh_token) {
+      // Check if user data is present in the URL or fetch it if necessary
+      const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
+      dispatch(setAuthData({ access_token, refresh_token, user: storedUser }));
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+      window.history.replaceState({}, document.title, "/user-dashboard");
+    } else {
+      const storedAccessToken = localStorage.getItem('access_token');
+      const storedRefreshToken = localStorage.getItem('refresh_token');
+      const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
+  
+      if (!storedAccessToken || !storedRefreshToken) {
+        navigate('/registration/sign-in');
+      } else {
+        if (!accessToken) {
+          dispatch(setAuthData({ 
+            access_token: storedAccessToken, 
+            refresh_token: storedRefreshToken, 
+            user: storedUser
+          }));
+        }
+      }
+    }
+  }, [dispatch, navigate, location, accessToken]);
+  
+
+  // Logout and clear all tokens from Redux and localStorage
+  const handleLogout = () => {
+    localStorage.clear();
+    dispatch(logout());
+    navigate('/registration/sign-in');
+  };
+
   const goToAddressList = () => {
     navigate('/addresses');
   };
 
+
   return (
     <div className="user-dashboard">
-      <h1>Your Account</h1>
+       <h1>Welcome, {userFullName ? `Hello, ${userFullName}` : 'Hello, Guest'}</h1>
+      {/*} <h1>Welcome, {user?.full_name || 'User'}</h1> */}
       <div className="dashboard-sections">
         <div className="dashboard-section">
           <div className="dashboard-card">
@@ -22,13 +72,13 @@ const UserDashboard: React.FC = () => {
           </div>
           <div className="dashboard-card">
             <h3>Login & Security</h3>
-            <p>Manage password, email and mobile number</p>
+            <p>Manage password, email, and mobile number</p>
           </div>
           <div className="dashboard-card">
             <h3>Prime</h3>
             <p>Manage your membership, view benefits, and payment settings</p>
           </div>
-           <div className="dashboard-card" onClick={goToAddressList}>
+          <div className="dashboard-card" onClick={goToAddressList}>
             <h3>Your Addresses</h3>
             <p>Edit, remove or set default address</p>
           </div>
@@ -54,7 +104,7 @@ const UserDashboard: React.FC = () => {
           </div>
           <div className="dashboard-card">
             <h3>Your Lists</h3>
-            <p>View, modify and share your lists, or create new ones</p>
+            <p>View, modify, and share your lists, or create new ones</p>
           </div>
           <div className="dashboard-card">
             <h3>Fylinde Mobile App</h3>
@@ -63,73 +113,11 @@ const UserDashboard: React.FC = () => {
         </div>
       </div>
       <div className="extra-sections">
-        <div className="extra-section">
-          <h3>Digital content and devices</h3>
-          <ul>
-            <li>Fylinde Drive</li>
-            <li>Content Library</li>
-            <li>Devices</li>
-            <li>Manage Digital Delivery</li>
-          </ul>
-        </div>
-        <div className="extra-section">
-          <h3>Email alerts, messages, ads and cookies</h3>
-          <ul>
-            <li>Cookies and advertising choices</li>
-            <li>Advertising preferences</li>
-            <li>Communication preferences</li>
-            <li>Message Centre</li>
-          </ul>
-        </div>
-        <div className="extra-section">
-          <h3>More ways to pay</h3>
-          <ul>
-            <li>Your purchase preferences</li>
-          </ul>
-        </div>
-        <div className="extra-section">
-          <h3>Ordering and shopping preferences</h3>
-          <ul>
-            <li>Your Transaction</li>
-            <li>Manage Your Fylinde Family</li>
-            <li>Language settings</li>
-            <li>Archived Orders</li>
-            <li>Lists</li>
-            <li>Profile</li>
-            <li>VAT registration number</li>
-            <li>Racism and Product Safety Alerts</li>
-          </ul>
-        </div>
-        <div className="extra-section">
-          <h3>Other accounts</h3>
-          <ul>
-            <li>Sell on Fylinde</li>
-            <li>Fylinde Web Services</li>
-            <li>Twitch account settings</li>
-          </ul>
-        </div>
-        <div className="extra-section">
-          <h3>Memberships and subscriptions</h3>
-          <ul>
-            <li>Subscribe & Save</li>
-            <li>Fylinde Prime</li>
-            <li>Memberships & Subscriptions</li>
-          </ul>
-        </div>
-        <div className="extra-section">
-          <h3>Manage your data</h3>
-          <ul>
-            <li>Request your data</li>
-            <li>Transfer your data</li>
-            <li>Data and besters services</li>
-            <li>Recommendation Preferences</li>
-            <li>Manage apps and services with data access</li>
-            <li>Seller Data Sharing Preferences</li>
-            <li>Close Your Fylinde Account</li>
-            <li>Privacy Notice</li>
-          </ul>
-        </div>
+        {/* Other sections */}
       </div>
+      <button onClick={handleLogout} className="logout-button">
+        Logout
+      </button>
     </div>
   );
 };

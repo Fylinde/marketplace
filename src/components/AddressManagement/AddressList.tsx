@@ -2,20 +2,33 @@ import React, { useEffect, useState } from 'react';
 import { getUserAddresses, deleteUserAddress, setDefaultAddress } from '../../services/addressService';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate for navigation
+import { useNavigate, useLocation } from 'react-router-dom';
 import './AddressList.css';
-import RemoveAddressPopup from './RemoveAddressPopup'; // Import the popup component
+import RemoveAddressPopup from './RemoveAddressPopup';
 
 const AddressList: React.FC = () => {
-  const location = useLocation();  // Get the location object
-  const navigate = useNavigate(); // Initialize navigate hook
+  const location = useLocation();
+  const navigate = useNavigate();
   const [addresses, setAddresses] = useState<any[]>([]);
-  const [showRemovePopup, setShowRemovePopup] = useState(false); // Track whether the popup is visible
-  const [addressToRemove, setAddressToRemove] = useState<any | null>(null); // Track the address to remove
+  const [showRemovePopup, setShowRemovePopup] = useState(false);
+  const [addressToRemove, setAddressToRemove] = useState<any | null>(null);
   const userId = useSelector((state: RootState) => state.auth.user?.id);
 
+  // Function to handle navigation, ensuring no navigation when the popup is open
+  const handleNavigation = (newPageUrl: string) => {
+    if (showRemovePopup) {
+      console.error("Navigation blocked: Popup is open.");
+      return;
+    } else {
+      navigate(newPageUrl);
+    }
+  };
+
+  // Simplified handleAddAddress function
   const handleAddAddress = () => {
-    navigate('/addresses/add'); // Navigate to the add address form
+    console.log("Navigating to addresses page");
+     handleNavigation('/address-management');
+   // window.location.href = '/addresses';
   };
 
   useEffect(() => {
@@ -23,7 +36,7 @@ const AddressList: React.FC = () => {
       if (userId) {
         try {
           const fetchedAddresses = await getUserAddresses(userId);
-          console.log('Fetched addresses: ', fetchedAddresses); // Log fetched addresses to ensure it's returning the correct data
+          console.log('Fetched addresses: ', fetchedAddresses);
           setAddresses(fetchedAddresses);
         } catch (error) {
           console.error('Failed to fetch addresses:', error);
@@ -51,39 +64,24 @@ const AddressList: React.FC = () => {
         setAddresses((prevAddresses) =>
           prevAddresses.filter((address) => address.id !== addressToRemove.id)
         );
-        console.log('Updated addresses after deletion: ', addresses);
-        setShowRemovePopup(false); // Hide the popup after deletion
-        setAddressToRemove(null);  // Reset the selected address for deletion
+        setShowRemovePopup(false);
+        setAddressToRemove(null);
       } catch (error) {
         console.error('Error deleting address:', error);
       }
     }
   };
 
-  // Show the delete confirmation popup with error handling
   const handleDeleteAddress = (address: any) => {
-    setAddressToRemove(address);  // Set the address to remove
-    setShowRemovePopup(true);     // Show the confirmation popup
+    setAddressToRemove(address);
+    setShowRemovePopup(true);
 
-    // Ensure the popup shows and block any further action if it doesn't
     setTimeout(() => {
       if (!showRemovePopup) {
         console.error('Error: Remove address popup failed to show.');
         throw new Error('Remove address popup failed to show.');
       }
     }, 500);
-  };
-
-  // New function that prevents any navigation if the popup fails to show
-  const handleNavigation = (newPageUrl: string) => {
-    // Check if the popup is open before navigating
-    if (showRemovePopup) {
-      console.error("Navigation blocked: Popup is open.");
-      return; // Block navigation
-    } else {
-      // Proceed with navigation if popup is not open
-      navigate(newPageUrl);
-    }
   };
 
   const cancelDelete = () => {
@@ -102,19 +100,18 @@ const AddressList: React.FC = () => {
             {address.is_default && <span>Default</span>}
             <div className="address-actions">
               <button>Edit</button>
-              <button onClick={() => handleDeleteAddress(address)}>Remove</button> {/* Trigger popup on remove */}
+              <button onClick={() => handleDeleteAddress(address)}>Remove</button>
               {!address.is_default && (
                 <button onClick={() => handleSetDefault(address.id)}>Set as Default</button>
               )}
             </div>
           </div>
         ))}
-        <div className="add-address-card" onClick={() => handleNavigation('/addresses/add')}>
+        <div className="add-address-card" onClick={handleAddAddress}>
           + Add Address
         </div>
       </div>
 
-      {/* Show the confirmation popup */}
       {showRemovePopup && addressToRemove && (
         <RemoveAddressPopup
           address={addressToRemove}

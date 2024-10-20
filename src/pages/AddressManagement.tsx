@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { getUserAddresses, addUserAddress, deleteUserAddress, setDefaultAddress } from '../services/addressService';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';  // Adjust this import based on your store setup
+import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
 import './AddressManagement.css';
 
 const AddressManagement: React.FC = () => {
+  const navigate = useNavigate(); // Initialize the navigation hook
   const [addresses, setAddresses] = useState<any[]>([]);
   const [newAddress, setNewAddress] = useState({
     street: '',
@@ -17,7 +19,6 @@ const AddressManagement: React.FC = () => {
 
   // Get the userId from the Redux store
   const userId = useSelector((state: RootState) => state.auth.user?.id);
-
   
   // Fetch addresses when the component is mounted
   useEffect(() => {
@@ -47,15 +48,10 @@ const AddressManagement: React.FC = () => {
     e.preventDefault();
     try {
       const addedAddress = await addUserAddress(newAddress);
+      // Navigate to the address list page after successfully adding an address
       setAddresses([...addresses, addedAddress]);
-      setNewAddress({
-        street: '',
-        city: '',
-        state: '',
-        postal_code: '',
-        country: '',
-        phone_number: '',  // Add phone_number here
-      });
+      
+      navigate('/addresses', { state: { newAddressAdded: addedAddress } });
     } catch (error) {
       console.error("Error adding address:", error);
     }

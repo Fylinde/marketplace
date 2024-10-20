@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { selectUserFullName } from '../../redux/slices/authSlice';
+
 
 const SidebarMenu: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-
+  const userFullName = useSelector(selectUserFullName);
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
   };
@@ -27,7 +30,8 @@ const SidebarMenu: React.FC = () => {
             <div style={closeButtonContainer}>
               <button style={closeButton} onClick={closeSidebar}>X</button>
             </div>
-            <p><strong>Hello, User</strong></p>
+            <h1><strong>Welcome, {userFullName ? `Hello, ${userFullName}` : 'Hello, Guest'}</strong></h1>
+            {/* <p><strong>Hello, User</strong></p> */}
             <h4>Digital Content & Devices</h4>
             <p>Fylinde Music</p>
             <p>Kindle E-readers & Books</p>

@@ -86,17 +86,24 @@ const CreateAccount: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8001/users/register', registrationData);
+      const response = await axios.post(
+        'http://localhost:8001/users/register',
+        registrationData,
+        { headers: { 'Content-Type': 'application/json' } }  
+      );
       console.log('Registration response:', response.data);
       
-      if (response.status === 200) {
+      
+      //if (response.status === 200) {
         // Store the access token in localStorage
-        const token = response.data.access_token;
-        localStorage.setItem('token', token);  // Store token in localStorage
+       // const token = response.data.access_token;
+       // localStorage.setItem('token', token);  // Store token in localStorage
 
         // Redirect user to the dashboard or protected page
-        navigate('/email-verification');
-      }
+        console.log('Redirecting to Email Verification...');
+        navigate('/registration/email-verification');
+        
+      //}
     } catch (error: any) {
       console.error("Full error during registration:", error);
       console.error("Error response data:", error.response?.data);

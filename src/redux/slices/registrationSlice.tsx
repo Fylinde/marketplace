@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { getUserAddresses, addUserAddress, deleteUserAddress, setDefaultAddress } from '../../services/addressService';
 
-const API_URL = 'http://localhost:8000/auth';  // Correct backend URL
+const API_URL = 'http://localhost:8000/auth'; // Update with your correct backend URL
 
 // Define interfaces for each part of the state
 interface CompanyDetails {
@@ -70,11 +70,10 @@ interface BillingAddress {
   state: string;
   postal_code: string;
   country: string;
-  phone_number?: string;  // Make phone_number optional here
+  phone_number?: string; // Make phone_number optional here
 }
 
 // Define the overall state structure
-// In registrationSlice.ts, update the RegistrationState interface to include companyData
 export interface RegistrationState {
   companyDetails: CompanyDetails;
   contactDetails: ContactDetails;
@@ -85,17 +84,20 @@ export interface RegistrationState {
   billingAddress: BillingAddress;
   registrationStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
-  companyData?: {  // Add companyData if needed
+  userAddresses: any[]; // Define based on your address structure
+  addressError: string | null;
+  companyData?: {
     companyName: string;
     companyRegistrationNumber: string;
     taxId: string;
     countryOfIncorporation: string;
     businessAddress: string;
+    userAddresses: any[];
+    addressError: string | null;
   };
 }
 
-
-// Async thunk for user registration
+// Thunk for user registration
 export const registerUser = createAsyncThunk(
   'registration/registerUser',
   async (registrationData: RegistrationState, { rejectWithValue }) => {
@@ -119,6 +121,31 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+// Thunk for fetching user addresses
+// Updated thunk names to avoid naming conflicts
+export const fetchUserAddressList = createAsyncThunk(
+  'registration/fetchUserAddressList',
+  async (userId: number, { rejectWithValue }) => {
+    try {
+      const response = await getUserAddresses(userId);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Failed to fetch addresses');
+    }
+  }
+);
+
+export const removeUserAddressById = createAsyncThunk(
+  'registration/removeUserAddressById',
+  async (addressId: number, { rejectWithValue }) => {
+    try {
+      await deleteUserAddress(addressId);
+      return addressId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Failed to delete address');
+    }
+  }
+);
 const initialState: RegistrationState = {
   companyDetails: {
     country: '',
@@ -189,18 +216,9 @@ const initialState: RegistrationState = {
   },
   registrationStatus: 'idle',
   error: null,
+  userAddresses: [],
+  addressError: null,
 };
-
-// Create selectors to retrieve the state values
-export const selectCompanyDetails = (state: { registration: RegistrationState }) => state.registration.companyDetails;
-export const selectContactDetails = (state: { registration: RegistrationState }) => state.registration.contactDetails;
-export const selectPaymentDetails = (state: { registration: RegistrationState }) => state.registration.paymentDetails;
-export const selectShopDetails = (state: { registration: RegistrationState }) => state.registration.shopDetails;
-export const selectVerificationDetails = (state: { registration: RegistrationState }) => state.registration.verificationDetails;
-export const selectDocumentDetails = (state: { registration: RegistrationState }) => state.registration.documentDetails;
-export const selectBillingAddress = (state: { registration: RegistrationState }) => state.registration.billingAddress;
-export const selectRegistrationStatus = (state: { registration: RegistrationState }) => state.registration.registrationStatus;
-export const selectRegistrationError = (state: { registration: RegistrationState }) => state.registration.error;
 
 const registrationSlice = createSlice({
   name: 'registration',
@@ -234,15 +252,50 @@ const registrationSlice = createSlice({
         state.registrationStatus = 'loading';
         state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.registrationStatus = 'succeeded';
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.registrationStatus = 'failed';
         state.error = action.payload as string;
+      })
+      .addCase(fetchUserAddressList.pending, (state) => {
+        state.registrationStatus = 'loading';
+        state.addressError = null;
+      })
+      .addCase(fetchUserAddressList.fulfilled, (state, action: PayloadAction<any[]>) => {
+        state.registrationStatus = 'succeeded';
+        state.userAddresses = action.payload;
+      })
+      .addCase(fetchUserAddressList.rejected, (state, action) => {
+        state.registrationStatus = 'failed';
+        state.addressError = action.payload as string;
+      })
+      .addCase(removeUserAddressById.pending, (state) => {
+        state.registrationStatus = 'loading';
+        state.addressError = null;
+      })
+      .addCase(removeUserAddressById.fulfilled, (state, action: PayloadAction<number>) => {
+        state.registrationStatus = 'succeeded';
+        state.userAddresses = state.userAddresses.filter(address => address.id !== action.payload);
+      })
+      .addCase(removeUserAddressById.rejected, (state, action) => {
+        state.registrationStatus = 'failed';
+        state.addressError = action.payload as string;
       });
   },
 });
+
+// Selectors to extract specific parts of the state
+export const selectCompanyDetails = (state: { registration: RegistrationState }) => state.registration.companyDetails;
+export const selectContactDetails = (state: { registration: RegistrationState }) => state.registration.contactDetails;
+export const selectPaymentDetails = (state: { registration: RegistrationState }) => state.registration.paymentDetails;
+export const selectShopDetails = (state: { registration: RegistrationState }) => state.registration.shopDetails;
+export const selectVerificationDetails = (state: { registration: RegistrationState }) => state.registration.verificationDetails;
+export const selectDocumentDetails = (state: { registration: RegistrationState }) => state.registration.documentDetails;
+export const selectBillingAddress = (state: { registration: RegistrationState }) => state.registration.billingAddress;
+export const selectRegistrationStatus = (state: { registration: RegistrationState }) => state.registration.registrationStatus;
+export const selectRegistrationError = (state: { registration: RegistrationState }) => state.registration.error;
 
 export const {
   saveCompanyDetails,
@@ -253,5 +306,6 @@ export const {
   saveDocumentDetails,
   submitRegistration,
 } = registrationSlice.actions;
+
 
 export default registrationSlice.reducer;

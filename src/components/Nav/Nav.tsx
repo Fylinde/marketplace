@@ -4,6 +4,8 @@ import { RootState } from '../../redux/store';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../redux/slices/authSlice';
 import './Nav.css';  // Make sure styles are handled here
+import { selectUserFullName } from '../../redux/slices/authSlice';
+
 
 const Nav: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +14,7 @@ const Nav: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isSignedIn = !!user?.full_name;
+  const userFullName = useSelector(selectUserFullName);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -19,15 +22,19 @@ const Nav: React.FC = () => {
 
   const handleSignOut = () => {
     dispatch(logout());
-    navigate('/sign-out');
+    navigate('/registration/sign-out');
   };
 
   const handleSignIn = () => {
-    navigate('/sign-in');
+    navigate('/registration/sign-in');
   };
 
   const handleCreateAccount = () => {
-    navigate('/create-account');
+    navigate('/registration/create-account');
+  };
+
+  const handleLogoClick = () => {
+    navigate('/');
   };
 
   const handleCreateSellerAccount = () => {
@@ -42,7 +49,7 @@ const Nav: React.FC = () => {
 
   return (
     <div className="nav">
-      <div className="nav-logo" onClick={() => navigate('/')}>
+     <div className="nav-logo" onClick={handleLogoClick}>
         {/* Your logo goes here */}
       </div>
       <div className="nav-option">
@@ -51,8 +58,8 @@ const Nav: React.FC = () => {
             className="account-section"
             onMouseEnter={toggleDropdown}
             onMouseLeave={toggleDropdown}
-          >
-            <span>Hello, {user?.full_name || 'User'}</span>
+          ><span>Welcome, {userFullName ? `Hello, ${userFullName}` : 'Hello, Guest'}</span>
+            {/* <span>Hello, {user?.full_name || 'User'}</span> */}
             <span>Account & Lists ▾</span>
             {isOpen && (
               <div className="dropdown-content">
@@ -70,6 +77,7 @@ const Nav: React.FC = () => {
                     <ul>
                       <li><a href="#">Your Account</a></li>
                       <li><a href="#">Your Orders</a></li>
+                      <li><a href="#">Keep Shopping For</a></li>
                       <li><a href="#">Your Recommendations</a></li>
                       <li><a href="#">Recalls and Product Safety Alerts</a></li>
                       <li><a href="#">Your Subscribe & Save Items</a></li>

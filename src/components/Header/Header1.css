@@ -1,0 +1,198 @@
+/* Main header container */
+.main-header {
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px 0;
+  position: relative;
+  z-index: 100;
+}
+
+/* Sticky header behavior */
+.main-header.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 999;
+  background-color: #fff;
+}
+
+/* Top bar with user info */
+.top-bar {
+  background-color: #f8f8f8;
+  padding: 5px 0;
+  font-size: 12px;
+  text-align: right;
+  color: #333;
+}
+
+.top-bar p {
+  margin: 0;
+  display: inline-block;
+  padding-left: 10px;
+}
+
+.settings {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.settings .setting-dropdown {
+  display: inline-block;
+  margin-left: 15px;
+}
+
+.settings .setting-dropdown ul {
+  display: none;
+  position: absolute;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.settings .setting-dropdown:hover ul {
+  display: block;
+}
+
+.settings .setting-dropdown ul li {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.settings .setting-dropdown ul li:hover {
+  background-color: #f1f1f1;
+}
+
+/* Header content (logo, nav, search, cart) */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.logo img {
+  max-height: 60px;
+}
+
+/* Navigation */
+.navigation ul {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.navigation ul li {
+  position: relative;
+  margin-right: 20px;
+}
+
+.navigation ul li a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 10px;
+  display: block;
+}
+
+.navigation ul li:hover a {
+  color: #f1c40f;
+}
+
+/* Dropdown menus */
+.navigation ul li .dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #ffffff;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navigation ul li:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-content ul li {
+  padding: 10px;
+}
+
+.dropdown-content ul li:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown-content ul li a {
+  text-decoration: none;
+  color: #333;
+}
+
+/* Search bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.search-bar select,
+.search-bar input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.search-bar button {
+  background-color: #f1c40f;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-bar button i {
+  color: #fff;
+}
+
+/* Cart and wishlist icons */
+.cart-icons {
+  display: flex;
+  align-items: center;
+}
+
+.cart-icons .wishlist,
+.cart-icons .cart {
+  position: relative;
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.cart-icons .wishlist i,
+.cart-icons .cart i {
+  font-size: 24px;
+}
+
+.cart-icons .wishlist span,
+.cart-icons .cart span {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background-color: #f1c40f;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-size: 12px;
+}
+
+/* Total price */
+.cart-icons .total {
+  font-weight: bold;
+  color: #e74c3c;
+  font-size: 16px;
+}

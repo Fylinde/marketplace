@@ -1,23 +1,30 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import axios, { AxiosError } from 'axios';
-import { RootState } from '../store';
 
-// Define AuthState interface
-interface AuthState {
-  token: string | null;
-  user: User | null;
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  error: string | null;
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import axios, { AxiosError } from 'axios';
+
+// Ensure User is defined
+interface User {
+  id: number;
+  full_name: string;
+  email: string;
 }
 
-// Define CompanyDetails interface
+interface AuthState {
+  access_token: string | null;
+  user: any; // Define a more specific type if you have one
+}
+
+// Define the message type returned by the login thunk
+interface LoginMessagePayload {
+  message: string;
+}
+
 interface CompanyDetails {
   country?: string;
   companyType?: string;
   companyName?: string;
 }
 
-// Define ContactDetails interface
 interface ContactDetails {
   firstName: string;
   middleName?: string;
@@ -36,19 +43,53 @@ interface ContactDetails {
   };
 }
 
-// Combine all states into a single slice
-interface AppState extends AuthState {
+interface AppState {
+  access_token: string | null;
+  refresh_token: string | null;
+  user: User | null;
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null;
+  otpSent: boolean; // Flag for OTP flow
   companyDetails: CompanyDetails;
-  contactDetails: ContactDetails; // Add ContactDetails here
+  contactDetails: ContactDetails;
 }
 
-// Initial state for the combined slice
+interface LoginPayload {
+  access_token: string;
+  refresh_token: string;
+  session_token?: string;
+  user: User;
+}
+
+interface AuthDataPayload {
+  access_token: string;
+  refresh_token: string;
+  user: User | null;
+}
+
+// Cleanup: Remove any "undefined" strings from localStorage
+if (localStorage.getItem('user') === 'undefined') {
+  localStorage.removeItem('user');
+}
+
+
+// Define initial state with safe JSON parsing for user
 const initialState: AppState = {
-  token: localStorage.getItem('token'),  // Initialize token from localStorage
-  user: JSON.parse(localStorage.getItem('user') || 'null'),  // Initialize user from localStorage if available
+  access_token: localStorage.getItem('access_token'),
+  refresh_token: localStorage.getItem('refresh_token'),
+  user: (() => {
+    try {
+        const userData = localStorage.getItem('user');
+        return userData && userData !== 'undefined' && userData !== '' ? JSON.parse(userData) : null;
+    } catch (error) {
+        console.error("Failed to parse user data from localStorage:", error);
+        return null;
+    }
+  })(),
   status: 'idle',
   error: null,
-  companyDetails: {},
+  otpSent: false, // Initialize OTP flag as false
+  companyDetails: {}, // Empty object for companyDetails
   contactDetails: {
     firstName: '',
     lastName: '',
@@ -67,112 +108,167 @@ const initialState: AppState = {
   },
 };
 
-// Define User interface (update username to full_name)
-interface User {
-  id: number;
-  full_name: string;  // Update to full_name
-  email: string;
-  // Add other user properties as needed
-}
-
-interface LoginPayload {
-  access_token: string;
-  refresh_token: string;
-  session_token: string;
-  user: User;
-}
-
-// Async thunk for login
-export const login = createAsyncThunk<LoginPayload, { email: string; password: string }, { rejectValue: string }>(
-  'auth/login',
-  async (credentials, { rejectWithValue }) => {
-    console.log('Login thunk started with credentials:', credentials);
-
-    try {
-      const response = await axios.post(
-        'http://localhost:8000/auth/login',
-        new URLSearchParams({
-          username: credentials.email,
-          password: credentials.password,
-        }),
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        }
-      );
-
-      console.log('Login API response:', response.data);
-
-      const { access_token, refresh_token, session_token, user } = response.data;
-
-      // Save the token and user in localStorage after login
-      localStorage.setItem('token', access_token);  // Store the token in localStorage
-      localStorage.setItem('user', JSON.stringify(user));  // Store the user object in localStorage
-
-      return {
-        access_token,
-        refresh_token,
-        session_token,
-        user,
-      };
-    } catch (error) {
-      console.error('Error during login process:', error);
-      const axiosError = error as AxiosError;
-      if (axiosError.response && axiosError.response.data) {
-        console.error('Error response from server:', axiosError.response.data);
-        return rejectWithValue(axiosError.response.data as string);
-      } else {
-        return rejectWithValue(axiosError.message);
+// Async thunk for handling login with credentials
+export const login = createAsyncThunk<
+LoginMessagePayload,
+  { emailOrPhone: string; password: string },
+  { rejectValue: string }
+>('auth/login', async (credentials, { rejectWithValue }) => {
+  try {
+    const response = await axios.post(
+      'http://localhost:8000/auth/login',
+      new URLSearchParams({
+        username: credentials.emailOrPhone,
+        password: credentials.password,
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       }
-    }
-  }
-);
+    );
 
-// Slice definition
-const appSlice = createSlice({
-  name: 'app',
+    console.log("Login response data:", response.data);
+
+    const { message } = response.data;
+
+    return { message };
+  } catch (error) {
+    const axiosError = error as AxiosError;
+
+    // Use optional chaining and a fallback message
+    const errorDetail = axiosError.response?.data && typeof axiosError.response.data === 'object' && 'detail' in axiosError.response.data
+      ? (axiosError.response.data as { detail: string }).detail
+      : 'Login failed.';
+
+    return rejectWithValue(errorDetail);
+  }
+});
+export const selectUserFullName = (state: { auth: { user: User | null } }) => state.auth.user?.full_name || '';
+// Async thunk for OTP verification
+export const verifyOtp = createAsyncThunk<
+  LoginPayload,
+  { contact: string; otp: string },
+  { rejectValue: string }
+>('auth/verifyOtp', async ({ contact, otp }, { rejectWithValue }) => {
+  try {
+    const response = await axios.post(
+      'http://localhost:8000/auth/verify-otp',
+      new URLSearchParams({
+        contact,
+        otp,
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    );
+
+    const { access_token, refresh_token } = response.data;
+
+    const user: User = {
+      id: Number(contact), 
+      full_name: 'Unknown', 
+      email: 'unknown@example.com' 
+    };
+
+    return { 
+      access_token, 
+      refresh_token, 
+      session_token: undefined, 
+      user 
+    };
+  } catch (error) {
+    const axiosError = error as AxiosError;
+
+    // Safely access detail property with fallback
+    const errorDetail = axiosError.response?.data && typeof axiosError.response.data === 'object' && 'detail' in axiosError.response.data
+      ? (axiosError.response.data as { detail: string }).detail
+      : 'OTP verification failed.';
+
+    return rejectWithValue(errorDetail);
+  }
+});
+
+
+// Create the auth slice with reducers and async thunk cases
+const authSlice = createSlice({
+  name: 'auth',
   initialState,
   reducers: {
-    saveCompanyDetails(state, action: PayloadAction<CompanyDetails>) {
-      console.log('Saving company details:', action.payload);
-      state.companyDetails = action.payload;
+    setAuthData(state, action: PayloadAction<AuthDataPayload>) {
+      const { access_token, refresh_token, user } = action.payload;
+      state.access_token = access_token;
+      state.refresh_token = refresh_token;
+      state.user = user;
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+      localStorage.setItem('user', JSON.stringify(user));
     },
-    saveContactDetails(state, action: PayloadAction<ContactDetails>) {
-      console.log('Saving contact details:', action.payload);
-      state.contactDetails = action.payload;
+    loadAuthData(state) {
+      const storedAccessToken = localStorage.getItem('access_token');
+      const storedRefreshToken = localStorage.getItem('refresh_token');
+      const storedUser = localStorage.getItem('user');
+
+      state.access_token = storedAccessToken;
+      state.refresh_token = storedRefreshToken;
+      state.user = storedUser && storedUser !== 'undefined' ? JSON.parse(storedUser) : null;
     },
     logout(state) {
-      console.log('User logged out');
-      localStorage.removeItem('token');  // Remove token from localStorage on logout
-      localStorage.removeItem('user');  // Remove user from localStorage on logout
-      state.token = null;
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      state.access_token = null;
+      state.refresh_token = null;
       state.user = null;
       state.status = 'idle';
       state.error = null;
+    },
+    saveCompanyDetails(state, action: PayloadAction<CompanyDetails>) {
+      state.companyDetails = action.payload;
+    },
+    saveContactDetails(state, action: PayloadAction<ContactDetails>) {
+      state.contactDetails = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {
-        console.log('Login process started...');
         state.status = 'loading';
+        state.otpSent = false;
       })
-      .addCase(login.fulfilled, (state, action: PayloadAction<LoginPayload>) => {
-        console.log('Login fulfilled, payload:', action.payload);
+      .addCase(login.fulfilled, (state, action: PayloadAction<LoginMessagePayload>) => {
         state.status = 'succeeded';
-        state.token = action.payload.access_token;
-        state.user = action.payload.user;
-        state.error = null;
+        state.otpSent = true; // OTP has been sent, proceed to OTP entry
+        console.log(action.payload.message); // Log the OTP sent message
       })
       .addCase(login.rejected, (state, action) => {
-        console.error('Login failed:', action.payload);
         state.status = 'failed';
         state.error = action.payload as string;
+        state.otpSent = false;
+      })
+      .addCase(verifyOtp.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(verifyOtp.fulfilled, (state, action: PayloadAction<LoginPayload>) => {
+        state.status = 'succeeded';
+        const { access_token, refresh_token, user } = action.payload;
+        state.access_token = access_token;
+        state.refresh_token = refresh_token;
+        state.user = user;
+        state.error = null;
+        state.otpSent = false; // Reset OTP flag after verification
+        
+        // Persist to localStorage
+        localStorage.setItem('access_token', access_token);
+        localStorage.setItem('refresh_token', refresh_token);
+        localStorage.setItem('user', JSON.stringify(user));
+      })
+      .addCase(verifyOtp.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+        state.otpSent = true; // Stay in OTP flow if verification fails
       });
   },
 });
 
-// Export actions and reducer
-export const { saveCompanyDetails, saveContactDetails, logout } = appSlice.actions;
-export default appSlice.reducer;
+// Export actions and the reducer
+export const { setAuthData, logout, saveCompanyDetails, saveContactDetails } = authSlice.actions;
+export default authSlice.reducer;

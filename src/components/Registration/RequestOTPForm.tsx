@@ -8,17 +8,26 @@ const RequestOTPForm: React.FC = () => {
   const [method, setMethod] = useState('email');
   const [contact, setContact] = useState('');
   const [carrierGateway, setCarrierGateway] = useState('');
-  const token = useSelector((state: RootState) => state.auth.token);
+  
+  // Use hooks only within the component body
+  const token = useSelector((state: RootState) => state.auth.access_token);
+  const user = useSelector((state: RootState) => state.auth.user); // Add user for logging purposes
   const navigate = useNavigate();
-
-  console.log('Token in RequestOTPForm:', token);
+  
+  const authStatus = useSelector((state: RootState) => state.auth.status); // Retrieve authStatus correctly
 
   useEffect(() => {
-    if (!token) {
+    // Log both Redux and localStorage to confirm
+    console.log("Token in Redux:", token);
+    console.log("User in Redux:", user);
+    console.log("Access Token in LocalStorage:", localStorage.getItem('access_token'));
+    console.log("User in LocalStorage:", localStorage.getItem('user'));
+
+    if (authStatus === 'succeeded' && !token) {
       console.error("Authorization token is missing.");
-      navigate('/sign-in'); // Redirect to login if no token is found
+      navigate('/registration/sign-in'); // Redirect to login if no token is found
     }
-  }, [token, navigate]);
+  }, [token, navigate, authStatus, user]); // Added user as a dependency to log it only when it changes
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,8 +46,6 @@ const RequestOTPForm: React.FC = () => {
         payload.email = contact;
       }
 
-      console.log('Sending payload:', payload); // Log the payload to see what is being sent
-
       const response = await axios.post('http://localhost:8000/auth/send-otp', new URLSearchParams(payload), {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -47,7 +54,7 @@ const RequestOTPForm: React.FC = () => {
       });
 
       console.log('OTP sent successfully', response.data);
-      navigate('/verify-otp');
+      navigate('/registration/verify-otp');
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         console.error('Failed to send OTP', error.response?.data || error.message);

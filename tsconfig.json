@@ -2,6 +2,8 @@
   "compilerOptions": {
     "noImplicitAny": true, // Explicitly enable noImplicitAny if you want stronger checks
     "target": "es2015",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["jest", "@testing-library/jest-dom"],
     "lib": [
       "dom",
       "dom.iterable",
@@ -19,7 +21,16 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": "./src",  // Set the baseUrl to the root of your project (usually 'src')
+    "paths": {
+      "@component/*": ["components/*"],  // Adjusted paths based on baseUrl
+      "@context/*": ["context/*"],
+      "@data/*": ["data/*"],
+      "@hook/*": ["hooks/*"],
+      "@utils/*": ["utils/*"],
+      "@reducer/*": ["reducers/*"]         // Adjusted paths based on baseUrl
+    }
   },
   "include": [
     "src"

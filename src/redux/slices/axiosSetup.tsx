@@ -1,10 +1,10 @@
-import axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import axios, { InternalAxiosRequestConfig } from 'axios';
 import store from '../store';
 
 const setupAxiosInterceptors = () => {
   axios.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      const token = store.getState().auth.token;
+      const token = store.getState().auth.access_token;
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
