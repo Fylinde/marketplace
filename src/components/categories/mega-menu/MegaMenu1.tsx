@@ -1,19 +1,19 @@
-import Box from "@component/Box";
-import Card from "@component/Card";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import Image from "@component/Image";
-import LazyImage from "@component/LazyImage";
-import NavLink from "@component/nav-link/NavLink";
-import { SemiSpan } from "@component/Typography";
-import Link from "next/link";
+import Box from "components/Box";
+import Card from "components/Card";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import Image from "components/Image";
+import LazyImage from "components/LazyImage";
+import NavLink from "components/nav-link/NavLink";
+import { SemiSpan } from "components/Typography";
+import { Link } from "react-router-dom";  // Use react-router-dom Link
 import React from "react";
 import { StyledMegaMenu1 } from "./MegaMenuStyle";
 
 interface Image {
   imgUrl: string;
   href: string;
-  alt?: string;  // <-- Added optional alt attribute here for Image interface
+  alt?: string;
 }
 
 interface SubCategory {
@@ -51,14 +51,14 @@ const MegaMenu1: React.FC<MegaMenuProps> = ({
               {categories?.map((item, ind) => (
                 <Grid item md={3} key={ind}>
                   {item.href ? (
-                    <NavLink className="title-link" href={item.href}>
+                    <NavLink className="title-link" to={item.href}>
                       {item.title}
                     </NavLink>
                   ) : (
                     <SemiSpan className="title-link">{item.title}</SemiSpan>
                   )}
                   {item.subCategories?.map((sub) => (
-                    <NavLink className="child-link" href={sub.href}>
+                    <NavLink className="child-link" to={sub.href}>
                       {sub.title}
                     </NavLink>
                   ))}
@@ -68,33 +68,27 @@ const MegaMenu1: React.FC<MegaMenuProps> = ({
           </Box>
 
           {rightImage && (
-            <Link href={rightImage.href}>
-              <a>
-                <Box position="relative" width="153px" height="100%">
-                  <LazyImage
-                    src={rightImage.imgUrl}
-                    alt={rightImage.alt || "Right image"}  // <-- Add alt here
-                    layout="fill"
-                    objectFit="contain"
-                  />
-                </Box>
-              </a>
+            <Link to={rightImage.href}> 
+              <Box position="relative" width="153px" height="100%">
+              <LazyImage
+                src={rightImage.imgUrl}
+                alt={rightImage.alt || "Right image"}
+                style={{ objectFit: "contain" }}  // Apply objectFit as a style
+              />
+              </Box>
             </Link>
           )}
         </FlexBox>
 
         {bottomImage && (
-          <Link href={bottomImage.href}>
-            <a>
-              <Box position="relative" height="170px">
-                <LazyImage
-                  src={bottomImage.imgUrl}
-                  alt={bottomImage.alt || "Bottom image"}  // <-- Add alt here
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </Box>
-            </a>
+          <Link to={bottomImage.href}>  {/* Changed href to to */}
+            <Box position="relative" height="170px">
+            <LazyImage
+              src={bottomImage.imgUrl}
+              alt={bottomImage.alt || "Bottom image"}
+              style={{ objectFit: "cover" }}  // Apply objectFit as a style
+            />
+            </Box>
           </Link>
         )}
       </Card>

@@ -1,17 +1,17 @@
-import Card from "@component/Card";
-import Carousel from "@component/carousel/Carousel";
-import useWindowSize from "@hook/useWindowSize";
-import Link from "next/link";
+import Card from "components/Card";
+import Carousel from "components/carousel/Carousel";
+import useWindowSize from "hooks/useWindowSize";
+import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import CategorySectionCreator from "../CategorySectionCreator";
 import ProductCard6 from "../product-cards/ProductCard6";
 
 const Section3: React.FC = () => {
   const [visibleSlides, setVisibleSlides] = useState(3);
-  const width = useWindowSize();
+  const { width } = useWindowSize();  // Extract the width from the useWindowSize hook
 
   useEffect(() => {
-    if (width && width < 500) setVisibleSlides(1); // Check if width is not null
+    if (width && width < 500) setVisibleSlides(1); 
     else if (width && width < 650) setVisibleSlides(2);
     else if (width && width < 950) setVisibleSlides(3);
     else setVisibleSlides(4);
@@ -25,22 +25,21 @@ const Section3: React.FC = () => {
     >
       <Carousel totalSlides={5} visibleSlides={visibleSlides}>
         {categoryList.map((item, ind) => (
-          <Link href={item.categoryUrl} key={ind}>
-            <a>
-              <Card p="1rem">
-                <ProductCard6
-                  title={item.title}
-                  subtitle={item.subtitle}
-                  imgUrl={item.imgUrl}
-                />
-              </Card>
-            </a>
+          <Link to={item.categoryUrl} key={ind}>
+            <Card p="1rem">
+              <ProductCard6
+                title={item.title}
+                subtitle={item.subtitle}
+                imgUrl={item.imgUrl}
+              />
+            </Card>
           </Link>
         ))}
       </Carousel>
     </CategorySectionCreator>
   );
 };
+
 
 const categoryList = [
   {

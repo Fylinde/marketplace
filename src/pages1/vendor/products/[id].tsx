@@ -1,23 +1,33 @@
-import Button from "@component/buttons/Button";
-import Card from "@component/Card";
-import DropZone from "@component/DropZone";
-import Grid from "@component/grid/Grid";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import VendorDashboardLayout from "@component/layout/VendorDashboardLayout";
-import Select from "@component/Select";
-import TextField from "@component/text-field/TextField";
-import TextArea from "@component/textarea/TextArea";
+import Button from "components/buttons/Button";
+import Card from "components/Card";
+import DropZone from "components/DropZone";
+import Grid from "components/grid/Grid";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
+import Select from "components/Select";
+import TextField from "components/text-field/TextField";
+import TextArea from "components/textarea/TextArea";
 import { Formik } from "formik";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { Link, useParams } from "react-router-dom"; 
 import React from "react";
 import * as yup from "yup";
 
-const OrderDetails = () => {
-  const router = useRouter();
-  const { id } = router.query;
+// Define interface for form values
+interface FormValues {
+  name: string;
+  stock: string;
+  price: string;
+  sale_price: string;
+  description: string;
+  tags: string;
+  category: string;
+}
 
-  const handleFormSubmit = async (values) => {
+const OrderDetails = () => {
+  const { id } = useParams(); // Replaced useRouter with useParams to get the ID
+
+  // Annotate values with FormValues type
+  const handleFormSubmit = async (values: FormValues) => {
     console.log(values);
   };
 
@@ -29,7 +39,7 @@ const OrderDetails = () => {
         title="Edit Product"
         iconName="delivery-box"
         button={
-          <Link href="/vendor/products">
+          <Link to="/vendor/products"> {/* Replaced href with to */}
             <Button color="primary" bg="primary.light" px="2rem">
               Back to Product List
             </Button>
@@ -68,7 +78,7 @@ const OrderDetails = () => {
                 </Grid>
                 <Grid item sm={6} xs={12}>
                   <Select
-                    label="Caterogy"
+                    label="Category"
                     placeholder="Select category"
                     options={[]}
                     value={values.tags || "US"}
@@ -165,7 +175,8 @@ const OrderDetails = () => {
   );
 };
 
-const initialValues = {
+// Define the initial values and validation schema
+const initialValues: FormValues = {
   name: "",
   stock: "",
   price: "",
@@ -182,7 +193,7 @@ const checkoutSchema = yup.object().shape({
   stock: yup.number().required("required"),
   price: yup.number().required("required"),
   sale_price: yup.number().required("required"),
-  tags: yup.object().required("required"),
+  tags: yup.string().required("required"),
 });
 
 OrderDetails.layout = VendorDashboardLayout;

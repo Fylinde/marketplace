@@ -7,7 +7,7 @@ import Rating from "../rating/Rating";
 import { H5, H6, Paragraph, SemiSpan } from "../Typography";
 
 export interface ProductCommentProps {
-  name;
+  name: string;  // Explicitly typed as string
   imgUrl: string;
   rating: number;
   date: string;

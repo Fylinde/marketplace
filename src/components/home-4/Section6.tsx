@@ -1,15 +1,16 @@
-import Box from "@component/Box";
-import Button from "@component/buttons/Button";
-import IconButton from "@component/buttons/IconButton";
-import Card from "@component/Card";
-import Carousel from "@component/carousel/Carousel";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import Icon from "@component/icon/Icon";
-import Image from "@component/Image";
-import { H3, H4, Paragraph, SemiSpan } from "@component/Typography";
-import React, { useState } from "react";
+import Box from "components/Box";
+import Button from "components/buttons/Button";
+import IconButton from "components/buttons/IconButton";
+import Card from "components/Card";
+import Carousel from "components/carousel/Carousel";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import Icon from "components/icon/Icon";
+import Image from "components/Image";
+import { H3, H4, Paragraph, SemiSpan } from "components/Typography";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import axios from "axios";
 
 const SectionWrapper = styled.div`
   margin-top: -0.25rem;
@@ -38,16 +39,45 @@ const SectionWrapper = styled.div`
   }
 `;
 
+// Define the Deal type
+interface Deal {
+  imgUrl: string;
+  title: string;
+  productName: string;
+  description: string;
+  countdown: {
+    days: number;
+    hours: number;
+    mins: number;
+    secs: number;
+  };
+}
+
 const Section6: React.FC = () => {
   const totalSlides = 3;
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [deals, setDeals] = useState<Deal[]>([]);
 
-  const handleSlideChange = (count: number) => () => { // Typing 'count' as number
+  const handleSlideChange = (count: number) => () => {
     if (count < 0) setCurrentSlide(0);
     else if (count > totalSlides - 1) setCurrentSlide(totalSlides - 1);
     else setCurrentSlide(count);
   };
-  
+
+  // Fetch deals data
+  useEffect(() => {
+    const fetchDeals = async () => {
+      try {
+        const response = await axios.get("/api/deals"); // Replace with your endpoint
+        setDeals(response.data);
+      } catch (error) {
+        console.error("Error fetching deals:", error);
+      }
+    };
+
+    fetchDeals();
+  }, []);
+
   return (
     <Box mb="3.75rem">
       <SectionWrapper>
@@ -59,7 +89,7 @@ const Section6: React.FC = () => {
           dotClass="dot-group"
           currentSlide={currentSlide}
         >
-          {[...new Array(totalSlides)].map((_item, ind) => (
+          {deals.map((deal, ind) => (
             <Box py="0.25rem" key={ind}>
               <Card
                 p="1rem"
@@ -69,11 +99,7 @@ const Section6: React.FC = () => {
               >
                 <Grid container alignItems="center" spacing={6}>
                   <Grid item md={6} xs={12} key={ind}>
-                    <Image
-                      src="/assets/images/products/xiaomi-watch.png"
-                      mx="auto"
-                      maxWidth="100%"
-                    />
+                    <Image src={deal.imgUrl} mx="auto" maxWidth="100%" />
                   </Grid>
                   <Grid item md={6} xs={12} key={ind}>
                     <FlexBox mt="3rem" mb="1.125rem">
@@ -99,22 +125,15 @@ const Section6: React.FC = () => {
                         </Icon>
                       </IconButton>
                     </FlexBox>
-                    <H3
-                      // mt="5.25rem"
-                      mb="0.875rem"
-                      color="primary.main"
-                      lineHeight="1.3"
-                    >
-                      Deal Of The Day
+                    <H3 mb="0.875rem" color="primary.main" lineHeight="1.3">
+                      {deal.title}
                     </H3>
 
                     <H3 mb="0.5rem" fontSize="25px" lineHeight="1.2">
-                      Rapple Watch Series 4 (Black)
+                      {deal.productName}
                     </H3>
                     <Paragraph mb="2rem" color="text.muted" maxWidth="400px">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                      Quis lobortis consequat eu, quam etiam at quis ut
-                      convallis.
+                      {deal.description}
                     </Paragraph>
 
                     <H4 mb="0.5rem" lineHeight="1.3" fontWeight="600">
@@ -124,7 +143,7 @@ const Section6: React.FC = () => {
                     <FlexBox flexWrap="wrap" mb="2rem">
                       <FlexBox alignItems="flex-end" mr="1.75rem">
                         <H3 lineHeight="1.3" mr="0.25rem">
-                          365
+                          {deal.countdown.days}
                         </H3>
                         <SemiSpan fontWeight="600" lineHeight="1.7">
                           DAYS
@@ -133,7 +152,7 @@ const Section6: React.FC = () => {
 
                       <FlexBox alignItems="flex-end" mr="1.75rem">
                         <H3 lineHeight="1.3" mr="0.25rem">
-                          22
+                          {deal.countdown.hours}
                         </H3>
                         <SemiSpan fontWeight="600" lineHeight="1.7">
                           HOURS
@@ -142,7 +161,7 @@ const Section6: React.FC = () => {
 
                       <FlexBox alignItems="flex-end" mr="1.75rem">
                         <H3 lineHeight="1.3" mr="0.25rem">
-                          39
+                          {deal.countdown.mins}
                         </H3>
                         <SemiSpan fontWeight="600" lineHeight="1.7">
                           MINS
@@ -151,7 +170,7 @@ const Section6: React.FC = () => {
 
                       <FlexBox alignItems="flex-end">
                         <H3 lineHeight="1.3" mr="0.25rem">
-                          42
+                          {deal.countdown.secs}
                         </H3>
                         <SemiSpan fontWeight="600" lineHeight="1.7">
                           SECS
@@ -160,12 +179,7 @@ const Section6: React.FC = () => {
                     </FlexBox>
 
                     <FlexBox alignItems="center" mb="3rem">
-                      <Button
-                        color="primary"
-                        variant="contained"
-                        borderRadius={8}
-                        mr="0.5rem"
-                      >
+                      <Button color="primary" variant="contained" borderRadius={8} mr="0.5rem">
                         BUY NOW
                       </Button>
                       <FlexBox
@@ -183,11 +197,7 @@ const Section6: React.FC = () => {
                   </Grid>
                 </Grid>
 
-                <Image
-                  className="hot"
-                  maxWidth="100px"
-                  src="/assets/images/badges/hot.svg"
-                />
+                <Image className="hot" maxWidth="100px" src="/assets/images/badges/hot.svg" />
               </Card>
             </Box>
           ))}

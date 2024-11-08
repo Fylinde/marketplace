@@ -1,5 +1,6 @@
-import LazyImage from "@component/LazyImage";
-import Link from "next/link";
+
+import LazyImage from "components/LazyImage";
+import { Link } from "react-router-dom";
 import React, { Fragment, useCallback, useState } from "react";
 import { CSSProperties } from "styled-components";
 import Box from "../Box";
@@ -25,17 +26,6 @@ export interface ProductCard10Props {
     title: string;
     url: string;
   }>;
-  // className?: string;
-  // style?: CSSProperties;
-  // imgUrl: string;
-  // title: string;
-  // price: number;
-  // off: number;
-  // rating?: number;
-  // subcategories?: Array<{
-  //   title: string;
-  //   url: string;
-  // }>;
 }
 
 const ProductCard10: React.FC<ProductCard10Props> = ({
@@ -55,9 +45,8 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
   }, []);
 
   const handleCartAmountChange = useCallback(
-    (amount) => () => {
+    (amount: number) => () => {
       console.log(amount);
-
       if (amount >= 0) setCartAmount(amount);
     },
     []
@@ -94,27 +83,26 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
           <Icon className="favorite-icon outlined-icon" variant="small">
             heart
           </Icon>
-          {/* <Icon className="favorite-icon" color="primary" variant="small">
-              heart-filled
-            </Icon> */}
         </FlexBox>
 
-        <Link href="/product/34324321">
+        <Link to="/product/34324321">
           <a>
+            {/* Provide a fallback for imgUrl and title */}
             <LazyImage
-              src={imgUrl}
-              width="100%"
-              height="auto"
-              layout="responsive"
-              alt={title}
+              src={imgUrl || "/assets/images/products/macbook.png"}
+              width={500}  // Set a valid numeric value
+              height={500} // Set a valid numeric value
+              style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
+              alt={title || "Product Image"}
             />
           </a>
         </Link>
       </div>
+
       <div className="details">
         <FlexBox>
           <Box flex="1 1 0" minWidth="0px" mr="0.5rem">
-            <Link href="/product/34324321">
+            <Link to="/product/34324321">
               <a>
                 <H3
                   className="title"
@@ -123,9 +111,9 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
                   fontWeight="600"
                   color="text.secondary"
                   mb="6px"
-                  title={title}
+                  title={title || "Product Title"}
                 >
-                  {title}
+                  {title || "Product Title"}
                 </H3>
               </a>
             </Link>
@@ -134,11 +122,14 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
 
             <FlexBox alignItems="center" mt="6px">
               <SemiSpan pr="0.5rem" fontWeight="600" color="primary.main">
-                ${price?.toFixed(2)}
+                ${price?.toFixed(2) || "0.00"}
               </SemiSpan>
               {off && (
                 <SemiSpan color="text.muted" fontWeight="600">
-                  <del>${(price - (price * off) / 100).toFixed(2)}</del>
+                  {/* Provide fallback values for price and off */}
+                  <del>
+                    ${((price ?? 0) - ((price ?? 0) * (off ?? 0)) / 100).toFixed(2)}
+                  </del>
                 </SemiSpan>
               )}
             </FlexBox>
@@ -150,12 +141,11 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
             justifyContent={!!cartAmount ? "space-between" : "flex-start"}
             width="30px"
           >
-            {/* <div className="add-cart"> */}
             <Button
               variant="outlined"
               color="primary"
               padding="5px"
-              size="none"
+              size="small"
               borderColor="primary.light"
               onClick={handleCartAmountChange(cartAmount + 1)}
             >
@@ -171,7 +161,7 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
                   variant="outlined"
                   color="primary"
                   padding="5px"
-                  size="none"
+                  size="small"
                   borderColor="primary.light"
                   onClick={handleCartAmountChange(cartAmount - 1)}
                 >
@@ -179,14 +169,18 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
                 </Button>
               </Fragment>
             )}
-            {/* </div> */}
           </FlexBox>
         </FlexBox>
       </div>
 
       <Modal open={open} onClose={toggleDialog}>
         <Card p="1rem" position="relative">
-          <ProductIntro imgUrl={[imgUrl]} title={title} price={price} />
+          {/* Provide fallback for imgUrl and title */}
+          <ProductIntro
+            imgUrl={[imgUrl || "/assets/images/products/macbook.png"]}
+            title={title || "Product Title"}
+            price={price ?? 0}
+          />
           <Box
             position="absolute"
             top="0.75rem"
@@ -208,8 +202,8 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
   );
 };
 
+// Default props with fallback values
 ProductCard10.defaultProps = {
-  // title: "KSUS ROG Strix G15",
   title: "KSUS ROG Strix G15 ASUS ROG Strix G15 ASUS ROG Strix G15",
   imgUrl: "/assets/images/products/macbook.png",
   off: 50,

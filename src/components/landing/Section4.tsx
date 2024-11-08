@@ -1,11 +1,11 @@
-import Box from "@component/Box";
-import Card from "@component/Card";
-import Container from "@component/Container";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import LazyImage from "@component/LazyImage";
-import { H3, H4 } from "@component/Typography";
-import { getTheme } from "@utils/utils";
+import Box from "components/Box";
+import Card from "components/Card";
+import Container from "components/Container";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import LazyImage from "components/LazyImage";
+import { H3, H4 } from "components/Typography";
+import { getTheme } from "utils/utils";
 import React from "react";
 import styled from "styled-components";
 
@@ -74,8 +74,7 @@ const Section4: React.FC<Section4Props> = () => {
                     src={item.imgUrl}
                     height={60}
                     width={60}
-                    objectFit="contain"
-                    objectPosition="center"
+                    style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
                     alt={item.title} 
                   />
                 </Box>

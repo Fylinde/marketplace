@@ -2,31 +2,29 @@ import { deviceSize } from "./constants";
 import { colors } from "./themeColors";
 import shadows from "./themeShadows";
 
-export interface ThemeProps {
-  theme: {
-    fontSizes: number[];
-    space: number[];
-    colors: {
-      black: string;
-      white: string;
-      blue: string;
-      primary: string;
-      navy: string;
-    };
-  };
+// Define explicit types for breakpoints
+interface Breakpoints {
+  sm: string;
+  md: string;
+  lg: string;
 }
 
-const breakpoints: any = Object.keys(deviceSize).map(
-  (key) => deviceSize[key] + "px"
-);
-
-breakpoints.sm = breakpoints[0];
-breakpoints.md = breakpoints[1];
-breakpoints.lg = breakpoints[2];
-breakpoints.xl = breakpoints[3];
-
-export const theme = {
-  colors,
-  shadows,
-  breakpoints,
+// Construct breakpoints as both an object and an array
+const breakpoints: Breakpoints = {
+  sm: `${deviceSize.sm}px`,
+  md: `${deviceSize.md}px`,
+  lg: `${deviceSize.lg}px`,
 };
+
+// Convert object breakpoints to array format for compatibility with styled-system
+const breakpointsArray = Object.values(breakpoints);
+
+// Define the theme object with both array and object formats
+export const theme = {
+  colors,       // Import colors from themeColors
+  shadows,      // Import shadows from themeShadows
+  breakpoints: breakpointsArray, // Array for styled-system
+  breakpointsObj: breakpoints,   // Object for custom use cases
+};
+
+export default theme;

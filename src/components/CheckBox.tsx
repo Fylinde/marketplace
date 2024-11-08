@@ -4,6 +4,11 @@ import styled from "styled-components";
 import { color, compose, space, SpaceProps } from "styled-system";
 import { colorOptions } from "../interfaces";
 
+// Define a type that extends existing props with dynamic spacing keys.
+type DynamicProps = {
+  [key: string]: any; // Allow dynamic keys for spacing props like "m", "p", etc.
+};
+
 type CheckBoxProps = {
   color?: colorOptions;
   labelColor?: colorOptions;
@@ -11,15 +16,13 @@ type CheckBoxProps = {
   label?: any;
   id?: any;
   size?: number;
-};
+} & DynamicProps; // Extend with dynamic keys.
 
 type WrapperProps = {
   labelPlacement?: "start" | "end";
 };
 
-const SyledCheckBox = styled.input<
-  CheckBoxProps & InputHTMLAttributes<HTMLInputElement>
->(
+const SyledCheckBox = styled.input<CheckBoxProps & InputHTMLAttributes<HTMLInputElement>>(
   ({ color, size }) =>
     systemCss({
       /* remove standard background appearance */
@@ -42,10 +45,10 @@ const SyledCheckBox = styled.input<
       position: "relative",
 
       "&:checked": {
-        borderColor: `${color}.main`,
+        borderColor: color ? `${color}.main` : "text.hint",
       },
 
-      /* create custom radiobutton appearance */
+      /* create custom checkbox appearance */
       "&:after": {
         width: "calc(100% - 5px)",
         height: "calc(100% - 5px)",
@@ -60,9 +63,8 @@ const SyledCheckBox = styled.input<
         transition: "all 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
       },
 
-      /* appearance for checked radiobutton */
       "&:checked:after": {
-        bg: `${color}.main`,
+        bg: color ? `${color}.main` : "text.hint",
       },
 
       "&:disabled": {
@@ -99,30 +101,43 @@ const Wrapper = styled.div<WrapperProps & SpaceProps>`
   ${space}
 `;
 
-const CheckBox: React.FC<
-  InputHTMLAttributes<HTMLInputElement> & CheckBoxProps & SpaceProps
-> = ({ id, label, labelPlacement, labelColor, ...props }: CheckBoxProps) => {
+const CheckBox: React.FC<InputHTMLAttributes<HTMLInputElement> & CheckBoxProps & SpaceProps> = ({
+  id,
+  label,
+  labelPlacement,
+  labelColor,
+  ...props
+}: CheckBoxProps) => {
   const [checkboxId, setCheckboxId] = useState(id);
 
-  // extract spacing props
-  let spacingProps = {};
+  // Extract spacing props
+  let spacingProps: Record<string, any> = {};
+  let otherProps: Record<string, any> = {};
+
   for (const key in props) {
-    if (key.startsWith("m") || key.startsWith("p"))
-      spacingProps[key] = props[key];
+    if (props.hasOwnProperty(key)) {
+      if (key.startsWith("m") || key.startsWith("p")) {
+        spacingProps[key] = props[key];
+      } else {
+        otherProps[key] = props[key];
+      }
+    }
   }
 
   useEffect(() => {
-    setCheckboxId(Math.random());
-  }, []);
+    if (!id) {
+      setCheckboxId(Math.random().toString());
+    }
+  }, [id]);
 
   return (
     <Wrapper
       labelPlacement={labelPlacement}
-      color={`${labelColor}.main`}
+      color={labelColor ? `${labelColor}.main` : "default"}
       {...spacingProps}
     >
-      <SyledCheckBox id={checkboxId} type="checkbox" {...props} />
-      <label htmlFor={checkboxId}>{label}</label>
+      <SyledCheckBox id={checkboxId} type="checkbox" {...otherProps} />
+      {label && <label htmlFor={checkboxId}>{label}</label>}
     </Wrapper>
   );
 };

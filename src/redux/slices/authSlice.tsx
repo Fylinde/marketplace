@@ -1,7 +1,7 @@
 
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
-
+import { RootState } from '../store';
 // Ensure User is defined
 interface User {
   id: number;
@@ -11,7 +11,8 @@ interface User {
 
 interface AuthState {
   access_token: string | null;
-  user: any; // Define a more specific type if you have one
+  refresh_token: string | null;
+  user: User | null;
 }
 
 // Define the message type returned by the login thunk
@@ -142,7 +143,8 @@ LoginMessagePayload,
     return rejectWithValue(errorDetail);
   }
 });
-export const selectUserFullName = (state: { auth: { user: User | null } }) => state.auth.user?.full_name || '';
+export const selectUserFullName = (state: RootState) => state.auth.user?.full_name || "Guest";
+// Async thunk for OTP verification
 // Async thunk for OTP verification
 export const verifyOtp = createAsyncThunk<
   LoginPayload,
@@ -150,30 +152,30 @@ export const verifyOtp = createAsyncThunk<
   { rejectValue: string }
 >('auth/verifyOtp', async ({ contact, otp }, { rejectWithValue }) => {
   try {
+    // Use JSON payload for consistency
     const response = await axios.post(
       'http://localhost:8000/auth/verify-otp',
-      new URLSearchParams({
-        contact,
-        otp,
-      }),
+      { contact, otp },
       {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 'Content-Type': 'application/json' },
       }
     );
 
-    const { access_token, refresh_token } = response.data;
+    // Assume the response contains the full user data
+    const { access_token, refresh_token, user } = response.data;
 
-    const user: User = {
+    // Check if user data is present, if not, add a fallback
+    const userData: User = user || {
       id: Number(contact), 
       full_name: 'Unknown', 
-      email: 'unknown@example.com' 
+      email: 'unknown@example.com'
     };
 
     return { 
       access_token, 
       refresh_token, 
-      session_token: undefined, 
-      user 
+      user: userData,
+      session_token: undefined
     };
   } catch (error) {
     const axiosError = error as AxiosError;
@@ -186,6 +188,7 @@ export const verifyOtp = createAsyncThunk<
     return rejectWithValue(errorDetail);
   }
 });
+
 
 
 // Create the auth slice with reducers and async thunk cases
@@ -210,6 +213,7 @@ const authSlice = createSlice({
       state.access_token = storedAccessToken;
       state.refresh_token = storedRefreshToken;
       state.user = storedUser && storedUser !== 'undefined' ? JSON.parse(storedUser) : null;
+
     },
     logout(state) {
       localStorage.removeItem('access_token');
@@ -270,5 +274,6 @@ const authSlice = createSlice({
 });
 
 // Export actions and the reducer
-export const { setAuthData, logout, saveCompanyDetails, saveContactDetails } = authSlice.actions;
+export const { setAuthData, loadAuthData, logout, saveCompanyDetails, saveContactDetails } = authSlice.actions;
+export const selectIsAuthenticated = (state: RootState) => !!state.auth.access_token;
 export default authSlice.reducer;

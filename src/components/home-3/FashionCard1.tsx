@@ -1,5 +1,5 @@
-import Button from "@component/buttons/Button";
-import Link from "next/link";
+import Button from "components/buttons/Button";
+import { Link } from "react-router-dom";
 import React from "react";
 import Box from "../Box";
 import Card from "../Card";
@@ -16,23 +16,22 @@ const FashionCard1: React.FC<FashionCard1Props> = () => {
           Introducing New Winter Collection
         </H2>
         <SemiSpan display="block" textAlign="center" mb="1.5rem">
-          Starting at $39 & save upto 40%
+          Starting at $39 & save up to 40%
         </SemiSpan>
 
-        <Link href="/">
-          <a>
-            <Button mx="auto">
-              <H6
-                fontSize="12px"
-                textAlign="center"
-                borderBottom="2px solid"
-                borderColor="primary.main"
-                pb="2px"
-              >
-                SHOP NOW
-              </H6>
-            </Button>
-          </a>
+        {/* Remove <a> and use Link directly */}
+        <Link to="/">
+          <Button mx="auto">
+            <H6
+              fontSize="12px"
+              textAlign="center"
+              borderBottom="2px solid"
+              borderColor="primary.main"
+              pb="2px"
+            >
+              SHOP NOW
+            </H6>
+          </Button>
         </Link>
       </Box>
 

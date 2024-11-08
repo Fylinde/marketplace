@@ -1,4 +1,4 @@
-import productDatabase from "@data/product-database";
+import productDatabase from "data/product-database";
 import React from "react";
 import CategorySectionHeader from "../CategorySectionHeader";
 import Container from "../Container";

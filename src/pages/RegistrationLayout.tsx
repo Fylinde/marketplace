@@ -10,6 +10,7 @@ import Signout from '../components/Registration/Signout';
 const RegistrationLayout: React.FC = () => (
     <div>
         <Routes>
+            
             <Route path="sign-in" element={<SignInForm />} />
             <Route path="create-account" element={<CreateAccount />} />
             <Route path="email-verification" element={<EmailVerification />} />

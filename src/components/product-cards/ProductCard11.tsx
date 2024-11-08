@@ -1,9 +1,10 @@
-import Box from "@component/Box";
-import FlexBox from "@component/FlexBox";
-import LazyImage from "@component/LazyImage";
-import Rating from "@component/rating/Rating";
-import { H6, SemiSpan, Small } from "@component/Typography";
-import Link from "next/link";
+
+import Box from "components/Box";
+import FlexBox from "components/FlexBox";
+import LazyImage from "components/LazyImage";
+import Rating from "components/rating/Rating";
+import { H6, SemiSpan, Small } from "components/Typography";
+import { Link } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
 
@@ -50,16 +51,17 @@ const ProductCard11: React.FC<ProductCard11Props> = ({
   rating,
 }) => {
   return (
-    <Link href={productUrl}>
+    <Link to={productUrl || "/"}>
       <a>
         <StyledProductCard>
           <Box className="image-holder">
             <LazyImage
-              src={imgUrl}
-              width="100%"
-              height="auto"
-              layout="responsive"
-              objectFit="cover"
+              // Provide a default fallback image if imgUrl is undefined
+              src={imgUrl || "/assets/images/default.png"}  
+              alt={title || "Product Image"}  // Add the alt attribute
+              width={undefined} // Set to undefined or a number like 500
+              height={undefined} // Set to undefined or a number like 500
+              style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
               mb="1rem"
             />
           </Box>
@@ -68,18 +70,18 @@ const ProductCard11: React.FC<ProductCard11Props> = ({
             <Rating value={rating} outof={5} color="warn" readonly />
           </Box>
 
-          <H6 className="ellipsis" mb="6px" title={title}>
-            {title}
+          <H6 className="ellipsis" mb="6px" title={title || "Product Title"}>
+            {title || "Product Title"}  {/* Fallback title */}
           </H6>
 
           <FlexBox alignItems="center">
             <SemiSpan pr="0.25rem" fontWeight="600" color="primary.main">
-              ${price?.toLocaleString()}
+              ${price?.toLocaleString() || "0"} {/* Fallback price */}
             </SemiSpan>
 
             {oldPrice && (
               <Small color="text.muted" lineHeight="1.3">
-                {oldPrice}
+                ${oldPrice}
               </Small>
             )}
           </FlexBox>
@@ -89,6 +91,7 @@ const ProductCard11: React.FC<ProductCard11Props> = ({
   );
 };
 
+// Default values for props
 ProductCard11.defaultProps = {
   rating: 5,
   price: 1300,

@@ -1,4 +1,4 @@
-import Card from "@component/Card";
+import Card from "components/Card";
 import React from "react";
 
 export interface CarouselCard2Props {}

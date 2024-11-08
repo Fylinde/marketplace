@@ -1,8 +1,8 @@
-import IconButton from "@component/buttons/IconButton";
-import GrocerySearchBox from "@component/search-box/GrocerySearchBox";
-import { Tiny } from "@component/Typography";
-import { useAppContext } from "@context/app/AppContext";
-import Link from "next/link";
+import IconButton from "components/buttons/IconButton";
+import GrocerySearchBox from "components/search-box/GrocerySearchBox";
+import { Tiny } from "components/Typography";
+import { useAppContext } from "contexts/app/AppContext";
+import { Link } from "react-router-dom";
 import React, { useState } from "react";
 import Box from "../Box";
 import Container from "../Container";
@@ -12,7 +12,7 @@ import MiniCart from "../mini-cart/MiniCart";
 import Login from "../sessions/Login";
 import Sidenav from "../sidenav/Sidenav";
 import StyledHeader from "./HeaderStyle";
-import UserLoginDialog from "./UserLoginDialog";
+import UserLoginDialog from "components/header/UserLoginDialog";
 
 type HeaderProps = {
   isFixed?: boolean;
@@ -27,7 +27,7 @@ const GroceryHeader: React.FC<HeaderProps> = ({ className }) => {
   const { cartList } = state.cart;
 
   const cartHandle = (
-    <FlexBox ml="20px" alignItems="flex-start">
+    <FlexBox ml="20px" style={{ alignItems: "flex-start" }}>  {/* Moved alignItems to style */}
       <IconButton bg="gray.200" p="12px">
         <Icon size="20px">bag</Icon>
       </IconButton>
@@ -38,8 +38,7 @@ const GroceryHeader: React.FC<HeaderProps> = ({ className }) => {
           bg="error.main"
           px="5px"
           py="2px"
-          alignItems="center"
-          justifyContent="center"
+          style={{ alignItems: "center", justifyContent: "center" }}  
           ml="-1rem"
           mt="-9px"
         >
@@ -54,16 +53,11 @@ const GroceryHeader: React.FC<HeaderProps> = ({ className }) => {
   return (
     <StyledHeader className={className}>
       <Container
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        height="100%"
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "100%" }}  
       >
-        <FlexBox className="logo" alignItems="center" mr="1rem">
-          <Link href="/">
-            <a>
-              <img src="/assets/images/logo.svg" alt="logo" />
-            </a>
+        <FlexBox className="logo" style={{ alignItems: "center", marginRight: "1rem" }}> 
+          <Link to="/">
+            <img src="/assets/images/logo.svg" alt="logo" />
           </Link>
         </FlexBox>
 
@@ -71,7 +65,7 @@ const GroceryHeader: React.FC<HeaderProps> = ({ className }) => {
           <GrocerySearchBox />
         </FlexBox>
 
-        <FlexBox className="header-right" alignItems="center">
+        <FlexBox className="header-right" style={{ alignItems: "center" }}> {/* Moved alignItems to style */}
           <UserLoginDialog
             handle={
               <IconButton ml="1rem" bg="gray.200" p="8px">

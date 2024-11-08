@@ -1,5 +1,5 @@
-import LazyImage from "@component/LazyImage";
-import productDatabase from "@data/product-database";
+import LazyImage from "components/LazyImage";
+import productDatabase from "data/product-database";
 import React, { useEffect, useState } from "react";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
@@ -10,14 +10,14 @@ import Hidden from "../hidden/Hidden";
 import ProductCard1 from "../product-cards/ProductCard1";
 import Typography from "../Typography";
 import StyledProductCategory from "./ProductCategoryStyle";
+import { Product } from "types/Product";
 
 const Section7: React.FC = () => {
-  const [type, setType] = useState("brands");
+  const [type, setType] = useState<"brands" | "shops">("brands");
   const [selected, setSelected] = useState("");
-  const [list, setList] = useState<string[]>([]); // Explicitly typed as string[]
+  const [list, setList] = useState<string[]>([]);
 
   const handleCategoryClick = (brand: string) => {
-    // Explicitly typed brand as string
     if (selected.match(brand)) {
       setSelected("");
     } else {
@@ -26,8 +26,7 @@ const Section7: React.FC = () => {
   };
 
   useEffect(() => {
-    if (type === "brands") setList(brandList);
-    else setList(shopList);
+    setList(type === "brands" ? brandList : shopList);
   }, [type]);
 
   return (
@@ -72,15 +71,22 @@ const Section7: React.FC = () => {
                 key={brand}
                 mb="0.75rem"
                 bg={selected.match(brand) ? "white" : "gray.100"}
-                shadow={selected.match(brand) ? 4 : undefined} // Use undefined instead of null
+                shadow={selected.match(brand) ? 4 : undefined}
                 onClick={() => handleCategoryClick(brand)}
               >
                 <LazyImage
-                  height={20} // Use number instead of string "20px"
-                  width={20}  // Use number instead of string "20px"
-                  objectFit="contain"
+                  height={20}
+                  width={20}
                   alt={brand}
                   src={`/assets/images/logos/${ind % 2 === 0 ? "v" : "u"}.png`}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
                 />
                 <span className="product-category-title">{brand}</span>
               </StyledProductCategory>
@@ -89,7 +95,7 @@ const Section7: React.FC = () => {
             <StyledProductCategory
               mt="4rem"
               bg={selected.match(`all-${type}`) ? "white" : "gray.100"}
-              shadow={selected.match(`all-${type}`) ? 4 : undefined} // Use undefined instead of null
+              shadow={selected.match(`all-${type}`) ? 4 : undefined}
               onClick={() => handleCategoryClick(`all-${type}`)}
             >
               <span className="product-category-title show-all">
@@ -103,12 +109,17 @@ const Section7: React.FC = () => {
           <CategorySectionHeader title="Mobile Phones" seeMoreLink="#" />
 
           <Grid container spacing={6}>
-          {productDatabase.slice(81, 90).map((item, ind) => (
-          <Grid item lg={4} sm={6} xs={12} key={ind}>
-            <ProductCard1 hoverEffect {...item} /> {/* No need to pass price={23} */}
-          </Grid>
-        ))}
-
+            {productDatabase.slice(81, 90).map((item: Product, ind: number) => (
+              <Grid item lg={4} sm={6} xs={12} key={item.id || ind}>
+                <ProductCard1
+                  hoverEffect
+                  id={item.id}
+                  imgUrl={item.imgUrl || "/assets/images/default-product.png"}
+                  title={item.title || "No Title Available"}
+                  price={item.price ?? 0}
+                />
+              </Grid>
+            ))}
           </Grid>
         </Box>
       </FlexBox>

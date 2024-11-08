@@ -1,15 +1,14 @@
 import { Formik, FormikHelpers } from "formik";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { Link, useNavigate } from "react-router-dom";  // Use react-router-dom for navigation and linking
 import React, { useState } from "react";
 import * as yup from "yup";
-import countryList from "@data/countryList";
+import countryList from "data/countryList";
 import Button from "../buttons/Button";
 import { Card1 } from "../Card1";
 import CheckBox from "../CheckBox";
 import Grid from "../grid/Grid";
 import Select from "../Select";
-import TextField from "@component/text-field/TextField";
+import TextField from "components/text-field/TextField";
 import Typography from "../Typography";
 
 // Define the shape of the form values
@@ -35,14 +34,14 @@ interface FormValues {
 
 const CheckoutForm = () => {
   const [sameAsShipping, setSameAsShipping] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();  // Use react-router-dom's useNavigate for programmatic navigation
 
   const handleFormSubmit = async (
     values: FormValues,
     formikHelpers: FormikHelpers<FormValues>
   ) => {
     console.log(values);
-    router.push("/payment");
+    navigate("/payment");  // Navigate to the payment page
   };
 
   const handleCheckboxChange = (
@@ -284,7 +283,7 @@ const CheckoutForm = () => {
 
           <Grid container spacing={7}>
             <Grid item sm={6} xs={12}>
-              <Link href="/cart">
+              <Link to="/cart">
                 <Button
                   variant="outlined"
                   color="primary"

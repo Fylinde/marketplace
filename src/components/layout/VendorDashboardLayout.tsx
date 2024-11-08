@@ -7,7 +7,7 @@ import VendorDashboardNavigation from "./VendorDashboardNavigation";
 import AppLayout from "./AppLayout";
 
 interface VendorDashboardLayoutProps {
-  children: React.ReactNode; // Add 'children' prop to the type definition
+  children?: React.ReactNode;  // Make children optional if necessary
 }
 
 const VendorDashboardLayout: React.FC<VendorDashboardLayoutProps> = ({ children }) => (

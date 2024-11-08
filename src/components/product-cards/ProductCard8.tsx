@@ -1,6 +1,7 @@
-import HoverBox from "@component/HoverBox";
-import LazyImage from "@component/LazyImage";
-import Link from "next/link";
+
+import HoverBox from "components/HoverBox";
+import LazyImage from "components/LazyImage";
+import { Link } from "react-router-dom";
 import React from "react";
 import Card from "../Card";
 import FlexBox from "../FlexBox";
@@ -23,17 +24,14 @@ const ProductCard8: React.FC<ProductCard8Props> = ({
 }) => {
   return (
     <Card p="1rem" {...props}>
-      <Link href={`/product/${id}`}>
+      <Link to={`/product/${id}`}>
         <a>
           <HoverBox mb="0.75rem" borderRadius={8}>
             <LazyImage
               src={imgUrl || "/assets/images/products/Rectangle 116.png"}
               borderRadius={8}
-              height={500}
-              width={500}
-              layout="responsive"
-              objectFit="contain"
-              objectPosition="center"
+              style={{ width: '500', height: '500', borderRadius: '4px' }}
+              alt={title}  // Always include an alt attribute for accessibility
             />
           </HoverBox>
           <SemiSpan

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom"; 
 import React from "react";
 import FlexBox from "./FlexBox";
 import Icon from "./icon/Icon";
@@ -29,15 +29,13 @@ const CategorySectionHeader: React.FC<CategorySectionHeaderProps> = ({
       </FlexBox>
 
       {seeMoreLink && (
-        <Link href={seeMoreLink}>
-          <a>
-            <FlexBox alignItems="center" ml="0.5rem" color="text.muted">
-              <SemiSpan mr="0.5rem">View all</SemiSpan>
-              <Icon size="12px" defaultcolor="currentColor">
-                right-arrow
-              </Icon>
-            </FlexBox>
-          </a>
+        <Link to={seeMoreLink}> {/* Use `to` instead of `href` */}
+          <FlexBox alignItems="center" ml="0.5rem" color="text.muted">
+            <SemiSpan mr="0.5rem">View all</SemiSpan>
+            <Icon size="12px" defaultcolor="currentColor">
+              right-arrow
+            </Icon>
+          </FlexBox>
         </Link>
       )}
     </FlexBox>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addUserAddress } from '../../services/addressService';
+import { addUserAddress } from 'services/addressService';
 import { useNavigate } from 'react-router-dom';
 import './AddressForm.css';
 
@@ -33,10 +33,10 @@ const AddressForm: React.FC = () => {
             navigate('/addresses', { state: { newAddressAdded: true } });
             
             console.log("Address added successfully");
-        } catch (error: any) {
+        } catch (error) {  // Removed ": any" from the catch clause
             // Handle errors and display error messages if needed
-            if (error.response && error.response.data) {
-                setErrorMessage(error.response.data.detail || "Failed to add address");
+            if ((error as any).response && (error as any).response.data) {
+                setErrorMessage((error as any).response.data.detail || "Failed to add address");
             } else {
                 setErrorMessage("An unexpected error occurred while adding the address.");
             }

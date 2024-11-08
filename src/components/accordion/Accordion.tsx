@@ -1,7 +1,6 @@
 import React, {
   Children,
   cloneElement,
-  ReactElement,
   ReactNode,
   useEffect,
   useRef,
@@ -11,7 +10,7 @@ import { AccordionWrapper } from "./AccordionStyle";
 
 export interface AccordionProps {
   expanded?: boolean;
-  children: ReactNode; // Type for children
+  children: ReactNode;
 }
 
 interface AccordionChildProps {
@@ -24,24 +23,26 @@ const Accordion: React.FC<AccordionProps> = ({ expanded = false, children }) => 
   const [headerHeight, setHeaderHeight] = useState(0);
   const [parentHeight, setParentHeight] = useState(0);
 
-  // Typing the ref to HTMLDivElement
+  // Ref for the parent element of Accordion
   const ref = useRef<HTMLDivElement>(null);
 
   const toggle = () => {
-    setOpen(!open);
+    setOpen((prevOpen) => !prevOpen);
   };
 
   useEffect(() => {
     const parent = ref.current;
 
     if (parent) {
-      const firstChild = parent.children[0] as HTMLElement;
-      setHeaderHeight(firstChild.scrollHeight);
-      setParentHeight(parent.scrollHeight);
-    }
-  }, [ref.current]);
+      const firstChild = parent.children[0] as HTMLElement | undefined;
 
-  // Type check and cast child element to accept `open` and `onClick`
+      if (firstChild) {
+        setHeaderHeight(firstChild.scrollHeight);
+        setParentHeight(parent.scrollHeight);
+      }
+    }
+  }, []);
+
   const modifiedChildren = Children.map(children, (child, ind) => {
     if (React.isValidElement<AccordionChildProps>(child)) {
       if (ind === 0) {

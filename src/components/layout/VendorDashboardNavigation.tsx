@@ -1,5 +1,5 @@
-import Box from "@component/Box";
-import { useRouter } from "next/router";
+import Box from "components/Box";
+import { Link, useLocation } from "react-router-dom"; // Use react-router-dom's Link and useLocation
 import React from "react";
 import FlexBox from "../FlexBox";
 import Icon from "../icon/Icon";
@@ -9,14 +9,15 @@ import {
 } from "./DashboardStyle";
 
 const VendorDashboardNavigation = () => {
-  const { pathname } = useRouter();
+  const { pathname } = useLocation(); // Replacing useRouter with useLocation to get the current route
 
   return (
     <DashboardNavigationWrapper px="0px" py="1.5rem" color="gray.900">
       {linkList.map((item) => (
         <StyledDashboardNav
-          isCurrentPath={pathname.includes(item.href)}
-          href={item.href}
+          as={Link} // Use Link from react-router-dom for navigation
+          to={item.href} // 'to' is used with react-router-dom's Link
+          isCurrentPath={pathname.includes(item.href)} // Check if current path matches the item's href
           key={item.title}
           px="1.5rem"
           mb="1.25rem"
@@ -29,7 +30,7 @@ const VendorDashboardNavigation = () => {
             </Box>
             <span>{item.title}</span>
           </FlexBox>
-          <span>{item.count}</span>
+          {item.count && <span>{item.count}</span>} {/* Show count only if it exists */}
         </StyledDashboardNav>
       ))}
     </DashboardNavigationWrapper>

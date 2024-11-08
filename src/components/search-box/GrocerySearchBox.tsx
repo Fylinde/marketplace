@@ -1,9 +1,10 @@
-import Button from "@component/buttons/Button";
-import Card from "@component/Card";
-import MenuItem from "@component/MenuItem";
-import { Span } from "@component/Typography";
+
+import Button from "components/buttons/Button";
+import Card from "components/Card";
+import MenuItem from "components/MenuItem";
+import { Span } from "components/Typography";
 import { debounce } from "lodash";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import React, { useCallback, useEffect, useState } from "react";
 import Box from "../Box";
 import Icon from "../icon/Icon";
@@ -13,22 +14,24 @@ import SearchBoxStyle from "./SearchBoxStyle";
 export interface GrocerySearchBoxProps {}
 
 const GrocerySearchBox: React.FC<GrocerySearchBoxProps> = () => {
-  const [resultList, setResultList] = useState([]);
+  const [resultList, setResultList] = useState<string[]>([]); // Explicitly define resultList as an array of strings
 
-  const search = debounce((e) => {
+  // Add type annotation for the event
+  const search = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target?.value;
 
-    if (!value) setResultList([]);
-    else setResultList(dummySearchResult);
+    if (!value) setResultList([]); // Clear the result list if input is empty
+    else setResultList(dummySearchResult); // Otherwise, set dummy search results
   }, 200);
 
-  const hanldeSearch = useCallback((event) => {
-    event.persist();
-    search(event);
+  // Add type annotation for the event
+  const handleSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    event.persist(); // Persist the event
+    search(event); // Call the debounce search function
   }, []);
 
   const handleDocumentClick = () => {
-    setResultList([]);
+    setResultList([]); // Clear the result list when clicking outside
   };
 
   useEffect(() => {
@@ -48,7 +51,7 @@ const GrocerySearchBox: React.FC<GrocerySearchBoxProps> = () => {
           className="search-field"
           placeholder="Search and hit enter..."
           fullwidth
-          onChange={hanldeSearch}
+          onChange={handleSearch} // Attach the handleSearch function to the input change event
         />
         <Button className="search-button" variant="contained" color="primary">
           Search
@@ -58,17 +61,17 @@ const GrocerySearchBox: React.FC<GrocerySearchBoxProps> = () => {
         </Box>
       </SearchBoxStyle>
 
-      {!!resultList.length && (
+      {!!resultList.length && ( // Only show resultList if there are results
         <Card
           position="absolute"
           top="100%"
           py="0.5rem"
           width="100%"
           boxShadow="large"
-          zIndex={99}
+          style={{ zIndex: 99 }}
         >
           {resultList.map((item) => (
-            <Link href={`/product/search/${item}`} key={item}>
+            <Link to={`/product/search/${item}`} key={item}>
               <MenuItem key={item}>
                 <Span fontSize="14px">{item}</Span>
               </MenuItem>

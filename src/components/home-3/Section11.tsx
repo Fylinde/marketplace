@@ -1,5 +1,6 @@
-import CategorySectionCreator from "@component/CategorySectionCreator";
-import Grid from "@component/grid/Grid";
+
+import CategorySectionCreator from "components/CategorySectionCreator";
+import Grid from "components/grid/Grid";
 import React from "react";
 import FashionCard6 from "./FashionCard6";
 

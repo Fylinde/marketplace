@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import Link from "next/link";
+import { Link, useLocation } from "react-router-dom";
 import React from "react";
 import Box from "../Box";
 import IconButton from "../buttons/IconButton";
@@ -10,7 +10,7 @@ import TableRow from "../TableRow";
 import Typography, { H5, Small } from "../Typography";
 
 export interface OrderRowProps {
-  item: {
+  orderData: {
     orderNo: any;
     status: string;
     href: string;
@@ -19,38 +19,40 @@ export interface OrderRowProps {
   };
 }
 
-const OrderRow: React.FC<OrderRowProps> = ({ item }) => {
-  const getColor = (status) => {
-    switch (status) {
-      case "Pending":
-        return "secondary";
-      case "Processing":
-        return "secondary";
-      case "Delivered":
-        return "success";
-      case "Cancelled":
-        return "error";
-      default:
-        return "";
-    }
-  };
+const getColor = (status: string): string => {
+  switch (status) {
+    case "Pending":
+      return "secondary";
+    case "Processing":
+      return "secondary";
+    case "Delivered":
+      return "success";
+    case "Cancelled":
+      return "error";
+    default:
+      return "";
+  }
+};
 
+const OrderRow: React.FC<OrderRowProps> = ({ orderData }) => {
   return (
-    <Link href={item.href}>
-      <TableRow as="a" href={item.href} my="1rem" padding="6px 18px">
+    <Link to={orderData.href} style={{ textDecoration: 'none', color: 'inherit' }}>
+      <TableRow my="1rem" padding="6px 18px">
         <H5 m="6px" textAlign="left">
-          {item.orderNo}
+          {orderData.orderNo}
         </H5>
         <Box m="6px">
-          <Chip p="0.25rem 1rem" bg={`${getColor(item.status)}.light`}>
-            <Small color={`${getColor(item.status)}.main`}>{item.status}</Small>
+          <Chip p="0.25rem 1rem" bg={`${getColor(orderData.status)}.light`}>
+            <Small color={`${getColor(orderData.status)}.main`}>
+              {orderData.status}
+            </Small>
           </Chip>
         </Box>
         <Typography className="flex-grow pre" m="6px" textAlign="left">
-          {format(new Date(item.purchaseDate), "MMM dd, yyyy")}
+          {format(new Date(orderData.purchaseDate), "MMM dd, yyyy")}
         </Typography>
         <Typography m="6px" textAlign="left">
-          ${item.price.toFixed(2)}
+          ${orderData.price.toFixed(2)}
         </Typography>
 
         <Hidden flex="0 0 0 !important" down={769}>

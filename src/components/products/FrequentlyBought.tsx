@@ -1,4 +1,4 @@
-import productDatabase from "@data/product-database";
+import productDatabase from "data/product-database";
 import React, { Fragment } from "react";
 import Button from "../buttons/Button";
 import FlexBox from "../FlexBox";

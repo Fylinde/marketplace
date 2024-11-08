@@ -1,5 +1,5 @@
-import Card from "@component/Card";
-import Link from "next/link";
+import Card from "components/Card";
+import { Link } from "react-router-dom";
 import React from "react";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
@@ -24,10 +24,8 @@ const Section4: React.FC = () => {
                 <Grid container spacing={4}>
                   {topRatedList.map((item) => (
                     <Grid item md={3} sm={6} xs={6} key={item.title}>
-                      <Link href={item.productUrl}>
-                        <a>
-                          <ProductCard4 {...item} />
-                        </a>
+                      <Link to={item.productUrl}>
+                        <ProductCard4 {...item} />
                       </Link>
                     </Grid>
                   ))}
@@ -44,10 +42,8 @@ const Section4: React.FC = () => {
                 <Grid container spacing={4}>
                   {brandList.map((item) => (
                     <Grid item sm={6} xs={12} key={item.title}>
-                      <Link href={item.productUrl}>
-                        <a>
-                          <ProductCard5 {...item} />
-                        </a>
+                      <Link to={item.productUrl}>
+                        <ProductCard5 {...item} />
                       </Link>
                     </Grid>
                   ))}

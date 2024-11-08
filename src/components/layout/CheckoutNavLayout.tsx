@@ -1,11 +1,17 @@
-import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom"; 
 import Container from "../Container";
 import Box from "../Box";
 import Grid from "../grid/Grid";
 import Navbar from "../navbar/Navbar";
 import Stepper from "../stepper/Stepper";
 import AppLayout from "./AppLayout";
+
+// Define Step type (replace this with the actual structure of Step in your code)
+interface Step {
+  title: string;
+  disabled: boolean;
+}
 
 interface CheckoutNavLayoutProps {
   children: React.ReactNode; // Explicitly type 'children'
@@ -14,23 +20,24 @@ interface CheckoutNavLayoutProps {
 const CheckoutNavLayout: React.FC<CheckoutNavLayoutProps> = ({ children }) => {
   const [selectedStep, setSelectedStep] = useState(0);
 
-  const router = useRouter();
-  const { pathname } = router;
+  const navigate = useNavigate(); 
+  const location = useLocation(); 
+  const { pathname } = location;
 
-  // Type '_step' and 'ind' explicitly
-  const handleStepChange = (_step: string, ind: number) => {
+  // Type '_step' as 'Step'
+  const handleStepChange = (step: Step, ind: number) => {
     switch (ind) {
       case 0:
-        router.push("/cart");
+        navigate("/cart");
         break;
       case 1:
-        router.push("/checkout");
+        navigate("/checkout");
         break;
       case 2:
-        router.push("/payment");
+        navigate("/payment");
         break;
       case 3:
-        router.push("/orders");
+        navigate("/orders");
         break;
       default:
         break;
@@ -62,7 +69,7 @@ const CheckoutNavLayout: React.FC<CheckoutNavLayoutProps> = ({ children }) => {
               <Stepper
                 stepperList={stepperList}
                 selectedStep={selectedStep}
-                onChange={handleStepChange}
+                onChange={handleStepChange}  
               />
             </Grid>
           </Grid>
@@ -73,7 +80,8 @@ const CheckoutNavLayout: React.FC<CheckoutNavLayoutProps> = ({ children }) => {
   );
 };
 
-const stepperList = [
+// Define the Stepper list
+const stepperList: Step[] = [
   {
     title: "Cart",
     disabled: false,

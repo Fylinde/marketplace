@@ -1,8 +1,8 @@
-import LazyImage from '@component/LazyImage';
-import { useAppContext } from '@context/app/AppContext';
-import { CartItem } from '@reducer/cartReducer';
-import Link from 'next/link';
 import React, { Fragment, useCallback, useState } from 'react';
+import LazyImage from 'components/LazyImage';
+import { useAppContext } from 'contexts/app/AppContext';
+import { CartItem } from 'reducers/cartReducer';
+import { Link } from "react-router-dom";
 import { CSSProperties } from 'styled-components';
 import Box from '../Box';
 import Button from '../buttons/Button';
@@ -25,39 +25,36 @@ export interface ProductCard1Props extends CardProps {
   off?: number;
   rating?: number;
   id?: string | number;
-  // className?: string;
-  // style?: CSSProperties;
-  // imgUrl: string;
-  // title: string;
-  // price: number;
-  // off: number;
-  // rating?: number;
-  // subcategories?: Array<{
-  //   title: string;
-  //   url: string;
-  // }>;
+  category?: string;
+  images?: string[];
+  brand?: string;
+  stock?: boolean; // Add stock as an optional prop
 }
 
 const ProductCard1: React.FC<ProductCard1Props> = ({
   id,
-  imgUrl,
-  title,
-  price,
+  imgUrl = '/assets/images/default-product.png', // Default image
+  title = 'No Title Available', // Default title
+  price = 0, // Default price
   off,
-  rating,
+  rating = 0, // Default rating
+  category,
+  images,
+  brand,
+  stock, // Include stock in the props destructuring
   ...props
 }) => {
   const [open, setOpen] = useState(false);
 
   const { state, dispatch } = useAppContext();
-  const cartItem: CartItem = state.cart.cartList.find((item) => item.id === id);
+  const cartItem: CartItem | undefined = state.cart.cartList.find((item: CartItem) => item.id === id);
 
   const toggleDialog = useCallback(() => {
     setOpen((open) => !open);
   }, []);
 
   const handleCartAmountChange = useCallback(
-    (amount) => () => {
+    (amount: number) => () => {
       dispatch({
         type: 'CHANGE_CART_AMOUNT',
         payload: {
@@ -69,7 +66,7 @@ const ProductCard1: React.FC<ProductCard1Props> = ({
         },
       });
     },
-    []
+    [dispatch, title, price, imgUrl, id]
   );
 
   return (
@@ -103,51 +100,67 @@ const ProductCard1: React.FC<ProductCard1Props> = ({
           <Icon className="favorite-icon outlined-icon" variant="small">
             heart
           </Icon>
-          {/* <Icon className="favorite-icon" color="primary" variant="small">
-              heart-filled
-            </Icon> */}
         </FlexBox>
 
-        <Link href={`/product/${id}`}>
-          <a>
-            <LazyImage
-              src={imgUrl}
-              width="100%"
-              height="auto"
-              layout="responsive"
-              alt={title}
-            />
-          </a>
+        <Link to={`/product/${id}`}>
+          <LazyImage
+            src={images && images.length > 0 ? images[0] : imgUrl} // Use first image if available, else fallback
+            style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
+            alt={title}
+          />
         </Link>
       </div>
+
       <div className="details">
         <FlexBox>
           <Box flex="1 1 0" minWidth="0px" mr="0.5rem">
-            <Link href={`/product/${id}`}>
-              <a>
-                <H3
-                  className="title"
-                  fontSize="14px"
-                  textAlign="left"
-                  fontWeight="600"
-                  color="text.secondary"
-                  mb="10px"
-                  title={title}
-                >
-                  {title}
-                </H3>
-              </a>
+            <Link to={`/product/${id}`}>
+              <H3
+                className="title"
+                fontSize="14px"
+                textAlign="left"
+                fontWeight="600"
+                color="text.secondary"
+                mb="10px"
+                title={title}
+              >
+                {title}
+              </H3>
             </Link>
 
-            <Rating value={rating || 0} outof={5} color="warn" readonly />
+            {/* Display brand if available */}
+            {brand && (
+              <SemiSpan color="text.muted" fontSize="12px" mb="5px">
+                Brand: {brand}
+              </SemiSpan>
+            )}
+
+            {/* Display category if available */}
+            {category && (
+              <SemiSpan color="text.muted" fontSize="12px" mb="5px">
+                Category: {category}
+              </SemiSpan>
+            )}
+
+            {/* Display stock status */}
+            <SemiSpan
+              color={stock ? "success.main" : "error.main"}
+              fontSize="12px"
+              mb="5px"
+            >
+              {stock ? "In Stock" : "Out of Stock"}
+            </SemiSpan>
+
+            <Rating value={rating} outof={5} color="warn" readonly />
 
             <FlexBox alignItems="center" mt="10px">
               <SemiSpan pr="0.5rem" fontWeight="600" color="primary.main">
-                ${(price - (price * off) / 100).toFixed(2)}
+                ${(price - (price * (off ?? 0)) / 100).toFixed(2)}
               </SemiSpan>
+
               {!!off && (
                 <SemiSpan color="text.muted" fontWeight="600">
-                  <del>{price?.toFixed(2)}</del>
+                  <del>{price.toFixed(2)}</del>
                 </SemiSpan>
               )}
             </FlexBox>
@@ -159,7 +172,6 @@ const ProductCard1: React.FC<ProductCard1Props> = ({
             justifyContent={!!cartItem?.qty ? 'space-between' : 'flex-start'}
             width="30px"
           >
-            {/* <div className="add-cart"> */}
             <Button
               variant="outlined"
               color="primary"
@@ -194,7 +206,14 @@ const ProductCard1: React.FC<ProductCard1Props> = ({
 
       <Modal open={open} onClose={toggleDialog}>
         <Card p="1rem" position="relative">
-          <ProductIntro imgUrl={[imgUrl]} title={title} price={price} id={id} />
+          <ProductIntro
+            imgUrl={images && images.length > 0 ? images : [imgUrl]} // Use images if available, else fallback
+            title={title}
+            price={price}
+            id={id}
+            brand={brand} // Pass brand to ProductIntro if needed
+            stock={stock} // Pass stock to ProductIntro if needed
+          />
           <Box
             position="absolute"
             top="0.75rem"
@@ -214,15 +233,6 @@ const ProductCard1: React.FC<ProductCard1Props> = ({
       </Modal>
     </StyledProductCard1>
   );
-};
-
-ProductCard1.defaultProps = {
-  id: '324321',
-  title: 'KSUS ROG Strix G15',
-  imgUrl: '/assets/images/products/macbook.png',
-  off: 50,
-  price: 450,
-  rating: 0,
 };
 
 export default ProductCard1;

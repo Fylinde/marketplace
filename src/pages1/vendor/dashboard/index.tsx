@@ -1,11 +1,11 @@
-import Avatar from "@component/avatar/Avatar";
-import Card from "@component/Card";
-import VendorAnalyticsChart from "@component/dashboard/VendorAnalyticsChart";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import VendorDashboardLayout from "@component/layout/VendorDashboardLayout";
-import Typography, { H1, H5, Paragraph } from "@component/Typography";
+import Avatar from "components/avatar/Avatar";
+import Card from "components/Card";
+import VendorAnalyticsChart from "components/dashboard/VendorAnalyticsChart";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
+import Typography, { H1, H5, Paragraph } from "components/Typography";
 import React from "react";
 
 const VendorDashboard = () => {

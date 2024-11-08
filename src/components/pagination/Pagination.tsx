@@ -19,8 +19,9 @@ const Pagination: React.FC<PaginationProps> = ({
   onChange,
   ...props
 }) => {
-  const handlePageChange = async (page) => {
-    if (onChange) onChange(page.selected);
+  // Explicitly type 'page' as an object with 'selected: number'
+  const handlePageChange = async (page: { selected: number }) => {
+    if (onChange) onChange({ selected: page.selected }); // Pass the object with 'selected'
   };
 
   return (
@@ -62,7 +63,7 @@ const Pagination: React.FC<PaginationProps> = ({
         pageCount={pageCount}
         marginPagesDisplayed={marginPagesDisplayed}
         pageRangeDisplayed={pageRangeDisplayed}
-        onPageChange={handlePageChange}
+        onPageChange={handlePageChange} // Handles page change
         containerClassName="pagination"
         subContainerClassName="pages pagination"
         activeClassName="active"

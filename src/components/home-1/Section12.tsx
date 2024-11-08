@@ -14,20 +14,27 @@ const Section12: React.FC = () => {
           <Grid item lg={3} md={6} xs={12} key={ind}>
             <FlexBox
               as={Card}
-              flexDirection="column"
-              alignItems="center"
-              p="3rem"
-              height="100%"
-              borderRadius={8}
-              boxShadow="border"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "3rem",
+                height: "100%",
+                borderRadius: "8px",
+                boxShadow: "border",
+              }}
               hoverEffect
             >
               <FlexBox
-                justifyContent="center"
-                alignItems="center"
-                borderRadius="300px"
-                bg="gray.200"
-                size="64px"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "300px",
+                  backgroundColor: "gray.200",
+                  width: "64px",
+                  height: "64px",
+                }}
               >
                 <Icon color="secondary" size="1.75rem">
                   {item.iconName}
@@ -44,7 +51,6 @@ const Section12: React.FC = () => {
           </Grid>
         ))}
       </Grid>
-      {/* </Card> */}
     </Container>
   );
 };

@@ -1,14 +1,15 @@
-import Avatar from "@component/avatar/Avatar";
-import IconButton from "@component/buttons/IconButton";
-import FlexBox from "@component/FlexBox";
-import Hidden from "@component/hidden/Hidden";
-import Icon from "@component/icon/Icon";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import VendorDashboardLayout from "@component/layout/VendorDashboardLayout";
-import Pagination from "@component/pagination/Pagination";
-import TableRow from "@component/TableRow";
-import Typography, { H5 } from "@component/Typography";
-import Link from "next/link";
+
+import Avatar from "components/avatar/Avatar";
+import IconButton from "components/buttons/IconButton";
+import FlexBox from "components/FlexBox";
+import Hidden from "components/hidden/Hidden";
+import Icon from "components/icon/Icon";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
+import Pagination from "components/pagination/Pagination";
+import TableRow from "components/TableRow";
+import Typography, { H5 }  from "components/Typography";
+import { Link } from "react-router-dom"; 
 import React from "react";
 
 const Products = () => {
@@ -42,8 +43,8 @@ const Products = () => {
       </Hidden>
 
       {productList.map((item, ind) => (
-        <Link href={item.href} key={ind}>
-          <TableRow as="a" href={item.href} my="1rem" padding="6px 18px">
+        <Link to={item.href} key={ind}>
+          <TableRow my="1rem" padding="6px 18px">
             <FlexBox alignItems="center" m="6px" flex="2 2 220px !important">
               <Avatar src="/assets/images/products/imageshoes.png" size={36} />
               <Typography textAlign="left" ml="20px">
@@ -77,6 +78,7 @@ const Products = () => {
           </TableRow>
         </Link>
       ))}
+
 
       <FlexBox justifyContent="center" mt="2.5rem">
         <Pagination

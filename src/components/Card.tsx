@@ -1,5 +1,4 @@
-
-import { shadowOptions } from "./interfaces";
+import { shadowOptions } from "interfaces";
 import styled from "styled-components";
 import {
   border,
@@ -20,9 +19,10 @@ export interface CardProps {
   hoverEffect?: boolean;
 }
 
-const Card = styled(Box)<
-  ColorProps & SpaceProps & LayoutProps & BorderProps & CardProps
->`
+const Card = styled(Box).withConfig({
+  shouldForwardProp: (prop) =>
+    !["boxShadow", "elevation", "hoverEffect"].includes(prop), // Filter out custom props
+})<ColorProps & SpaceProps & LayoutProps & BorderProps & CardProps>`
   background-color: ${getTheme("colors.body.paper")};
   box-shadow: ${(props) =>
     getTheme(`shadows.${props.boxShadow}`, `shadows.${props.elevation}`)};

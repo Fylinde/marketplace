@@ -1,4 +1,4 @@
-import Card from "@component/Card";
+import Card from "components/Card";
 import React from "react";
 import CategorySectionCreator from "../CategorySectionCreator";
 import Grid from "../grid/Grid";

@@ -1,16 +1,20 @@
-import Box from "@component/Box";
-import FlexBox from "@component/FlexBox";
-import NavbarLayout from "@component/layout/NavbarLayout";
-import AvailableShops from "@component/products/AvailableShops";
-import FrequentlyBought from "@component/products/FrequentlyBought";
-import ProductDescription from "@component/products/ProductDescription";
-import ProductIntro from "@component/products/ProductIntro";
-import ProductReview from "@component/products/ProductReview";
-import RelatedProducts from "@component/products/RelatedProducts";
-import { H5 } from "@component/Typography";
+import Box from "components/Box";
+import FlexBox from "components/FlexBox";
+import NavbarLayout from "components/layout/NavbarLayout";
+import AvailableShops from "components/products/AvailableShops";
+import FrequentlyBought from "components/products/FrequentlyBought";
+import ProductDescription from "components/products/ProductDescription";
+import ProductIntro from "components/products/ProductIntro";
+import ProductReview from "components/products/ProductReview";
+import RelatedProducts from "components/products/RelatedProducts";
+import { H5 } from "components/Typography";
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 
 const ProductDetails = () => {
+  const { id: productId } = useParams<{ id: string }>(); 
+  
+
   const state = {
     title: "Mi Note 11 Pro",
     price: 1135,
@@ -18,7 +22,8 @@ const ProductDetails = () => {
 
   const [selectedOption, setSelectedOption] = useState("description");
 
-  const handleOptionClick = (opt) => () => {
+  // Provide type annotations for opt to avoid 'any' error
+  const handleOptionClick = (opt: "description" | "review") => () => {
     setSelectedOption(opt);
   };
 
@@ -39,7 +44,9 @@ const ProductDetails = () => {
           color={
             selectedOption === "description" ? "primary.main" : "text.muted"
           }
-          borderBottom={selectedOption === "description" && "2px solid"}
+          borderBottom={
+            selectedOption === "description" ? "2px solid" : undefined
+          }
           borderColor="primary.main"
           onClick={handleOptionClick("description")}
         >
@@ -50,7 +57,7 @@ const ProductDetails = () => {
           p="4px 10px"
           color={selectedOption === "review" ? "primary.main" : "text.muted"}
           onClick={handleOptionClick("review")}
-          borderBottom={selectedOption === "review" && "2px solid"}
+          borderBottom={selectedOption === "review" ? "2px solid" : undefined}
           borderColor="primary.main"
         >
           Review (3)
@@ -66,7 +73,8 @@ const ProductDetails = () => {
 
       <AvailableShops />
 
-      <RelatedProducts />
+      {/* Pass the productId prop to RelatedProducts */}
+      {productId && <RelatedProducts productId={productId} />}
     </div>
   );
 };

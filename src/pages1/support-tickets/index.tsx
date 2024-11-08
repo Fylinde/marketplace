@@ -1,15 +1,16 @@
-import IconButton from "@component/buttons/IconButton";
-import { Chip } from "@component/Chip";
-import FlexBox from "@component/FlexBox";
-import Hidden from "@component/hidden/Hidden";
-import Icon from "@component/icon/Icon";
-import DashboardLayout from "@component/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import Pagination from "@component/pagination/Pagination";
-import TableRow from "@component/TableRow";
-import Typography, { SemiSpan, Small } from "@component/Typography";
+
+import IconButton from "components/buttons/IconButton";
+import { Chip } from "components/Chip";
+import FlexBox from "components/FlexBox";
+import Hidden from "components/hidden/Hidden";
+import Icon from "components/icon/Icon";
+import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import Pagination from "components/pagination/Pagination";
+import TableRow from "components/TableRow";
+import Typography, { SemiSpan, Small } from "components/Typography";
 import { format } from "date-fns";
-import Link from "next/link";
+import { Link } from "react-router-dom"; 
 import React from "react";
 
 const TicketList = () => {
@@ -18,13 +19,8 @@ const TicketList = () => {
       <DashboardPageHeader title="Support Ticket" iconName="support" />
 
       {[1, 2, 3].map((item) => (
-        <Link href="/support-tickets/xkssThds6h37sd" key={item}>
-          <TableRow
-            as="a"
-            href="/support-tickets/xkssThds6h37sd"
-            my="1rem"
-            padding="15px 24px"
-          >
+        <Link to="/support-tickets/xkssThds6h37sd" key={item}>
+          <TableRow my="1rem" padding="15px 24px">
             <div>
               <span>My product is broken. I need refund</span>
               <FlexBox alignItems="center" flexWrap="wrap" pt="0.5rem" m="-6px">
@@ -54,6 +50,7 @@ const TicketList = () => {
         </Link>
       ))}
 
+
       <FlexBox justifyContent="center" mt="2.5rem">
         <Pagination
           pageCount={5}
@@ -66,6 +63,6 @@ const TicketList = () => {
   );
 };
 
-TicketList.layout = DashboardLayout;
+TicketList.layout = CustomerDashboardLayout;
 
 export default TicketList;

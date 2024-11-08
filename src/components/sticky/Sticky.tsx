@@ -26,16 +26,16 @@ const Sticky: React.FC<StickyProps> = ({
 }) => {
   const [fixed, setFixed] = useState(false);
   const [parentHeight, setParentHeight] = useState(0);
-  const elementRef = useRef(null);
-  const positionRef = useRef(null);
+  const elementRef = useRef<HTMLDivElement | null>(null); // Use proper type for elementRef
+  const positionRef = useRef<number | null>(null); // Initialize positionRef as number or null
 
   const scrollListener = useCallback(() => {
-    if (!window) return;
+    if (positionRef.current === null || !window) return; // Guard for positionRef being null
 
-    let distance = window.pageYOffset - positionRef.current;
+    const distance = window.pageYOffset - positionRef.current;
 
     if (containerRef?.current) {
-      let containerDistance =
+      const containerDistance =
         containerRef.current.offsetTop +
         containerRef.current?.offsetHeight -
         window.pageYOffset;
@@ -52,41 +52,40 @@ const Sticky: React.FC<StickyProps> = ({
       notifyOnScroll(distance >= notifyPosition);
     }
 
-    let isFixed = distance >= fixedOn;
+    const isFixed = distance >= fixedOn;
     setFixed(isFixed);
-  }, []);
+  }, [fixedOn, notifyOnScroll, notifyPosition, containerRef]);
 
   useEffect(() => {
-    if (!window) return;
-
     window.addEventListener("scroll", scrollListener);
     window.addEventListener("resize", scrollListener);
     return () => {
       window.removeEventListener("scroll", scrollListener);
       window.removeEventListener("resize", scrollListener);
     };
-  }, []);
+  }, [scrollListener]);
 
   useEffect(() => {
-    if (!positionRef.current) {
-      positionRef.current = elementRef.current?.offsetTop;
+    if (elementRef.current && positionRef.current === null) {
+      // Safely set positionRef when elementRef is available
+      positionRef.current = elementRef.current.offsetTop || 0; // Fallback to 0
     }
     setParentHeight(elementRef.current?.offsetHeight || 0);
   }, [elementRef.current, children]);
 
   useEffect(() => {
     if (onSticky) onSticky(fixed);
-  }, [fixed]);
+  }, [fixed, onSticky]);
 
   return (
     <StyledSticky
-      componentPosition={positionRef.current}
+      componentPosition={positionRef.current || 0} // Fallback to 0 if positionRef is null
       componentHeight={parentHeight}
       fixedOn={fixedOn}
       fixed={fixed}
       ref={elementRef}
     >
-      {React.cloneElement(children, { isFixed: fixed })}
+      {children ? React.cloneElement(children, { isFixed: fixed }) : null}
     </StyledSticky>
   );
 };

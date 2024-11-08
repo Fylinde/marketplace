@@ -1,5 +1,6 @@
-import Link from "next/link";
-import React, { Fragment } from "react";
+import { Link } from "react-router-dom";
+import React, { useEffect, Fragment } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import IconButton from "../buttons/IconButton";
 import FlexBox from "../FlexBox";
 import Hidden from "../hidden/Hidden";
@@ -7,45 +8,75 @@ import Icon from "../icon/Icon";
 import Pagination from "../pagination/Pagination";
 import TableRow from "../TableRow";
 import Typography, { H5 } from "../Typography";
+import { fetchProducts } from "redux/slices/productSlice";
+import { RootState, AppDispatch } from "redux/store";
 
-export interface VendorProductListProps {}
+// Define the Product interface here if it’s not defined elsewhere
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  createdAt: string;
+  status?: string;
+  // Add other fields as needed
+}
 
-const VendorProductList: React.FC<VendorProductListProps> = () => {
+export interface VendorProductListProps {
+  vendorId: string;
+}
+
+const VendorProductList: React.FC<VendorProductListProps> = ({ vendorId }) => {
+  const dispatch: AppDispatch = useDispatch();
+  const { products, loading, error, totalPages } = useSelector((state: RootState) => state.products);
+  const buttonSize: "small" = "small"; // Strongly type the value
+
+  useEffect(() => {
+    // Fetch products for the specific vendor
+    dispatch(fetchProducts({ vendorId, page: 1 })); // Start with page 1
+  }, [dispatch, vendorId]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   return (
     <Fragment>
       <Hidden down={769}>
         <TableRow padding="0px 18px" boxShadow="none">
           <H5 color="text.muted" my="0px" mx="6px" textAlign="left">
-            Order #
+            Product ID
           </H5>
           <H5 color="text.muted" my="0px" mx="6px" textAlign="left">
             Status
           </H5>
           <H5 color="text.muted" my="0px" mx="6px" textAlign="left">
-            Date purchased
+            Date Added
           </H5>
           <H5 color="text.muted" my="0px" mx="6px" textAlign="left">
-            Total
+            Price
           </H5>
-          <H5
-            flex="0 0 0 !important"
-            color="text.muted"
-            px="22px"
-            my="0px"
-          ></H5>
+          <H5 flex="0 0 0 !important" color="text.muted" px="22px" my="0px"></H5>
         </TableRow>
       </Hidden>
 
-      {productList.map((item) => (
-        <Link href={item.href}>
-          <TableRow as="a" href={item.href} my="1rem" padding="6px 18px">
+      {products.map((item: Product) => (
+        <Link to={`/vendor/products/${item.id}`} key={item.id} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <TableRow my="1rem" padding="6px 18px">
             <H5 m="6px" textAlign="left">
-              {item.orderNo}
+              {item.id}
             </H5>
+            <Typography m="6px" textAlign="left" color="text.muted">
+              {item.status || "Available"}
+            </Typography>
+            <Typography m="6px" textAlign="left" color="text.muted">
+              {new Date(item.createdAt).toLocaleDateString()}
+            </Typography>
+            <Typography m="6px" textAlign="left" color="text.muted">
+              ${item.price}
+            </Typography>
 
             <Hidden flex="0 0 0 !important" down={769}>
               <Typography textAlign="center" color="text.muted">
-                <IconButton size="small">
+                <IconButton size={buttonSize}>
                   <Icon variant="small" defaultcolor="currentColor">
                     arrow-right
                   </Icon>
@@ -58,52 +89,14 @@ const VendorProductList: React.FC<VendorProductListProps> = () => {
 
       <FlexBox justifyContent="center" mt="2.5rem">
         <Pagination
-          pageCount={5}
+          pageCount={totalPages}
           onChange={(data) => {
-            console.log(data.selected);
+            dispatch(fetchProducts({ vendorId, page: data.selected + 1 }));
           }}
         />
       </FlexBox>
     </Fragment>
   );
 };
-
-const productList = [
-  {
-    orderNo: "1050017AS",
-    status: "Pending",
-    purchaseDate: new Date(),
-    price: 350,
-    href: "/vendor/orders/5452423",
-  },
-  {
-    orderNo: "1050017AS",
-    status: "Processing",
-    purchaseDate: new Date(),
-    price: 500,
-    href: "/vendor/orders/5452423",
-  },
-  {
-    orderNo: "1050017AS",
-    status: "Delivered",
-    purchaseDate: "2020/12/23",
-    price: 700,
-    href: "/vendor/orders/5452423",
-  },
-  {
-    orderNo: "1050017AS",
-    status: "Delivered",
-    purchaseDate: "2020/12/23",
-    price: 700,
-    href: "/vendor/orders/5452423",
-  },
-  {
-    orderNo: "1050017AS",
-    status: "Cancelled",
-    purchaseDate: "2020/12/15",
-    price: 300,
-    href: "/vendor/orders/5452423",
-  },
-];
 
 export default VendorProductList;

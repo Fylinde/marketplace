@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import React from "react";
 import Avatar from "../avatar/Avatar";
 import Box from "../Box";
@@ -66,7 +66,7 @@ const ShopCard1: React.FC<ShopCard1Props> = ({
           border="4px solid"
           borderColor="gray.100"
         />
-        <Link href={shopUrl}>
+        <Link to={shopUrl}>
           <a>
             <IconButton size="small" my="0.25rem">
               <Icon defaultcolor="auto">arrow-long-right</Icon>

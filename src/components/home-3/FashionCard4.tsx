@@ -1,5 +1,5 @@
-import LazyImage from "@component/LazyImage";
-import Link from "next/link";
+import LazyImage from "components/LazyImage";
+import { Link } from "react-router-dom";
 import React from "react";
 import Box from "../Box";
 import Card from "../Card";
@@ -10,7 +10,7 @@ export interface FashionCard4Props {}
 
 const FashionCard4: React.FC<FashionCard4Props> = () => {
   return (
-    <Link href="/">
+    <Link to="/">
       <a>
         <Card boxShadow="border" height="100%" borderRadius={4}>
           <Grid container spacing={0} flexWrap="wrap-reverse">
@@ -36,23 +36,17 @@ const FashionCard4: React.FC<FashionCard4Props> = () => {
               <Box height="100%" position="relative">
                 <LazyImage
                   src="/assets/images/products/paper-bag.png"
-                  layout="fill"
-                  objectFit="contain"
                   alt="model"
+                  style={{
+                    position: "absolute",  // Make the image fill the container
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",  // Ensure it maintains aspect ratio
+                  }}
                 />
               </Box>
-              {/* 
-              <FlexBox
-                flexDirection="column"
-                justifyContent="flex-end"
-                height="100%"
-              >
-                <Image
-                  width="100%"
-                  src="/assets/images/models/model-1.png"
-                  alt="model"
-                />
-              </FlexBox> */}
             </Grid>
           </Grid>
         </Card>

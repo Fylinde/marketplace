@@ -1,7 +1,8 @@
-import Card from "@component/Card";
-import { Span } from "@component/Typography";
+
+import Card from "components/Card";
+import { Span } from "components/Typography";
 import { debounce } from "lodash";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import React, { useCallback, useEffect, useState } from "react";
 import Box from "../Box";
 import FlexBox from "../FlexBox";
@@ -14,21 +15,24 @@ import StyledSearchBox from "./SearchBoxStyle";
 export interface SearchBoxProps {}
 
 const SearchBox: React.FC<SearchBoxProps> = () => {
-  const [category, setCategory] = useState("All Categories");
-  const [resultList, setResultList] = useState([]);
+  const [category, setCategory] = useState<string>("All Categories"); // Specify the type as string
+  const [resultList, setResultList] = useState<string[]>([]); // Specify the type as an array of strings
 
-  const handleCategoryChange = (cat) => () => {
+  // Type `cat` as string
+  const handleCategoryChange = (cat: string) => () => {
     setCategory(cat);
   };
 
-  const search = debounce((e) => {
+  // Type the event as React.ChangeEvent<HTMLInputElement>
+  const search = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target?.value;
 
     if (!value) setResultList([]);
     else setResultList(dummySearchResult);
   }, 200);
 
-  const hanldeSearch = useCallback((event) => {
+  // Type the event as React.ChangeEvent<HTMLInputElement>
+  const hanldeSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     event.persist();
     search(event);
   }, []);
@@ -54,7 +58,7 @@ const SearchBox: React.FC<SearchBoxProps> = () => {
           className="search-field"
           placeholder="Search and hit enter..."
           fullwidth
-          onChange={hanldeSearch}
+          onChange={hanldeSearch} // Attach the handleSearch function to the input change event
         />
         <Menu
           className="category-dropdown"
@@ -72,9 +76,6 @@ const SearchBox: React.FC<SearchBoxProps> = () => {
             </MenuItem>
           ))}
         </Menu>
-        {/* <Box className="menu-button" ml="14px" cursor="pointer">
-          <Icon color="primary">menu</Icon>
-        </Box> */}
       </StyledSearchBox>
 
       {!!resultList.length && (
@@ -84,10 +85,10 @@ const SearchBox: React.FC<SearchBoxProps> = () => {
           py="0.5rem"
           width="100%"
           boxShadow="large"
-          zIndex={99}
+          style={{ zIndex: 99 }}
         >
           {resultList.map((item) => (
-            <Link href={`/product/search/${item}`} key={item}>
+            <Link to={`/product/search/${item}`} key={item}>
               <MenuItem key={item}>
                 <Span fontSize="14px">{item}</Span>
               </MenuItem>

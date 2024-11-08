@@ -1,32 +1,30 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { AnchorHTMLAttributes } from "react";
+import { Link, useLocation } from "react-router-dom";
+import React, { ReactNode } from "react";
 import { CSSProperties } from "styled-components";
 import { ColorProps, SpaceProps } from "styled-system";
 import StyledNavLink from "./NavLinkStyle";
 
 export interface NavLinkProps extends SpaceProps, ColorProps {
-  href: string;
-  as?: string;
+  to: string; // Use 'to' for react-router-dom
   style?: CSSProperties;
   className?: string;
+  children: ReactNode; // Add children prop explicitly
+  target?: string;  // Allow external link handling
+  rel?: string;     // Allow external link handling
 }
 
-const NavLink: React.FC<
-  NavLinkProps & AnchorHTMLAttributes<HTMLAnchorElement>
-> = ({ href, as, children, style, className, ...props }) => {
-  let { pathname } = useRouter();
+const NavLink: React.FC<NavLinkProps> = ({ to, children, style, className, ...props }) => {
+  const { pathname } = useLocation();  // useLocation replaces useRouter
 
   const checkRouteMatch = () => {
-    if (href === "/") return pathname === href;
-    return pathname.includes(href);
+    if (to === "/") return pathname === to;
+    return pathname.includes(to);
   };
 
   return (
-    <Link href={href}>
+    <Link to={to} style={{ textDecoration: 'none' }}>
       <StyledNavLink
         className={className}
-        href={href}
         isCurrentRoute={checkRouteMatch()}
         style={style}
         {...props}

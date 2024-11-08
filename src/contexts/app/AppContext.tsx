@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useMemo, useReducer } from 'react';
 import { rootReducer, initialState as defaultInitialState } from '../../reducers/rootReducer'; // Ensure this is correctly imported
 
-import { rootActionType } from '../../reducers/rootReducer';
+// import { rootActionType } from '../../reducers/rootReducer';
 
 
 // Temporarily simplify the typing by using `any` to debug the issue

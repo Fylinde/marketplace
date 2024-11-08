@@ -1,4 +1,4 @@
-import Box from "@component/Box";
+import Box from "components/Box";
 import React from "react";
 import Divider from "../Divider";
 import FlexBox from "../FlexBox";

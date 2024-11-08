@@ -1,11 +1,12 @@
-import Box from "@component/Box";
-import Button from "@component/buttons/Button";
-import { Card1 } from "@component/Card1";
-import Grid from "@component/grid/Grid";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import TextField from "@component/text-field/TextField";
+
+import Box from "components/Box";
+import Button from "components/buttons/Button";
+import { Card1 } from "components/Card1";
+import Grid from "components/grid/Grid";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import TextField from "components/text-field/TextField";
 import { Formik } from "formik";
-import Link from "next/link";
+import { Link } from 'react-router-dom';
 import React from "react";
 import * as yup from "yup";
 import DashboardLayout from "../layout/CustomerDashboardLayout";
@@ -29,7 +30,7 @@ const AddressEditor = () => {
         iconName="pin_filled"
         title="Add New Address"
         button={
-          <Link href="/address">
+          <Link to="/address">
             <Button color="primary" bg="primary.light" px="2rem">
               Back to Address
             </Button>

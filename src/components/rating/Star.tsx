@@ -1,20 +1,33 @@
-import { colorOptions } from "interfaces";
 import React, { useEffect, useState } from "react";
-import { colors } from "../../utils/themeColors";
+import { colors } from "../../utils/themeColors"; // Import your colors
 
 export interface StarProps {
   value?: number;
   outof?: number;
-  color?: colorOptions;
+  color?: keyof typeof colors;  // Ensure color is one of the keys in colors
   onClick?: () => void;
 }
 
-const Star: React.FC<StarProps> = ({ value, outof, color, ...props }) => {
-  const [id, setId] = useState(null);
+const Star: React.FC<StarProps> = ({ value = 0, outof = 5, color = 'default', ...props }) => {
+  const [id, setId] = useState<number | null>(null);
 
   useEffect(() => {
     setId(Math.random());
   }, []);
+
+  // Helper function to get color main or fallback to some other value
+  const getColorMain = (colorKey: keyof typeof colors) => {
+    const colorEntry = colors[colorKey];
+
+    // Check if colorEntry has 'main' or numbered properties like '500'
+    if (typeof colorEntry === "object" && 'main' in colorEntry) {
+      return colorEntry.main;
+    } else if (typeof colorEntry === "object" && '500' in colorEntry) {
+      return colorEntry[500];
+    }
+
+    return "currentColor";  // Fallback to currentColor if no match
+  };
 
   return (
     <svg
@@ -23,7 +36,7 @@ const Star: React.FC<StarProps> = ({ value, outof, color, ...props }) => {
       height="24"
       viewBox="0 0 24 24"
       fill={`url(#star-${id})`}
-      stroke={color ? colors[color].main : "currentColor"}
+      stroke={getColorMain(color)}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -32,10 +45,10 @@ const Star: React.FC<StarProps> = ({ value, outof, color, ...props }) => {
     >
       <defs>
         <linearGradient id={`star-${id}`}>
-          <stop offset={value / outof} stopColor={colors[color].main} />
+          <stop offset={value / outof} stopColor={getColorMain(color)} />
           <stop
             offset={value / outof}
-            stopColor={colors.body.paper}
+            stopColor={colors.body.paper || "white"}  // Fallback to white if not found
             stopOpacity="1"
           />
         </linearGradient>

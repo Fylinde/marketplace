@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import React, { useState } from "react";
 import * as yup from "yup";
 import Box from "../Box";
@@ -20,7 +20,7 @@ const Signup: React.FC = () => {
     setPasswordVisibility((visible) => !visible);
   };
 
-  const handleFormSubmit = async (values) => {
+  const handleFormSubmit = async (values: typeof initialValues) => {
     console.log(values);
   };
 
@@ -50,7 +50,7 @@ const Signup: React.FC = () => {
           textAlign="center"
           mb="2.25rem"
         >
-          Please fill all forms to continued
+          Please fill all forms to continue
         </H5>
 
         <TextField
@@ -67,7 +67,7 @@ const Signup: React.FC = () => {
         <TextField
           mb="0.75rem"
           name="email"
-          placeholder="exmple@mail.com"
+          placeholder="example@mail.com"
           label="Email or Phone Number"
           type="email"
           fullwidth
@@ -140,7 +140,7 @@ const Signup: React.FC = () => {
               <SemiSpan>By signing up, you agree to</SemiSpan>
               <a href="/" target="_blank" rel="noreferrer noopener">
                 <H6 ml="0.5rem" borderBottom="1px solid" borderColor="gray.900">
-                  Terms & Condtion
+                  Terms & Condition
                 </H6>
               </a>
             </FlexBox>
@@ -199,8 +199,8 @@ const Signup: React.FC = () => {
         </FlexBox>
       </form>
       <FlexBox justifyContent="center" bg="gray.200" py="19px">
-        <SemiSpan>Already have account?</SemiSpan>
-        <Link href="/login">
+        <SemiSpan>Already have an account?</SemiSpan>
+        <Link to="/login">
           <a>
             <H6 ml="0.5rem" borderBottom="1px solid" borderColor="gray.900">
               Log in
@@ -226,7 +226,7 @@ const formSchema = yup.object().shape({
   password: yup.string().required("${path} is required"),
   re_password: yup
     .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match")
+    .oneOf([yup.ref("password"), undefined], "Passwords must match")
     .required("Please re-type password"),
   agreement: yup
     .bool()

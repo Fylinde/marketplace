@@ -9,15 +9,13 @@ const RequestOTPForm: React.FC = () => {
   const [contact, setContact] = useState('');
   const [carrierGateway, setCarrierGateway] = useState('');
   
-  // Use hooks only within the component body
   const token = useSelector((state: RootState) => state.auth.access_token);
-  const user = useSelector((state: RootState) => state.auth.user); // Add user for logging purposes
+  const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
   
-  const authStatus = useSelector((state: RootState) => state.auth.status); // Retrieve authStatus correctly
+  const authStatus = useSelector((state: RootState) => state.auth.status);
 
   useEffect(() => {
-    // Log both Redux and localStorage to confirm
     console.log("Token in Redux:", token);
     console.log("User in Redux:", user);
     console.log("Access Token in LocalStorage:", localStorage.getItem('access_token'));
@@ -25,9 +23,9 @@ const RequestOTPForm: React.FC = () => {
 
     if (authStatus === 'succeeded' && !token) {
       console.error("Authorization token is missing.");
-      navigate('/registration/sign-in'); // Redirect to login if no token is found
+      navigate('/registration/sign-in');
     }
-  }, [token, navigate, authStatus, user]); // Added user as a dependency to log it only when it changes
+  }, [token, navigate, authStatus, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +53,7 @@ const RequestOTPForm: React.FC = () => {
 
       console.log('OTP sent successfully', response.data);
       navigate('/registration/verify-otp');
-    } catch (error: unknown) {
+    } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error('Failed to send OTP', error.response?.data || error.message);
       } else {

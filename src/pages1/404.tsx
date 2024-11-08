@@ -1,15 +1,15 @@
-import Button from "@component/buttons/Button";
-import FlexBox from "@component/FlexBox";
-import Image from "@component/Image";
-import Link from "next/link";
-import { useRouter } from "next/router";
+
+import Button from "components/buttons/Button";
+import FlexBox from "components/FlexBox";
+import Image from "components/Image";
+import { Link, useNavigate } from "react-router-dom";  
 import React from "react";
 
 const Error404 = () => {
-  const router = useRouter();
+  const navigate = useNavigate();  // Replaced useRouter with useNavigate
 
   const handleGoBack = async () => {
-    router.back();
+    navigate(-1);  // Navigate back in history
   };
 
   return (
@@ -35,7 +35,7 @@ const Error404 = () => {
         >
           Go Back
         </Button>
-        <Link href="/">
+        <Link to="/">  {/* Replaced href with to */}
           <Button variant="contained" color="primary" m="0.5rem">
             Go to Home
           </Button>

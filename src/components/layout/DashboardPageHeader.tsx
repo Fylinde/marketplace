@@ -18,7 +18,7 @@ const DashboardPageHeader: React.FC<DashboardPageHeaderProps> = ({
   title,
   button,
 }) => {
-  const width = useWindowSize() || 0; // Fallback to 0 if width is null
+  const { width = 0 } = useWindowSize(); // Destructure width, fallback to 0 if undefined
   const isTablet = width < 1025;
 
   return (

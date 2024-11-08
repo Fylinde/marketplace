@@ -1,5 +1,5 @@
-import LazyImage from "@component/LazyImage";
-import productDatabase from "@data/product-database";
+import LazyImage from "components/LazyImage";
+import productDatabase from "data/product-database";
 import React, { useState } from "react";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
@@ -40,8 +40,15 @@ const Section6: React.FC = () => {
                 <LazyImage
                   width={20}  // Replace "20px" with number 20
                   height={20} // Replace "20px" with number 20
-                  layout="fixed"
-                  objectFit="contain"
+                  style={{
+                    position: "absolute",  // Make the image fill the container
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",  // Ensure it maintains aspect ratio
+                  }}
+
                   src={`/assets/images/logos/${ind % 2 === 0 ? "v" : "u"}.png`}
                   alt="apple"
                 />

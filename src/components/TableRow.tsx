@@ -14,7 +14,9 @@ interface TableRowProps extends SpaceProps, ColorProps, BorderProps {
   boxShadow?: shadowOptions;
 }
 
-const TableRow = styled.div<TableRowProps>`
+const TableRow = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "boxShadow", // Exclude boxShadow from DOM
+})<TableRowProps>`
   display: flex;
   flex-wrap: wrap;
   align-items: center;

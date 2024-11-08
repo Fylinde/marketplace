@@ -9,27 +9,29 @@ type Step = {
 };
 
 type StepperProps = {
-  selectedStep?: number;
+  selectedStep?: number; // Optional because of defaultProps
   stepperList: Step[];
-  onChange?: (Step, index) => void;
+  onChange?: (step: Step, index: number) => void; // Explicitly typed parameters
 };
 
 const Stepper: React.FC<StepperProps> = ({
-  selectedStep,
+  selectedStep = 1, // Default to 1 if undefined
   stepperList,
   onChange,
 }) => {
-  const [selected, setSelected] = useState(selectedStep - 1);
+  const [selected, setSelected] = useState<number>(selectedStep - 1); // `number` type
 
-  const handleStepClick = (step: Step, ind) => () => {
+  const handleStepClick = (step: Step, ind: number) => () => { // Explicit `number` type for ind
     if (!step.disabled) {
-      setSelected(ind);
-      if (onChange) onChange(step, ind);
+      setSelected(ind); // Update selected index
+      if (onChange) onChange(step, ind); // Call onChange if defined
     }
   };
 
   useEffect(() => {
-    setSelected(selectedStep - 1);
+    if (selectedStep !== undefined) {
+      setSelected(selectedStep - 1); // Safely handle selectedStep being undefined
+    }
   }, [selectedStep]);
 
   return (
@@ -66,6 +68,7 @@ const Stepper: React.FC<StepperProps> = ({
   );
 };
 
+// Provide default props if `selectedStep` is not provided
 Stepper.defaultProps = {
   selectedStep: 1,
 };

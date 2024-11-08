@@ -54,7 +54,7 @@ const dropdownMenu: React.CSSProperties = {
   backgroundColor: 'white',
   border: '1px solid #ccc',
   padding: '10px',
-  zIndex: 1000,
+  zIndex: 1000 ,
 };
 
 // Dropdown links

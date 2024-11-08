@@ -1,17 +1,17 @@
-import Avatar from "@component/avatar/Avatar";
-import Box from "@component/Box";
-import Button from "@component/buttons/Button";
-import Card from "@component/Card";
-import Divider from "@component/Divider";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import Icon from "@component/icon/Icon";
-import DashboardLayout from "@component/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import TableRow from "@component/TableRow";
-import Typography, { H5, H6, Paragraph } from "@component/Typography";
-import productDatabase from "@data/product-database";
-import useWindowSize from "@hook/useWindowSize";
+import Avatar from "components/avatar/Avatar";
+import Box from "components/Box";
+import Button from "components/buttons/Button";
+import Card from "components/Card";
+import Divider from "components/Divider";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import Icon from "components/icon/Icon";
+import DashboardLayout from "components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import TableRow from "components/TableRow";
+import Typography, { H5, H6, Paragraph } from "components/Typography";
+import productDatabase from "data/product-database";
+import useWindowSize from "hooks/useWindowSize";
 import { format } from "date-fns";
 import React, { Fragment } from "react";
 
@@ -22,8 +22,10 @@ const OrderDetails = () => {
   const orderStatusList = ["packaging", "shipping", "delivering", "complete"];
   const stepIconList = ["package-box", "truck-1", "delivery"];
 
-  const statusIndex = orderStatusList.indexOf(orderStatus);
-  const width = useWindowSize();
+  const statusIndex = orderStatusList.indexOf(orderStatus);  // Keep original functionality
+
+  const windowSize = useWindowSize();
+  const width = windowSize?.width ?? 0;  // Fallback to 0 if width is undefined or null
   const breakpoint = 350;
 
   return (

@@ -1,11 +1,12 @@
-import Box from "@component/Box";
-import Card from "@component/Card";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import LazyImage from "@component/LazyImage";
-import NavLink from "@component/nav-link/NavLink";
-import Typography, { H3, SemiSpan, Small } from "@component/Typography";
-import Link from "next/link";
+
+import Box from "components/Box";
+import Card from "components/Card";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import LazyImage from "components/LazyImage";
+import NavLink from "components/nav-link/NavLink";
+import Typography, { H3, SemiSpan, Small }  from "components/Typography";
+import { Link } from 'react-router-dom';
 import React from "react";
 import { StyledMegaMenu1 } from "./MegaMenuStyle";
 
@@ -49,14 +50,14 @@ const MegaMenu3: React.FC<MegaMenuProps> = ({
               {categories?.map((item, ind) => (
                 <Grid item md={3} key={ind}>
                   {item.href ? (
-                    <NavLink className="title-link" href={item.href}>
+                    <NavLink className="title-link" to={item.href}>
                       {item.title}
                     </NavLink>
                   ) : (
                     <SemiSpan className="title-link">{item.title}</SemiSpan>
                   )}
                   {item.subCategories?.map((sub) => (
-                    <NavLink className="child-link" href={sub.href}>
+                    <NavLink className="child-link" to={sub.href}>
                       {sub.title}
                     </NavLink>
                   ))}
@@ -66,22 +67,21 @@ const MegaMenu3: React.FC<MegaMenuProps> = ({
           </Box>
 
           {rightImage && (
-            <Link href={rightImage.href}>
-              <a>
-                <Box position="relative" width="153px" height="100%">
-                  <LazyImage
-                    src={rightImage.imgUrl}
-                    layout="fill"
-                    objectFit="contain"
-                    alt={rightImage.alt || "Right image"} // <-- Added alt attribute here
-                  />
-                </Box>
-              </a>
-            </Link>
-          )}
+          <Link to={rightImage.href}>
+            <a>
+              <Box position="relative" width="153px" height="100%">
+                <LazyImage
+                  src={rightImage.imgUrl}
+                  style={{ objectFit: "contain", width: "100%", height: "100%" }} // Apply objectFit via inline styles
+                  alt={rightImage.alt || "Right image"} // Added alt attribute here
+                />
+              </Box>
+            </a>
+          </Link>
+        )}
         </FlexBox>
 
-        <Link href="/sale-page-2">
+        <Link to="/sale-page-2">
           <a>
             <Grid
               container
@@ -114,12 +114,11 @@ const MegaMenu3: React.FC<MegaMenuProps> = ({
                   height="160px"
                   position="relative"
                 >
-                  <LazyImage
-                    layout="fill"
-                    objectFit="contain"
-                    src="/assets/images/products/paper-bag.png"
-                    alt="Product image" // <-- Added alt attribute here
-                  />
+                <LazyImage
+                  src="/assets/images/products/paper-bag.png"
+                  style={{ objectFit: "contain", width: "100%", height: "100%" }} // Apply objectFit via inline styles
+                  alt="Product image" // Added alt attribute here
+                />
                 </FlexBox>
               </Grid>
             </Grid>

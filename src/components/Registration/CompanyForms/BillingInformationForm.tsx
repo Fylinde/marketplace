@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { savePaymentDetails } from '../../../redux/slices/registrationSlice';
+import { saveBillingAddress } from '../../../redux/slices/registrationSlice';
+
 import './BillingInformationForm.css';
 
 interface BillingInformationFormProps {
   data: {
-    cardNumber: string;
-    cardholderName: string;
-    expiryDate: { month: string; year: string };
-    billingAddress: {
-      street: string;
-      city: string;
-      state: string;
-      postal_code: string;
-      country: string;
-    };
+    street: string;
+    city: string;
+    state: string;
+    postal_code: string;
+    country: string;
   };
   onUpdate: (newData: Partial<BillingInformationFormProps['data']>) => void;
   onNext: () => void;
@@ -23,93 +19,187 @@ interface BillingInformationFormProps {
 const BillingInformationForm: React.FC<BillingInformationFormProps> = ({ data, onUpdate, onNext }) => {
   const dispatch = useDispatch();
 
-  // Initialize form state with props or fallback to defaults
-  const [formData, setFormData] = useState({
-    creditCardNumber: data.cardNumber || '',
-    expiryMonth: data.expiryDate?.month || '',
-    expiryYear: data.expiryDate?.year || '',
-    cardHolderName: data.cardholderName || '',
-    billingStreet: data.billingAddress?.street || '',
-    billingCity: data.billingAddress?.city || '',
-    billingState: data.billingAddress?.state || '',
-    billingPostalCode: data.billingAddress?.postal_code || '',
-    billingCountry: data.billingAddress?.country || '',
+  const [billingAddress, setBillingAddress] = useState({
+    street: data.street || '',
+    city: data.city || '',
+    state: data.state || '',
+    postal_code: data.postal_code || '',
+    country: data.country || '',
   });
 
+  const [paymentDetails, setPaymentDetails] = useState({
+    cardNumber: '',
+    cardholderName: '',
+    expiryMonth: '',
+    expiryYear: '',
+    currency: 'USD', // Default currency, can be changed by user
+  });
+
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    setFormData({
-      creditCardNumber: data.cardNumber || '',
-      expiryMonth: data.expiryDate?.month || '',
-      expiryYear: data.expiryDate?.year || '',
-      cardHolderName: data.cardholderName || '',
-      billingStreet: data.billingAddress?.street || '',
-      billingCity: data.billingAddress?.city || '',
-      billingState: data.billingAddress?.state || '',
-      billingPostalCode: data.billingAddress?.postal_code || '',
-      billingCountry: data.billingAddress?.country || '',
+    setBillingAddress({
+      street: data.street || '',
+      city: data.city || '',
+      state: data.state || '',
+      postal_code: data.postal_code || '',
+      country: data.country || '',
     });
   }, [data]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    setBillingAddress((prevData) => ({
       ...prevData,
       [name]: value,
     }));
 
-    // Update parent component on change
-    onUpdate({
-      cardNumber: formData.creditCardNumber,
-      cardholderName: formData.cardHolderName,
-      expiryDate: {
-        month: formData.expiryMonth,
-        year: formData.expiryYear,
-      },
-      billingAddress: {
-        street: formData.billingStreet,
-        city: formData.billingCity,
-        state: formData.billingState,
-        postal_code: formData.billingPostalCode,
-        country: formData.billingCountry,
-      },
-    });
+    onUpdate({ [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
-    // Dispatch form data to Redux
-    dispatch(savePaymentDetails({
-      cardNumber: formData.creditCardNumber,
-      cardholderName: formData.cardHolderName,
-      expiryDate: {
-        month: formData.expiryMonth,
-        year: formData.expiryYear,
-      },
-      billingAddress: {
-        street: formData.billingStreet,
-        city: formData.billingCity,
-        state: formData.billingState,
-        postal_code: formData.billingPostalCode,
-        country: formData.billingCountry,
-      },
+  const handlePaymentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setPaymentDetails((prevData) => ({
+      ...prevData,
+      [name]: value,
     }));
-
-    // Proceed to the next step
-    onNext();
   };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    dispatch(saveBillingAddress(billingAddress));
+
+    setLoading(true);
+    setError(null);
+
+    const token = await securePaymentTokenization(paymentDetails);
+
+    if (token) {
+      onNext();
+    } else {
+      setError("Failed to tokenize payment. Please try again.");
+    }
+
+    setLoading(false);
+  };
+
+  const securePaymentTokenization = async (paymentData: typeof paymentDetails) => {
+    try {
+      const requestBody = {
+        cardNumber: paymentData.cardNumber,
+        cardholderName: paymentData.cardholderName,
+        expiryMonth: paymentData.expiryMonth,
+        expiryYear: paymentData.expiryYear,
+      };
+  
+      console.log("Sending request to tokenize card:", JSON.stringify(requestBody));
+  
+      const response = await fetch('http://localhost:8013/api/tokenize-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+  
+      console.log("Received response status:", response.status);
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Network response was not ok:', response.statusText, " - Details:", errorText);
+        setError(`Failed to connect to the payment service: ${response.statusText}`);
+        return null;
+      }
+  
+      const contentType = response.headers.get("content-type");
+      console.log("Response Content-Type:", contentType);
+  
+      if (contentType && contentType.includes("application/json")) {
+        const result = await response.json();
+        console.log("Received tokenization response:", result);
+        return result.token;
+      } else {
+        const nonJsonResponse = await response.text();
+        console.error('Unexpected non-JSON response:', nonJsonResponse);
+        setError('Unexpected response from the server.');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error tokenizing payment:', error);
+      setError('An error occurred during payment tokenization.');
+      return null;
+    }
+  };
+  
 
   return (
     <form onSubmit={handleSubmit} className="billing-form">
-      <h2>Billing Information</h2>
+      <h2>Billing Address</h2>
+
+      <div className="form-group">
+        <label>Street</label>
+        <input
+          type="text"
+          name="street"
+          value={billingAddress.street}
+          onChange={handleAddressChange}
+          placeholder="Street"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>City</label>
+        <input
+          type="text"
+          name="city"
+          value={billingAddress.city}
+          onChange={handleAddressChange}
+          placeholder="City"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>State</label>
+        <input
+          type="text"
+          name="state"
+          value={billingAddress.state}
+          onChange={handleAddressChange}
+          placeholder="State"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Postal Code</label>
+        <input
+          type="text"
+          name="postal_code"
+          value={billingAddress.postal_code}
+          onChange={handleAddressChange}
+          placeholder="Postal Code"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Country</label>
+        <input
+          type="text"
+          name="country"
+          value={billingAddress.country}
+          onChange={handleAddressChange}
+          placeholder="Country"
+        />
+      </div>
+
+      <h2>Payment Information</h2>
 
       <div className="form-group">
         <label>Credit Card Number</label>
         <input
           type="text"
-          name="creditCardNumber"
-          value={formData.creditCardNumber}
-          onChange={handleChange}
+          name="cardNumber"
+          value={paymentDetails.cardNumber}
+          onChange={handlePaymentChange}
           placeholder="Enter Credit Card Number"
         />
       </div>
@@ -119,8 +209,8 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({ data, o
         <input
           type="text"
           name="expiryMonth"
-          value={formData.expiryMonth}
-          onChange={handleChange}
+          value={paymentDetails.expiryMonth}
+          onChange={handlePaymentChange}
           placeholder="MM"
         />
       </div>
@@ -130,8 +220,8 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({ data, o
         <input
           type="text"
           name="expiryYear"
-          value={formData.expiryYear}
-          onChange={handleChange}
+          value={paymentDetails.expiryYear}
+          onChange={handlePaymentChange}
           placeholder="YY"
         />
       </div>
@@ -140,69 +230,28 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({ data, o
         <label>Card Holder's Name</label>
         <input
           type="text"
-          name="cardHolderName"
-          value={formData.cardHolderName}
-          onChange={handleChange}
+          name="cardholderName"
+          value={paymentDetails.cardholderName}
+          onChange={handlePaymentChange}
           placeholder="Card Holder Name"
         />
       </div>
 
       <div className="form-group">
-        <label>Billing Street</label>
-        <input
-          type="text"
-          name="billingStreet"
-          value={formData.billingStreet}
-          onChange={handleChange}
-          placeholder="Street"
-        />
+        <label>Currency</label>
+        <select name="currency" value={paymentDetails.currency} onChange={handlePaymentChange}>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="GBP">GBP</option>
+          <option value="JPY">JPY</option>
+          <option value="AUD">AUD</option>
+          <option value="CAD">CAD</option>
+          {/* Add other supported currencies as needed */}
+        </select>
       </div>
 
-      <div className="form-group">
-        <label>Billing City</label>
-        <input
-          type="text"
-          name="billingCity"
-          value={formData.billingCity}
-          onChange={handleChange}
-          placeholder="City"
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Billing State</label>
-        <input
-          type="text"
-          name="billingState"
-          value={formData.billingState}
-          onChange={handleChange}
-          placeholder="State"
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Postal Code</label>
-        <input
-          type="text"
-          name="billingPostalCode"
-          value={formData.billingPostalCode}
-          onChange={handleChange}
-          placeholder="Postal Code"
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Billing Country</label>
-        <input
-          type="text"
-          name="billingCountry"
-          value={formData.billingCountry}
-          onChange={handleChange}
-          placeholder="Country"
-        />
-      </div>
-
-      <button type="submit" className="submit-btn">Next</button>
+      {error && <p className="error-message">{error}</p>}
+      {loading ? <p>Processing...</p> : <button type="submit" className="submit-btn">Next</button>}
     </form>
   );
 };

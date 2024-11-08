@@ -14,13 +14,16 @@ import {
   variant,
 } from "styled-system";
 
+// Define the button props type
 interface IconButtonProps {
   size: "small" | "medium" | "large" | "none";
   variant: "text" | "outlined" | "contained";
-  color: "primary" | "secondary" | "error" | "default"; // These should be the valid color keys in your theme
+  color: "primary" | "secondary" | "error" | "default" | string;
 }
 
-const IconButton = styled.button<
+const IconButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => !["size", "variant", "color"].includes(prop),
+})<
   ColorProps | BackgroundProps | BorderProps | SpaceProps | IconButtonProps
 >(
   systemCss({
@@ -48,28 +51,43 @@ const IconButton = styled.button<
       variants: {
         text: {
           border: "none",
-          color: `${props.theme.colors[props.color ?? "default"]?.main}`, // Fallback to "default"
+          color: `${
+            props.theme?.colors?.[props.color as keyof typeof props.theme.colors]?.main || props.color || "#000"
+          }`,
         },
         outlined: {
-          color: `${props.theme.colors[props.color ?? "default"]?.main}`, // Fallback to "default"
+          color: `${
+            props.theme?.colors?.[props.color as keyof typeof props.theme.colors]?.main || props.color || "#000"
+          }`,
           border: "2px solid",
-          borderColor: `${props.theme.colors[props.color ?? "default"]?.main}`, // Fallback to "default"
+          borderColor: `${
+            props.theme?.colors?.[props.color as keyof typeof props.theme.colors]?.main || props.color || "#000"
+          }`,
           "&:focus": {
             boxShadow: `0px 1px 4px 0px ${
-              props.theme.colors[props.color ?? "default"]?.main // Fallback to "default"
+              props.theme?.colors?.[props.color as keyof typeof props.theme.colors]?.main ||
+              props.color || "#ddd"
             }`,
           },
         },
         contained: {
           border: "none",
-          color: `${props.theme.colors[props.color ?? "default"]?.text}`, // Fallback to "default"
-          bg: `${props.theme.colors[props.color ?? "default"]?.main}`, // Fallback to "default"
+          color: `${
+            props.theme?.colors?.[props.color as keyof typeof props.theme.colors]?.text || "inherit"
+          }`,
+          bg: `${
+            props.theme?.colors?.[props.color as keyof typeof props.theme.colors]?.main || props.color || "#000"
+          }`,
           "&:hover": {
-            bg: `${props.theme.colors[props.color ?? "default"]?.main}`, // Fallback to "default"
+            bg: `${
+              props.theme?.colors?.[props.color as keyof typeof props.theme.colors]?.main ||
+              props.color || "#f5f5f5"
+            }`,
           },
           "&:focus": {
             boxShadow: `0px 1px 4px 0px ${
-              props.theme.colors[props.color ?? "default"]?.main // Fallback to "default"
+              props.theme?.colors?.[props.color as keyof typeof props.theme.colors]?.main ||
+              props.color || "#ddd"
             }`,
           },
         },
@@ -93,9 +111,10 @@ const IconButton = styled.button<
   compose(color, layout, space, border, shadow)
 );
 
+
 IconButton.defaultProps = {
   size: "small",
-  color: "default", // Add a default color to avoid undefined
+  color: "default",
 };
 
 export default IconButton;

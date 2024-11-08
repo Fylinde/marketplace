@@ -1,4 +1,4 @@
-import navigations from "@data/navigations";
+import navigations from "data/navigations";
 import React from "react";
 import CategoryMenuItem from "./category-menu-item/CategoryMenuItem";
 import { StyledCategoryDropdown } from "./CategoryDropdownStyle";
@@ -10,7 +10,7 @@ interface NavigationItem {
   title: string;
   href: string;
   icon?: string;
-  menuComponent?: string; // Loosened this to be any string
+  menuComponent?: string; // Optional component name as string
   menuData?: any; // You can type this more strictly if you know the structure
 }
 
@@ -23,7 +23,7 @@ export interface CategoryDropdownProps {
 // Main CategoryDropdown component
 const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   open,
-  position,
+  position = "absolute",
 }) => {
   // Define the mapping for MegaMenu components
   const megaMenu: { MegaMenu1: React.FC<any>; MegaMenu2: React.FC<any> } = {
@@ -34,19 +34,20 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   return (
     <StyledCategoryDropdown open={open} position={position}>
       {navigations.map((item: NavigationItem, index: number) => {
-        // Safely cast and ensure it's one of the valid menu components
-        const MegaMenu = megaMenu[item.menuComponent as keyof typeof megaMenu];
+        // Ensure menuComponent exists and is a valid key in megaMenu
+        const menuComponent = item.menuComponent as keyof typeof megaMenu;
+        const MegaMenu = megaMenu[menuComponent];
 
         return (
           <CategoryMenuItem
-            title={item.title}
-            href={item.href}
+            title={item.title || "Untitled"}
+            href={item.href || "#"}
             icon={item.icon}
             caret={!!item.menuData}
-            key={item.title}
+            key={item.title || index} // Use title or index as a fallback for key
           >
-            {/* Ensure the MegaMenu exists before rendering */}
-            {MegaMenu && <MegaMenu data={item.menuData || {}} />}
+            {/* Render MegaMenu only if it exists */}
+            {MegaMenu ? <MegaMenu data={item.menuData || {}} /> : null}
           </CategoryMenuItem>
         );
       })}

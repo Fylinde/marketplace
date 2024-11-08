@@ -60,7 +60,7 @@ const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ onNext, onUpdate }) => {
 
     // Navigate to the next step (Verification)
     onNext();
-    navigate('/business/verification');
+    navigate('/register/seller/individual/verification');
   };
 
   return (

@@ -1,6 +1,5 @@
-import { Chip } from "@component/Chip";
-import Image from "@component/Image";
-import Link from "next/link";
+import { Chip } from "components/Chip";
+import { Link } from "react-router-dom";
 import React, { Fragment, useCallback, useState } from "react";
 import { CSSProperties } from "styled-components";
 import Box from "../Box";
@@ -30,17 +29,6 @@ export interface ProductCard9Props {
     url: string;
   }>;
   [key: string]: unknown;
-  // className?: string;
-  // style?: CSSProperties;
-  // imgUrl: string;
-  // title: string;
-  // price: number;
-  // off: number;
-  // rating?: number;
-  // subcategories?: Array<{
-  //   title: string;
-  //   url: string;
-  // }>;
 }
 
 const ProductCard9: React.FC<ProductCard9Props> = ({
@@ -55,14 +43,14 @@ const ProductCard9: React.FC<ProductCard9Props> = ({
   const [cartAmount, setCartAmount] = useState(0);
   const [open, setOpen] = useState(false);
 
+  // Toggle dialog for modal view
   const toggleDialog = useCallback(() => {
     setOpen((open) => !open);
   }, []);
 
+  // Handle cart amount changes with explicit 'number' typing for amount
   const handleCartAmountChange = useCallback(
-    (amount) => () => {
-      console.log(amount);
-
+    (amount: number) => () => {
       if (amount >= 0) setCartAmount(amount);
     },
     []
@@ -95,34 +83,30 @@ const ProductCard9: React.FC<ProductCard9Props> = ({
             >
               eye-alt
             </Icon>
-            <Image
-              src={imgUrl}
-              alt={title}
-              width="100%"
-              borderRadius="0.5rem"
+
+            {/* Replace Next.js Image component with standard <img> */}
+            <img
+              src={imgUrl || "/assets/images/default.png"}
+              alt={title || "Product"}
+              style={{ width: "100%", borderRadius: "0.5rem" }} // Apply width and borderRadius using inline styles
             />
           </Box>
         </Grid>
 
         <Grid item md={8} sm={8} xs={12}>
-          <FlexBox
-            flexDirection="column"
-            justifyContent="center"
-            height="100%"
-            p="1rem"
-          >
+          <FlexBox flexDirection="column" justifyContent="center" height="100%" p="1rem">
             <div className="categories">
               {subcategories?.map((item) => (
-                <NavLink className="link" href={item.url} key={item.title}>
+                <NavLink className="link" to={item.url} key={item.title}>
                   {item.title}
                 </NavLink>
               ))}
             </div>
 
-            <Link href="/product/34324321">
+            <Link to="/product/34324321">
               <a>
                 <H5 fontWeight="600" my="0.5rem">
-                  {title}
+                  {title || "No Title"}
                 </H5>
               </a>
             </Link>
@@ -138,22 +122,19 @@ const ProductCard9: React.FC<ProductCard9Props> = ({
 
             <FlexBox mt="0.5rem" mb="1rem" alignItems="center">
               <H5 fontWeight={600} color="primary.main" mr="0.5rem">
-                ${price?.toFixed(2)}
+                ${price?.toFixed(2) || "0.00"}
               </H5>
               {off && (
                 <SemiSpan fontWeight="600">
-                  <del>${(price - (price * off) / 100).toFixed(2)}</del>
+                  <del>
+                    ${((price ?? 0) - ((price ?? 0) * (off ?? 0)) / 100).toFixed(2)}
+                  </del>
                 </SemiSpan>
               )}
             </FlexBox>
 
             <Hidden up="sm">
-              <FlexBox
-                alignItems="center"
-                justifyContent="space-between"
-                flexDirection="row-reverse"
-                height="30px"
-              >
+              <FlexBox alignItems="center" justifyContent="space-between" flexDirection="row-reverse" height="30px">
                 <Icon className="favorite-icon outlined-icon" variant="small">
                   heart
                 </Icon>
@@ -163,7 +144,7 @@ const ProductCard9: React.FC<ProductCard9Props> = ({
                     variant="outlined"
                     color="primary"
                     padding="5px"
-                    size="none"
+                    size="small"
                     borderColor="primary.light"
                     onClick={handleCartAmountChange(cartAmount + 1)}
                   >
@@ -179,7 +160,7 @@ const ProductCard9: React.FC<ProductCard9Props> = ({
                         variant="outlined"
                         color="primary"
                         padding="5px"
-                        size="none"
+                        size="small"
                         borderColor="primary.light"
                         onClick={handleCartAmountChange(cartAmount - 1)}
                       >
@@ -206,9 +187,6 @@ const ProductCard9: React.FC<ProductCard9Props> = ({
             <Icon className="favorite-icon outlined-icon" variant="small">
               heart
             </Icon>
-            {/* <Icon className="favorite-icon" color="primary" variant="small">
-              heart-filled
-            </Icon> */}
 
             <FlexBox
               className="add-cart"
@@ -219,7 +197,7 @@ const ProductCard9: React.FC<ProductCard9Props> = ({
                 variant="outlined"
                 color="primary"
                 padding="5px"
-                size="none"
+                size="small"
                 borderColor="primary.light"
                 onClick={handleCartAmountChange(cartAmount + 1)}
               >
@@ -234,7 +212,7 @@ const ProductCard9: React.FC<ProductCard9Props> = ({
                     variant="outlined"
                     color="primary"
                     padding="5px"
-                    size="none"
+                    size="small"
                     borderColor="primary.light"
                     onClick={handleCartAmountChange(cartAmount - 1)}
                   >
@@ -249,19 +227,13 @@ const ProductCard9: React.FC<ProductCard9Props> = ({
 
       <Modal open={open} onClose={toggleDialog}>
         <Card p="1rem" position="relative">
-          <ProductIntro imgUrl={[imgUrl]} title={title} price={price} />
-          <Box
-            position="absolute"
-            top="0.75rem"
-            right="0.75rem"
-            cursor="pointer"
-          >
-            <Icon
-              className="close"
-              color="primary"
-              variant="small"
-              onClick={toggleDialog}
-            >
+          <ProductIntro
+            imgUrl={[imgUrl || "/assets/images/default.png"]}
+            title={title || "No Title Available"}
+            price={price ?? 0}
+          />
+          <Box position="absolute" top="0.75rem" right="0.75rem" cursor="pointer">
+            <Icon className="close" color="primary" variant="small" onClick={toggleDialog}>
               close
             </Icon>
           </Box>
@@ -271,6 +243,7 @@ const ProductCard9: React.FC<ProductCard9Props> = ({
   );
 };
 
+// Default props to ensure components have valid values if none are provided
 ProductCard9.defaultProps = {
   title:
     "Apple iPhone 5 Unlocked 16GB 8MP Used Cell-Phone-16gbIOS Used Refurbished 100%Factory Used",

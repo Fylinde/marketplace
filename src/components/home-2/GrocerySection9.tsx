@@ -1,10 +1,11 @@
-import Avatar from "@component/avatar/Avatar";
-import Box from "@component/Box";
-import Card from "@component/Card";
-import Carousel from "@component/carousel/Carousel";
-import FlexBox from "@component/FlexBox";
-import Icon from "@component/icon/Icon";
-import { H5, Span } from "@component/Typography";
+
+import Avatar from "components/avatar/Avatar";
+import Box from "components/Box";
+import Card from "components/Card";
+import Carousel from "components/carousel/Carousel";
+import FlexBox from "components/FlexBox";
+import Icon from "components/icon/Icon";
+import { H5, Span } from "components/Typography";
 import React from "react";
 import { GrocerySection10Wrapper } from "./GrocerySectionStyle";
 

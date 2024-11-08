@@ -1,9 +1,8 @@
-import systemCss from "@styled-system/css";
 import styled from "styled-components";
 import {
   border,
   BorderProps,
-  color,
+  color as styledColor,
   ColorProps,
   compose,
   layout,
@@ -14,136 +13,126 @@ import {
   variant,
   BackgroundProps,
 } from "styled-system";
-import { colorOptions } from "interfaces"; // Assuming colorOptions are declared in 'interfaces'
 
-type ColorKeys = "primary" | "secondary" | "text" | "error" | "warning"; // Define based on your theme colors
-
-interface ButtonProps {
+interface ButtonProps extends LayoutProps, SpaceProps { // Extend to include layout and space props
   size?: "small" | "medium" | "large" | "none";
-  color?: ColorKeys | undefined; // Use the manual color keys type
+  color?: "primary" | "secondary" | "text" | "error" | "warning";
   variant?: "text" | "outlined" | "contained";
   fullwidth?: boolean;
 }
 
+const Button = styled.button.withConfig({
+  shouldForwardProp: (prop) => !["fullwidth", "color", "size", "variant"].includes(prop),
+})<
+  ColorProps & BackgroundProps & BorderProps & SpaceProps & ButtonProps
+>`
+  ${(props) => {
+    const { color = "text", fullwidth, theme } = props;
+    const buttonColor: string =
+      theme?.colors?.[color]?.main ?? theme?.colors?.text?.main ?? "#000";
 
-// Fix: Destructure theme from props
-const Button = styled.button<
-  ColorProps &
-    BackgroundProps &
-    BorderProps &
-    SpaceProps &
-    ButtonProps &
-    LayoutProps
->(
-  ({ color = "text", fullwidth, theme }) => // Destructure theme here
-    systemCss({
-      display: "flex",
-      width: fullwidth ? "100%" : "unset",
-      justifyContent: "center",
-      alignItems: "center",
-      outline: "none",
-      border: "none",
-      cursor: "pointer",
-      padding: "11px 1.5rem",
-      fontSize: "1rem",
-      fontWeight: 600,
-      color: color ? `${theme.colors[color]?.main}` : "body.text", // Now theme is properly referenced
-      background: "transparent",
-      transition: "all 150ms ease-in-out",
-      lineHeight: 1,
-      "&:focus": {
-        boxShadow: 3, // Assuming 'shadows[3]' refers to the theme shadow
-      },
-      "&:disabled": {
-        bg: "text.disabled",
-        color: "text.hint",
-        borderColor: "text.disabled",
-        cursor: "unset",
-        "svg path": {
-          fill: "text.hint",
-        },
-        "svg polyline, svg polygon": {
-          color: "text.hint",
-        },
-      },
-    }),
-  ({ theme, color = "text" }) => // Destructure theme here as well
-    variant({
+    return `
+      display: flex;
+      width: ${fullwidth ? "100%" : "unset"};
+      justify-content: center;
+      align-items: center;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      padding: 11px 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: ${buttonColor};
+      background: transparent;
+      transition: all 150ms ease-in-out;
+      line-height: 1;
+
+      &:focus {
+        box-shadow: ${theme?.shadows?.[3] ?? "none"};
+      }
+
+      &:disabled {
+        background-color: ${theme?.colors?.text?.disabled ?? "#ccc"};
+        color: ${theme?.colors?.text?.hint ?? "#999"};
+        border-color: ${theme?.colors?.text?.disabled ?? "#ccc"};
+        cursor: not-allowed;
+
+        svg path {
+          fill: ${theme?.colors?.text?.hint ?? "#999"};
+        }
+
+        svg polyline, svg polygon {
+          color: ${theme?.colors?.text?.hint ?? "#999"};
+        }
+      }
+    `;
+  }}
+
+  ${(props) => {
+    const { theme, color = "text" } = props;
+
+    return variant({
       prop: "variant",
       variants: {
         text: {
           border: "none",
-          color: `${theme.colors[color]?.main ?? "text.primary"}`, // Fallback to 'text.primary'
+          color: theme?.colors?.[color]?.main || theme?.colors?.text?.main || "#000",
           "&:hover": {
-            bg: theme.colors[color]?.light ?? "gray.100", // Fallback to 'gray.100'
+            backgroundColor: theme?.colors?.[color]?.light || "#f5f5f5",
           },
         },
         outlined: {
           padding: "10px 16px",
-          color: `${theme.colors[color]?.main ?? "text.primary"}`, // Fallback to 'text.primary'
+          color: theme?.colors?.[color]?.main || theme?.colors?.text?.main || "#000",
           border: "1px solid",
-          borderColor: theme.colors[color]?.main ?? "text.disabled",
+          borderColor: theme?.colors?.[color]?.main || theme?.colors?.text?.disabled || "#ddd",
           "&:enabled svg path": {
-            fill: `${theme.colors[color]?.main ?? "text.primary"} !important`,
-          },
-          "&:enabled svg polyline, svg polygon": {
-            color: `${theme.colors[color]?.main ?? "text.primary"} !important`,
+            fill: theme?.colors?.[color]?.main || theme?.colors?.text?.main || "#000",
           },
           "&:focus": {
-            boxShadow: `0px 1px 4px 0px ${theme.colors[color]?.light ?? "gray.300"}`, // Fallback to 'gray.300'
-          },
-          "&:hover:enabled": {
-            bg: theme.colors[color]?.main ?? "gray.100", // Fallback to 'gray.100'
-            borderColor: theme.colors[color]?.main ?? "text.disabled", // Fallback to 'text.disabled'
-            color: theme.colors[color]?.text ?? "text.primary", // Fallback to 'text.primary'
-            "svg path": {
-              fill: `${theme.colors[color]?.text ?? "text.primary"} !important`, // Fallback to 'text.primary'
-            },
-            "svg polyline, svg polygon": {
-              color: `${theme.colors[color]?.text ?? "text.primary"} !important`, // Fallback to 'text.primary'
-            },
+            boxShadow: `0px 1px 4px 0px ${theme?.colors?.[color]?.light || "#ddd"}`,
           },
         },
         contained: {
-          border: "none",
-          color: `${theme.colors[color]?.text ?? "text.primary"}`, // Fallback to 'text.primary'
-          bg: `${theme.colors[color]?.main ?? "text.primary"}`, // Fallback to 'text.primary'
+          color: theme?.colors?.[color]?.text || theme?.colors?.text?.main || "#fff",
+          backgroundColor: theme?.colors?.[color]?.main || theme?.colors?.text?.main || "#000",
           "&:focus": {
-            boxShadow: `0px 1px 4px 0px ${theme.colors[color]?.light ?? "gray.300"}`, // Fallback to 'gray.300'
+            boxShadow: `0px 1px 4px 0px ${theme?.colors?.[color]?.light || "#ddd"}`,
           },
           "&:enabled svg path": {
-            fill: `${theme.colors[color]?.text ?? "text.primary"} !important`, // Fallback to 'text.primary'
-          },
-          "&:enabled svg polyline, svg polygon": {
-            color: `${theme.colors[color]?.text ?? "text.primary"} !important`, // Fallback to 'text.primary'
+            fill: theme?.colors?.[color]?.text || theme?.colors?.text?.main || "#fff",
           },
         },
       },
-    }),
-  variant({
+    });
+  }}
+
+  ${variant({
     prop: "size",
     variants: {
       large: {
         height: "56px",
-        px: 30,
+        paddingLeft: "30px",
+        paddingRight: "30px",
       },
       medium: {
         height: "48px",
-        px: 30,
+        paddingLeft: "30px",
+        paddingRight: "30px",
       },
       small: {
         height: "40px",
-        fontSize: 14,
+        fontSize: "14px",
       },
     },
-  }),
-  compose(color, layout, space, border, shadow)
-);
+  })}
 
-// Set default values for Button props
+  ${compose(styledColor, layout, space, border, shadow)}
+`;
+
 Button.defaultProps = {
   size: "small",
-  borderRadius: 5,
+  borderRadius: "5px",
 };
 
 export default Button;

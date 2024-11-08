@@ -1,4 +1,6 @@
-import { deviceSize } from "@utils/constants";
+
+import React from "react"; // Add this line
+import { deviceSize } from "utils/constants";
 import { CarouselProvider } from "pure-react-carousel";
 import styled from "styled-components";
 import { getTheme } from "../../utils/utils";

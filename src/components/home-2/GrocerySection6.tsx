@@ -1,11 +1,11 @@
-import Box from "@component/Box";
-import Button from "@component/buttons/Button";
-import Card from "@component/Card";
-import Carousel from "@component/carousel/Carousel";
-import FlexBox from "@component/FlexBox";
-import LazyImage from "@component/LazyImage";
-import { H3, H5 } from "@component/Typography";
-import Link from "next/link";
+import Box from "components/Box";
+import Button from "components/buttons/Button";
+import Card from "components/Card";
+import Carousel from "components/carousel/Carousel";
+import FlexBox from "components/FlexBox";
+import LazyImage from "components/LazyImage";
+import { H3, H5 } from "components/Typography";
+import { Link } from "react-router-dom";
 import React from "react";
 import { GrocerySection6Wrapper } from "./GrocerySectionStyle";
 
@@ -25,7 +25,13 @@ const GrocerySection6: React.FC = () => {
           {cardList.map((item, ind) => (
             <Box p="0.25rem" key={ind}>
               <Card className="carousel-card" bg={item.bgColor}>
-                <FlexBox alignItems="center" flexWrap="wrap">
+                <FlexBox
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
                   <Box flex="1 1 0">
                     <H5 fontWeight="600" fontSize="18px" mb="0.5rem">
                       {item.subtitle}
@@ -34,20 +40,19 @@ const GrocerySection6: React.FC = () => {
                       {item.title}
                     </H3>
 
-                    <Link href={item.shopUrl}>
-                      <a>
-                        <Button variant="contained" color="primary">
-                          Shop Now
-                        </Button>
-                      </a>
+                    {/* Use Link directly without the nested <a> */}
+                    <Link to={item.shopUrl}>
+                      <Button variant="contained" color="primary">
+                        Shop Now
+                      </Button>
                     </Link>
                   </Box>
                   <LazyImage
                     src={item.imgUrl}
-                    width={320}  
-                    height={200}  
-                    objectFit="contain"
-                    alt={item.title}  
+                    width={320}
+                    height={200}
+                    style={{ objectFit: "contain" }}
+                    alt={item.title}
                   />
                 </FlexBox>
               </Card>
@@ -85,4 +90,5 @@ const cardList = [
     bgColor: "#F6FFE5",
   },
 ];
+
 export default GrocerySection6;

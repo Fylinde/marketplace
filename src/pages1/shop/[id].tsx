@@ -1,18 +1,18 @@
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import Hidden from "@component/hidden/Hidden";
-import Icon from "@component/icon/Icon";
-import NavbarLayout from "@component/layout/NavbarLayout";
-import ProductCardList from "@component/products/ProductCard1List";
-import ProductFilterCard from "@component/products/ProductFilterCard";
-import ShopIntroCard from "@component/shop/ShopIntroCard";
-import Sidenav from "@component/sidenav/Sidenav";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import Hidden from "components/hidden/Hidden";
+import Icon from "components/icon/Icon";
+import NavbarLayout from "components/layout/NavbarLayout";
+import ProductCardList from "components/products/ProductCard1List";
+import ProductFilterCard from "components/products/ProductFilterCard";
+import ShopIntroCard from "components/shop/ShopIntroCard";
+import Sidenav from "components/sidenav/Sidenav";
 import React from "react";
 import useWindowSize from "../../hooks/useWindowSize";
 
 const Shop = () => {
-  const width = useWindowSize();
-  const isTablet = width < 1025;
+  const { width } = useWindowSize();  // Destructure 'width'
+  const isTablet = width < 1025;      // Now 'width' is a number
 
   return (
     <div>

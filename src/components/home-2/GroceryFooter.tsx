@@ -1,7 +1,7 @@
-import AppStore from "@component/AppStore";
-import Image from "@component/Image";
-import { deviceSize } from "@utils/constants";
-import Link from "next/link";
+import AppStore from "components/AppStore";
+import Image from "components/Image";
+import { deviceSize } from "utils/constants";
+import { Link } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
 import { getTheme } from "../../utils/utils";
@@ -11,7 +11,7 @@ import Grid from "../grid/Grid";
 import Icon from "../icon/Icon";
 import { Paragraph } from "../Typography";
 
-const StyledLink = styled.a`
+const StyledLink = styled(Link)`  // Updated to Link instead of 'a'
   display: block;
   padding: 0.35rem 0rem;
   color: ${getTheme("colors.gray.500")};
@@ -52,10 +52,9 @@ const GroceryFooter: React.FC = () => {
         color="white"
         overflow="hidden"
       >
-        <Link href="/">
-          <a>
-            <Image mb="1.5rem" src="/assets/images/logo.svg" alt="logo" />
-          </a>
+        {/* Use Link directly without the nested <a> */}
+        <Link to="/">
+          <Image mb="1.5rem" src="/assets/images/logo.svg" alt="logo" />
         </Link>
 
         <Grid container spacing={6}>
@@ -73,15 +72,15 @@ const GroceryFooter: React.FC = () => {
             <StyledBox maxWidth="230px" mt="-0.35rem">
               <div>
                 {customerCareLinks.map((item, ind) => (
-                  <Link href="/" key={ind}>
-                    <StyledLink>{item}</StyledLink>
-                  </Link>
+                  <StyledLink to="/" key={ind}> {/* StyledLink is now a Link */}
+                    {item}
+                  </StyledLink>
                 ))}
               </div>
 
               <FlexBox mx="-5px" mt="1rem">
                 {iconList.map((item, ind) => (
-                  <Link href="/" key={ind}>
+                  <Link to="/" key={ind}>
                     <Box
                       m="5px"
                       size="small"

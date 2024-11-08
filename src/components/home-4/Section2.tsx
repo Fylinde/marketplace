@@ -14,12 +14,14 @@ const Section2: React.FC<Section2Props> = () => {
       <Grid container spacing={6}>
         <Grid item lg={3} sm={6} xs={12}>
           <Card
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            p="2rem 3.5rem"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "2rem 3.5rem",
+              height: "100%",
+            }}
             boxShadow="border"
-            height="100%"
             hoverEffect
           >
             <Icon color="primary" size="50px" mb="1.5rem">
@@ -37,12 +39,14 @@ const Section2: React.FC<Section2Props> = () => {
         </Grid>
         <Grid item lg={3} sm={6} xs={12}>
           <Card
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            p="2rem 3.5rem"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "2rem 3.5rem",
+              height: "100%",
+            }}
             boxShadow="border"
-            height="100%"
             hoverEffect
           >
             <Icon color="primary" size="50px" mb="1.5rem">

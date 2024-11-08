@@ -13,9 +13,22 @@ const StyledProductCategory = styled(Box)<StyledProductCategoryProps>`
   cursor: pointer;
   min-width: 240px;
   border-radius: 5px;
+  position: relative; /* Ensure child elements respect this parent */
 
   &:hover {
     box-shadow: ${getTheme("shadows.4")};
+  }
+
+  /* Ensure the image stays within the bounds of the container */
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Keep aspect ratio and contain within the element */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 
   .product-category-title {

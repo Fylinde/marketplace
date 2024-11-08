@@ -8,20 +8,31 @@ import './SignInForm.css';
 const SignInForm: React.FC = () => {
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);  // Reset error
+
+    console.log("Initiating login with:", { emailOrPhone, password });
+
     const resultAction = await dispatch(login({ emailOrPhone, password }));
 
     if (login.fulfilled.match(resultAction)) {
-      // OTP has been successfully sent, proceed to the OTP entry form
-      console.log(resultAction.payload.message);
-      navigate('/registration/verify-otp');
+      console.log("Login successful:", resultAction.payload);
+
+      // Store contact information for OTP verification
+      localStorage.setItem('contact', emailOrPhone);
+      console.log("Stored contact in localStorage:", localStorage.getItem('contact'));
+
+      // Log any success message and navigate to the OTP entry form
+      console.log("Navigating to OTP verification page");
+      navigate('/register/verify-otp');
     } else if (login.rejected.match(resultAction)) {
-      console.error('Login failed:', resultAction.payload);
-      alert(
+      console.log("Login failed:", resultAction.payload);
+      setError(
         typeof resultAction.payload === 'string'
           ? resultAction.payload
           : 'Login failed. Please check your email/phone and password and try again.'
@@ -34,6 +45,7 @@ const SignInForm: React.FC = () => {
       <img src="Logo/fylind_logo_1.png" alt="Fylinde" className="auth-logo" onClick={() => navigate('/')} />
       <form onSubmit={handleSubmit}>
         <h1>Sign in</h1>
+        {error && <p className="error-message">{error}</p>}
         <label>Email or mobile phone number</label>
         <input
           type="text"
@@ -52,7 +64,7 @@ const SignInForm: React.FC = () => {
           Continue
         </button>
       </form>
-      <button className="auth-button" onClick={() => navigate('/registration/create-account')}>
+      <button className="auth-button" onClick={() => navigate('/register/create-account')}>
         Create your Fylinde account
       </button>
     </div>

@@ -1,6 +1,7 @@
-import Box from "@component/Box";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
+
+import Box from "components/Box";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
 import React from "react";
 import FashionCard1 from "./FashionCard1";
 import FashionCard2 from "./FashionCard2";

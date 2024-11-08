@@ -1,21 +1,32 @@
-import Avatar from "@component/avatar/Avatar";
-import Box from "@component/Box";
-import Button from "@component/buttons/Button";
-import { Card1 } from "@component/Card1";
-import Grid from "@component/grid/Grid";
-import Hidden from "@component/hidden/Hidden";
-import Icon from "@component/icon/Icon";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import VendorDashboardLayout from "@component/layout/VendorDashboardLayout";
-import Select from "@component/Select";
-import TextField from "@component/text-field/TextField";
+import Avatar from "components/avatar/Avatar";
+import Box from "components/Box";
+import Button from "components/buttons/Button";
+import { Card1 } from "components/Card1";
+import Grid from "components/grid/Grid";
+import Hidden from "components/hidden/Hidden";
+import Icon from "components/icon/Icon";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
+import Select from "components/Select";
+import TextField from "components/text-field/TextField";
 import { Formik } from "formik";
 import React from "react";
 import * as yup from "yup";
 import countryList from "../../../data/countryList";
 
+// Define the structure of form values
+interface FormValues {
+  first_name: string;
+  last_name: string;
+  country: string;
+  city: string;
+  email: string;
+  contact: string;
+}
+
 const AccountSettings = () => {
-  const handleFormSubmit = async (values) => {
+  // Add type annotation for 'values'
+  const handleFormSubmit = async (values: FormValues) => {
     console.log(values);
   };
 
@@ -31,8 +42,7 @@ const AccountSettings = () => {
           mb="1.5rem"
           position="relative"
           style={{
-            background:
-              "url(/assets/images/banners/banner-10.png) center/cover",
+            background: "url(/assets/images/banners/banner-10.png) center/cover",
           }}
         >
           <Box
@@ -49,7 +59,7 @@ const AccountSettings = () => {
               borderColor="gray.100"
             />
 
-            <Box ml="-20px" zIndex={1}>
+            <Box ml="-20px" style={{ zIndex: 1 }}>
               <label htmlFor="profile-image">
                 <Button
                   as="span"
@@ -206,7 +216,8 @@ const AccountSettings = () => {
   );
 };
 
-const initialValues = {
+// Define the initial values and form validation schema
+const initialValues: FormValues = {
   first_name: "",
   last_name: "",
   country: "",

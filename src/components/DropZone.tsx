@@ -6,18 +6,22 @@ import Divider from "./Divider";
 import Typography, { H5, Small } from "./Typography";
 
 export interface DropZoneProps {
-  onChange?: (files: []) => void;
+  onChange?: (files: File[]) => void;
 }
 
 const DropZone: React.FC<DropZoneProps> = ({ onChange }) => {
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     if (onChange) onChange(acceptedFiles);
-  }, []);
+  }, [onChange]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple: true,
-    accept: ".jpeg,.jpg,.png,.gif",
+    accept: {
+      'image/jpeg': ['.jpeg', '.jpg'],
+      'image/png': ['.png'],
+      'image/gif': ['.gif'],
+    },
     maxFiles: 10,
   });
 
@@ -31,7 +35,7 @@ const DropZone: React.FC<DropZoneProps> = ({ onChange }) => {
       border="1px dashed"
       borderColor="gray.400"
       borderRadius="10px"
-      bg={isDragActive && "gray.200"}
+      bg={isDragActive ? "gray.200" : undefined}  // Fix: use undefined instead of false
       transition="all 250ms ease-in-out"
       style={{ outline: "none" }}
       {...getRootProps()}

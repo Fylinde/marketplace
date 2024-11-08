@@ -1,27 +1,26 @@
-import Avatar from "@component/avatar/Avatar";
-import Box from "@component/Box";
-import Button from "@component/buttons/Button";
-import IconButton from "@component/buttons/IconButton";
-import Card from "@component/Card";
-import Divider from "@component/Divider";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import Icon from "@component/icon/Icon";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import VendorDashboardLayout from "@component/layout/VendorDashboardLayout";
-import Select from "@component/Select";
-import TableRow from "@component/TableRow";
-import TextField from "@component/text-field/TextField";
-import TextArea from "@component/textarea/TextArea";
-import Typography, { H5, H6 } from "@component/Typography";
+
+import Avatar from "components/avatar/Avatar";
+import Box from "components/Box";
+import Button from "components/buttons/Button";
+import IconButton from "components/buttons/IconButton";
+import Card from "components/Card";
+import Divider from "components/Divider";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import Icon from "components/icon/Icon";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
+import Select from "components/Select";
+import TableRow from "components/TableRow";
+import TextField from "components/text-field/TextField";
+import TextArea from "components/textarea/TextArea";
+import Typography, { H5, H6 }  from "components/Typography";
 import { format } from "date-fns";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { Link, useParams } from "react-router-dom";  
 import React from "react";
 
 const OrderDetails = () => {
-  const router = useRouter();
-  const { id } = router.query;
+  const { id } = useParams();  // Replaced useRouter with useParams to get the ID
 
   return (
     <div>
@@ -29,7 +28,7 @@ const OrderDetails = () => {
         title="Order Details"
         iconName="bag_filled"
         button={
-          <Link href="/vendor/orders">
+          <Link to="/vendor/orders">  {/* Replaced href with to */}
             <Button color="primary" bg="primary.light" px="2rem">
               Back to Order List
             </Button>
@@ -223,6 +222,7 @@ const orderStatusList = [
     value: "Cancelled",
   },
 ];
+
 OrderDetails.layout = VendorDashboardLayout;
 
 export default OrderDetails;

@@ -1,5 +1,5 @@
-import LazyImage from "@component/LazyImage";
-import productDatabase from "@data/product-database";
+import LazyImage from "components/LazyImage";
+import productDatabase from "data/product-database";
 import React, { useEffect, useState } from "react";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
@@ -75,8 +75,16 @@ const Section9: React.FC = () => {
                 <LazyImage
                   height={20} // Fix for LazyImage height type
                   width={20}  // Fix for LazyImage width type
-                  objectFit="contain"
                   src={`/assets/images/logos/${ind % 2 === 0 ? "v" : "u"}.png`}
+                  style={{
+                    position: "absolute",  // Make the image fill the container
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",  // Ensure it maintains aspect ratio
+                  }}
+
                   alt={brand}
                 />
                 <span className="product-category-title">{brand}</span>

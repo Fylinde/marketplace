@@ -1,17 +1,17 @@
-import Box from "@component/Box";
-import Carousel from "@component/carousel/Carousel";
-import ProductCard10 from "@component/product-cards/ProductCard10";
-import productDatabase from "@data/product-database";
-import useWindowSize from "@hook/useWindowSize";
+import Box from "components/Box";
+import Carousel from "components/carousel/Carousel";
+import ProductCard10 from "components/product-cards/ProductCard10";
+import productDatabase from "data/product-database";
+import useWindowSize from "hooks/useWindowSize";
 import React, { useEffect, useState } from "react";
 import { H3 } from "../Typography";
 
 const GrocerySection8: React.FC = () => {
   const [visibleSlides, setVisibleSlides] = useState(3);
-  const width = useWindowSize();
+  const { width } = useWindowSize(); // Destructure width from the hook
 
   useEffect(() => {
-    if (width !== null) {  // Add null check for width
+    if (width !== undefined && width !== null) { // Check for both undefined and null
       if (width < 500) setVisibleSlides(1);
       else if (width < 950) setVisibleSlides(2);
       else setVisibleSlides(3);

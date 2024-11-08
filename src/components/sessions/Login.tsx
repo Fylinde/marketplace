@@ -1,6 +1,5 @@
 import { useFormik } from "formik";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { Link, useNavigate } from "react-router-dom";
 import React, { useCallback, useState } from "react";
 import * as yup from "yup";
 import Box from "../Box";
@@ -15,14 +14,14 @@ import { StyledSessionCard } from "./SessionStyle";
 
 const Login: React.FC = () => {
   const [passwordVisibility, setPasswordVisibility] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = useCallback(() => {
     setPasswordVisibility((visible) => !visible);
   }, []);
 
-  const handleFormSubmit = async (values) => {
-    router.push("/profile");
+  const handleFormSubmit = async (values: { email: string; password: string }) => {
+    navigate("/profile");
     console.log(values);
   };
 
@@ -147,39 +146,36 @@ const Login: React.FC = () => {
         </FlexBox>
 
         <FlexBox justifyContent="center" mb="1.25rem">
-          <SemiSpan>Don’t have account?</SemiSpan>
-          <Link href="/signup">
-            <a>
-              <H6 ml="0.5rem" borderBottom="1px solid" borderColor="gray.900">
-                Sign Up
-              </H6>
-            </a>
+          <SemiSpan>Don’t have an account?</SemiSpan>
+          <Link to="/signup">
+            <H6 ml="0.5rem" borderBottom="1px solid" borderColor="gray.900">
+              Sign Up
+            </H6>
           </Link>
         </FlexBox>
       </form>
 
       <FlexBox justifyContent="center" bg="gray.200" py="19px">
         <SemiSpan>Forgot your password?</SemiSpan>
-        <Link href="/">
-          <a>
-            <H6 ml="0.5rem" borderBottom="1px solid" borderColor="gray.900">
-              Reset It
-            </H6>
-          </a>
+        <Link to="/">
+          <H6 ml="0.5rem" borderBottom="1px solid" borderColor="gray.900">
+            Reset It
+          </H6>
         </Link>
       </FlexBox>
     </StyledSessionCard>
   );
 };
 
+// Use plain strings instead of template strings in yup validation messages
 const initialValues = {
   email: "",
   password: "",
 };
 
 const formSchema = yup.object().shape({
-  email: yup.string().email("invalid email").required("${path} is required"),
-  password: yup.string().required("${path} is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup.string().required("Password is required"),
 });
 
 export default Login;

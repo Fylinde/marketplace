@@ -1,5 +1,6 @@
-import Carousel from "@component/carousel/Carousel";
-import CategorySectionCreator from "@component/CategorySectionCreator";
+
+import Carousel from "components/carousel/Carousel";
+import CategorySectionCreator from "components/CategorySectionCreator";
 import React from "react";
 import Grid from "../grid/Grid";
 import FashionCard1 from "./FashionCard1";

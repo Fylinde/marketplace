@@ -1,7 +1,8 @@
-import Box from "@component/Box";
-import Image from "@component/Image";
-import { useAppContext } from "@context/app/AppContext";
-import Link from "next/link";
+
+import Box from "components/Box";
+import Image from "components/Image";
+import { useAppContext } from "contexts/app/AppContext";
+import { Link } from "react-router-dom";
 import React, { useCallback } from "react";
 import { SpaceProps } from "styled-system";
 import Button from "../buttons/Button";
@@ -28,8 +29,10 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
   ...props
 }) => {
   const { dispatch } = useAppContext();
+  
+  // Explicitly type amount as number
   const handleCartAmountChange = useCallback(
-    (amount) => () => {
+    (amount: number) => () => {
       dispatch({
         type: "CHANGE_CART_AMOUNT",
         payload: {
@@ -41,7 +44,7 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
         },
       });
     },
-    []
+    [dispatch, name, price, imgUrl, id]
   );
 
   return (
@@ -59,7 +62,7 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
         minWidth="0px"
         width="100%"
       >
-        <Link href={`/product/${id}`}>
+        <Link to={`/product/${id}`}>
           <a>
             <Typography
               className="title"
@@ -72,14 +75,15 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
           </a>
         </Link>
         <Box position="absolute" right="1rem" top="1rem">
-          <IconButton
-            padding="4px"
-            ml="12px"
-            size="small"
-            onClick={handleCartAmountChange(0)}
-          >
-            <Icon size="1.25rem">close</Icon>
-          </IconButton>
+        <IconButton
+          padding="4px"
+          ml="12px"
+          onClick={handleCartAmountChange(0)}
+        >
+          <Icon size="1.25rem">close</Icon>
+        </IconButton>
+
+
         </Box>
 
         <FlexBox
@@ -101,7 +105,7 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
               variant="outlined"
               color="primary"
               padding="5px"
-              size="none"
+              size="small"  // Change "none" to "small"
               borderColor="primary.light"
               onClick={handleCartAmountChange(qty - 1)}
               disabled={qty === 1}
@@ -115,7 +119,7 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
               variant="outlined"
               color="primary"
               padding="5px"
-              size="none"
+              size="small"  // Change "none" to "small"
               borderColor="primary.light"
               onClick={handleCartAmountChange(qty + 1)}
             >

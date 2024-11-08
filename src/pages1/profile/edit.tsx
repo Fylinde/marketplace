@@ -1,21 +1,32 @@
-import Avatar from "@component/avatar/Avatar";
-import Box from "@component/Box";
-import Button from "@component/buttons/Button";
-import { Card1 } from "@component/Card1";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import Hidden from "@component/hidden/Hidden";
-import Icon from "@component/icon/Icon";
-import DashboardLayout from "@component/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import TextField from "@component/text-field/TextField";
+
+import Avatar from "components/avatar/Avatar";
+import Box from "components/Box";
+import Button from "components/buttons/Button";
+import { Card1 } from "components/Card1";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import Hidden from "components/hidden/Hidden";
+import Icon from "components/icon/Icon";
+import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import TextField from "components/text-field/TextField";
 import { Formik } from "formik";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import React from "react";
 import * as yup from "yup";
 
+// Define an interface for form values
+interface FormValues {
+  first_name: string;
+  last_name: string;
+  email: string;
+  contact: string;
+  birth_date: string;
+}
+
 const ProfileEditor = () => {
-  const handleFormSubmit = async (values) => {
+  // Annotate the handleFormSubmit function with FormValues type
+  const handleFormSubmit = async (values: FormValues) => {
     console.log(values);
   };
 
@@ -25,7 +36,7 @@ const ProfileEditor = () => {
         iconName="user_filled"
         title="Edit Profile"
         button={
-          <Link href="/profile">
+          <Link to="/profile">
             <Button color="primary" bg="primary.light" px="2rem">
               Back to Profile
             </Button>
@@ -37,7 +48,7 @@ const ProfileEditor = () => {
         <FlexBox alignItems="flex-end" mb="22px">
           <Avatar src="/assets/images/faces/ralph.png" size={64} />
 
-          <Box ml="-20px" zIndex={1}>
+          <Box ml="-20px" style={{ zIndex: 1 }}>
             <label htmlFor="profile-image">
               <Button
                 as="span"
@@ -150,7 +161,8 @@ const ProfileEditor = () => {
   );
 };
 
-const initialValues = {
+// Define the initial values
+const initialValues: FormValues = {
   first_name: "",
   last_name: "",
   email: "",
@@ -158,6 +170,7 @@ const initialValues = {
   birth_date: "",
 };
 
+// Define the validation schema
 const checkoutSchema = yup.object().shape({
   first_name: yup.string().required("required"),
   last_name: yup.string().required("required"),
@@ -166,6 +179,6 @@ const checkoutSchema = yup.object().shape({
   birth_date: yup.date().required("invalid date"),
 });
 
-ProfileEditor.layout = DashboardLayout;
+ProfileEditor.layout = CustomerDashboardLayout;
 
 export default ProfileEditor;

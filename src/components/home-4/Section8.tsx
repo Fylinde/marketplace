@@ -1,10 +1,32 @@
-import Box from "@component/Box";
-import FlexBox from "@component/FlexBox";
-import Icon from "@component/icon/Icon";
-import { H3, SemiSpan } from "@component/Typography";
-import React from "react";
+import Box from "components/Box";
+import FlexBox from "components/FlexBox";
+import Icon from "components/icon/Icon";
+import { H3, SemiSpan } from "components/Typography";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+interface ServiceItem {
+  title: string;
+  subtitle: string;
+  iconName: string;
+}
 
 const Section8: React.FC = () => {
+  const [serviceList, setServiceList] = useState<ServiceItem[]>([]);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await axios.get("/api/services");
+        setServiceList(response.data);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
   return (
     <FlexBox
       mb="3.75rem"
@@ -28,33 +50,5 @@ const Section8: React.FC = () => {
     </FlexBox>
   );
 };
-
-const serviceList = [
-  {
-    title: "Free Delivery",
-    subtitle: "Orders over",
-    iconName: "delivery-truck",
-  },
-  {
-    title: "Money Gurantee",
-    subtitle: "7 Days Back",
-    iconName: "piggy-bank",
-  },
-  {
-    title: "365 Days",
-    subtitle: "For free return",
-    iconName: "alarm-clock",
-  },
-  {
-    title: "Payment",
-    subtitle: "Secure system",
-    iconName: "credit-card-2",
-  },
-  {
-    title: "Online Support",
-    subtitle: "24/7 daily",
-    iconName: "smartphone",
-  },
-];
 
 export default Section8;

@@ -1,7 +1,7 @@
-import Box from "@component/Box";
-import Card from "@component/Card";
-import MenuItem from "@component/MenuItem";
-import navbarNavigations from "@data/navbarNavigations";
+import Box from "components/Box";
+import Card from "components/Card";
+import MenuItem from "components/MenuItem";
+import navbarNavigations from "data/navbarNavigations";
 import React from "react";
 import Button from "../buttons/Button";
 import Categories from "../categories/Categories";
@@ -31,7 +31,7 @@ const Navbar: React.FC<NavbarProps> = ({ navListOpen }) => {
           return (
             <NavLink
               className="nav-link"
-              href={nav.url}
+              to={nav.url}
               key={nav.title}
               target="_blank"
               rel="noopener noreferrer"
@@ -41,7 +41,7 @@ const Navbar: React.FC<NavbarProps> = ({ navListOpen }) => {
           );
         else if (nav.url)
           return (
-            <NavLink className="nav-link" href={nav.url} key={nav.title}>
+            <NavLink className="nav-link" to={nav.url} key={nav.title}>
               {nav.title}
             </NavLink>
           );
@@ -70,7 +70,7 @@ const Navbar: React.FC<NavbarProps> = ({ navListOpen }) => {
       } else {
         if (nav.url)
           return (
-            <NavLink href={nav.url} key={nav.title}>
+            <NavLink to={nav.url} key={nav.title}>
               <MenuItem>
                 <Span fontSize="14px">{nav.title}</Span>
               </MenuItem>

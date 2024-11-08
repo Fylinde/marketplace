@@ -1,40 +1,55 @@
-import Box from "@component/Box";
-import { Chip } from "@component/Chip";
-import Container from "@component/Container";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import Icon from "@component/icon/Icon";
-import SaleLayout1 from "@component/layout/SaleLayout1";
-import SaleNavbar from "@component/navbar/SaleNavbar";
-import Pagination from "@component/pagination/Pagination";
-import ProductCard1 from "@component/product-cards/ProductCard1";
-import Sticky from "@component/sticky/Sticky";
-import { H1, H5, SemiSpan } from "@component/Typography";
-import productDB from "@data/product-database";
-import shadows from "@utils/themeShadows";
+import Box from "components/Box";
+import { Chip } from "components/Chip";
+import Container from "components/Container";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import Icon from "components/icon/Icon";
+import SaleLayout1 from "components/layout/SaleLayout1";
+import SaleNavbar from "components/navbar/SaleNavbar";
+import Pagination from "components/pagination/Pagination";
+import ProductCard1 from "components/product-cards/ProductCard1";
+import Sticky from "components/sticky/Sticky";
+import { H1, H5, SemiSpan } from "components/Typography";
+import productDB from "data/product-database";
+import shadows from "utils/themeShadows";
 import React, { useCallback, useEffect, useState } from "react";
+
+interface Category {
+  icon: string;
+  title: string;
+}
+
+interface Product {
+  price: number;
+  title: string;
+  imgUrl: string;
+  category: string;
+  id: string;
+  subcategory?: string; // optional
+}
 
 const SalePage1 = () => {
   const productPerPage = 28;
-  const [productList, setProductList] = useState([]);
+  const [productList, setProductList] = useState<Product[]>([]);
   const [isFixed, setIsFixed] = useState(false);
   const [selected, setSelected] = useState(1);
   const [page, setPage] = useState(0);
 
   const handleCategoryClick = useCallback(
-    (category) => () => {
+    (category: number) => () => {
       setSelected(category);
     },
     []
   );
 
-  const toggleIsFixed = useCallback((fixed) => {
+  const toggleIsFixed = useCallback((fixed: boolean) => {
     setIsFixed(fixed);
   }, []);
 
-  const handlePageChange = (page) => {
-    console.log(page);
-    setPage(page);
+  // Adjust handlePageChange to accept { selected } as an argument
+  const handlePageChange = ({ selected }: { selected: number }) => {
+    console.log(selected);
+    setPage(selected);
   };
 
   const renderProductCount = () => {
@@ -44,9 +59,7 @@ const SalePage1 = () => {
 
     if (endNumber > totalProduct) endNumber = totalProduct;
 
-    return `Showing ${
-      startNumber + 1
-    }-${endNumber} of ${totalProduct} products`;
+    return `Showing ${startNumber + 1}-${endNumber} of ${totalProduct} products`;
   };
 
   useEffect(() => {
@@ -147,7 +160,7 @@ const SalePage1 = () => {
   );
 };
 
-const saleCategoryList = [
+const saleCategoryList: Category[] = [
   {
     icon: "women-dress",
     title: "Women",
@@ -158,7 +171,7 @@ const saleCategoryList = [
   },
   {
     icon: "camera",
-    title: "Eelctronics",
+    title: "Electronics",
   },
   {
     icon: "sofa",

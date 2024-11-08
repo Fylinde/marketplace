@@ -1,19 +1,21 @@
-import Avatar from "@component/avatar/Avatar";
-import Box from "@component/Box";
-import Button from "@component/buttons/Button";
-import Divider from "@component/Divider";
-import FlexBox from "@component/FlexBox";
-import DashboardLayout from "@component/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import TextArea from "@component/textarea/TextArea";
-import { H5, SemiSpan } from "@component/Typography";
+
+import Avatar from "components/avatar/Avatar";
+import Box from "components/Box";
+import Button from "components/buttons/Button";
+import Divider from "components/Divider";
+import FlexBox from "components/FlexBox";
+import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import TextArea from "components/textarea/TextArea";
+import { H5, SemiSpan  } from "components/Typography";
 import { format } from "date-fns";
-import Link from "next/link";
+import { Link, useNavigate } from "react-router-dom"; 
 import React from "react";
 
 const PaymentMethodEditor = () => {
-  const handleFormSubmit = async (values) => {
-    console.log(values);
+  // No values needed here
+  const handleFormSubmit = async () => {
+    console.log("Form submitted");
   };
 
   return (
@@ -22,7 +24,7 @@ const PaymentMethodEditor = () => {
         iconName="support"
         title="Support Ticket"
         button={
-          <Link href="/support-tickets">
+          <Link to="/support-tickets">
             <Button color="primary" bg="primary.light" px="2rem">
               Back to Support Ticket
             </Button>
@@ -61,7 +63,7 @@ const PaymentMethodEditor = () => {
         variant="contained"
         color="primary"
         ml="auto"
-        onClick={handleFormSubmit}
+        onClick={handleFormSubmit}  // No need for values
       >
         Post message
       </Button>
@@ -93,6 +95,6 @@ const messageList = [
   },
 ];
 
-PaymentMethodEditor.layout = DashboardLayout;
+PaymentMethodEditor.layout = CustomerDashboardLayout;
 
 export default PaymentMethodEditor;

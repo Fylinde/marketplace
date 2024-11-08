@@ -1,5 +1,5 @@
-import Head from "next/head";
 import React from "react";
+import { Helmet } from "react-helmet-async"; 
 import Divider from "../Divider";
 import Footer from "../footer/Footer";
 import Header from "../header/Header";
@@ -20,11 +20,13 @@ const SaleLayout2: React.FC<SaleLayout2Props> = ({
 }) => {
   return (
     <StyledAppLayout>
-      <Head>
+      {/* Use Helmet to replace Next.js Head */}
+      <Helmet>
         <title>{title}</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      </Head>
+      </Helmet>
+
       <Topbar />
       <Header />
       <Divider />

@@ -1,12 +1,12 @@
-import Avatar from "@component/avatar/Avatar";
-import Box from "@component/Box";
-import Card from "@component/Card";
-import FlexBox from "@component/FlexBox";
-import LazyImage from "@component/LazyImage";
-import TextField from "@component/text-field/TextField";
+import Avatar from "components/avatar/Avatar";
+import Box from "components/Box";
+import Card from "components/Card";
+import FlexBox from "components/FlexBox";
+import LazyImage from "components/LazyImage";
+import TextField from "components/text-field/TextField";
 import { format } from "date-fns"; // Ensure this is installed
 import { Formik } from "formik";
-import { useRouter } from "next/router";
+import { useNavigate } from "react-router-dom"; 
 import React, { useEffect, useState } from "react";
 import * as yup from "yup";
 import Button from "../buttons/Button";
@@ -48,12 +48,12 @@ type SetFieldValue = (field: string, value: any, shouldValidate?: boolean) => vo
 const CheckoutForm2 = () => {
   const [hasVoucher, setHasVoucher] = useState(false);
   const [dateList, setDateList] = useState<{ label: string; value: Date }[]>([]); // Typed date list
-  const router = useRouter();
+  const navigate = useNavigate(); // Replaced useRouter with useNavigate
 
   // Handle form submission
   const handleFormSubmit = async (values: FormValues) => {
     console.log(values);
-    router.push("/payment");
+    navigate("/payment"); // Replaced router.push with navigate
   };
 
   // Handle change of field values in Formik
@@ -162,7 +162,7 @@ const CheckoutForm2 = () => {
           <Card1 mb="1.5rem">
             <FlexBox alignItems="center" mb="1.75rem">
               <Avatar bg="primary.main" size={32} color="primary.text" mr="0.875rem">
-                3
+                2
               </Avatar>
               <Typography fontSize="20px">Personal Details</Typography>
             </FlexBox>
@@ -213,9 +213,8 @@ const CheckoutForm2 = () => {
                     <Box height="24px" width="36px" position="relative" mb="0.5rem">
                       <LazyImage
                         src={`/assets/images/payment-methods/${item.cardType}.svg`}
-                        layout="fill"
-                        objectFit="contain"
-                        alt={item.cardType} // Added 'alt' attribute
+                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}  // Fixed the 'layout' issue
+                        alt={item.cardType}  // Added 'alt' attribute
                       />
                     </Box>
 

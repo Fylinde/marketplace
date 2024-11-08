@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FlexBox from "../FlexBox";
 import Hidden from "../hidden/Hidden";
 import DashboardPageHeader from "../layout/DashboardPageHeader";
@@ -10,6 +10,24 @@ import OrderRow from "./OrderRow";
 export interface CustomerOrderListProps {}
 
 const CustomerOrderList: React.FC<CustomerOrderListProps> = () => {
+  const [orderList, setOrderList] = useState([]);
+  const [pageCount, setPageCount] = useState(5); // Update as needed
+
+  // Fetch order data on component mount
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch("/api/customer/orders"); // Replace with actual API endpoint
+        const data = await response.json();
+        setOrderList(data.orders);
+        setPageCount(data.pageCount); // Assume response includes page count
+      } catch (error) {
+        console.error("Failed to fetch orders", error);
+      }
+    };
+    fetchOrders();
+  }, []);
+
   return (
     <div>
       <DashboardPageHeader title="My Orders" iconName="bag_filled" />
@@ -37,13 +55,13 @@ const CustomerOrderList: React.FC<CustomerOrderListProps> = () => {
         </TableRow>
       </Hidden>
 
-      {orderList.map((item, ind) => (
-        <OrderRow item={item} key={ind} />
+      {orderList.map((order, ind) => (
+        <OrderRow orderData={order} key={ind} /> // Rename `item` to `orderData`
       ))}
 
       <FlexBox justifyContent="center" mt="2.5rem">
         <Pagination
-          pageCount={5}
+          pageCount={pageCount}
           onChange={(data) => {
             console.log(data.selected);
           }}
@@ -52,43 +70,5 @@ const CustomerOrderList: React.FC<CustomerOrderListProps> = () => {
     </div>
   );
 };
-
-const orderList = [
-  {
-    orderNo: "1050017AS",
-    status: "Pending",
-    purchaseDate: new Date(),
-    price: 350,
-    href: "/orders/5452423",
-  },
-  {
-    orderNo: "1050017AS",
-    status: "Processing",
-    purchaseDate: new Date(),
-    price: 500,
-    href: "/orders/5452423",
-  },
-  {
-    orderNo: "1050017AS",
-    status: "Delivered",
-    purchaseDate: "2020/12/23",
-    price: 700,
-    href: "/orders/5452423",
-  },
-  {
-    orderNo: "1050017AS",
-    status: "Delivered",
-    purchaseDate: "2020/12/23",
-    price: 700,
-    href: "/orders/5452423",
-  },
-  {
-    orderNo: "1050017AS",
-    status: "Cancelled",
-    purchaseDate: "2020/12/15",
-    price: 300,
-    href: "/orders/5452423",
-  },
-];
 
 export default CustomerOrderList;

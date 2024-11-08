@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import React from "react";
 import Box from "../Box";
 import Card from "../Card";
@@ -10,7 +10,7 @@ export interface FashionCard3Props {}
 
 const FashionCard3: React.FC<FashionCard3Props> = () => {
   return (
-    <Link href="/">
+    <Link to="/">
       <a>
         <Card boxShadow="border" borderRadius={4}>
           <Grid container spacing={0} flexWrap="wrap-reverse">

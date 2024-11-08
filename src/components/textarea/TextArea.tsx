@@ -22,13 +22,15 @@ const TextArea: React.FC<TextAreaProps> = ({
   ...props
 }: TextAreaProps) => {
   // extract spacing props
-  let spacingProps = {};
-  let otherProps = {};
+  let spacingProps: Record<string, any> = {}; // Explicitly typing as Record<string, any>
+  let otherProps: Record<string, any> = {}; // Explicitly typing as Record<string, any>
 
   for (const key in props) {
-    if (key.startsWith("m") || key.startsWith("p"))
-      spacingProps[key] = props[key];
-    else otherProps[key] = props[key];
+    if (key.startsWith("m") || key.startsWith("p")) {
+      spacingProps[key] = (props as Record<string, any>)[key]; // Safely cast props
+    } else {
+      otherProps[key] = (props as Record<string, any>)[key]; // Safely cast props
+    }
   }
 
   return (

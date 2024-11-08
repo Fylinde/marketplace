@@ -1,10 +1,11 @@
-import Card from "@component/Card";
-import Container from "@component/Container";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import Icon from "@component/icon/Icon";
-import { H3, H4 } from "@component/Typography";
-import { getTheme } from "@utils/utils";
+
+import Card from "components/Card";
+import Container from "components/Container";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import Icon from "components/icon/Icon";
+import { H3, H4 } from "components/Typography";
+import { getTheme } from "utils/utils";
 import React from "react";
 import styled from "styled-components";
 

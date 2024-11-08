@@ -1,6 +1,7 @@
-import { useAppContext } from "@context/app/AppContext";
-import { CartItem } from "@reducer/cartReducer";
-import Link from "next/link";
+
+import { useAppContext } from "contexts/app/AppContext";
+import { CartItem } from "reducers/cartReducer";
+import { Link } from "react-router-dom";
 import React, { Fragment } from "react";
 import Box from "../components/Box";
 import Button from "../components/buttons/Button";
@@ -116,7 +117,7 @@ const Cart = () => {
             <Button variant="outlined" color="primary" my="1rem" fullwidth>
               Calculate Shipping
             </Button>
-            <Link href="/checkout">
+            <Link to="/checkout">
               <Button variant="contained" color="primary" fullwidth>
                 Checkout Now
               </Button>

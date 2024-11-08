@@ -1,11 +1,11 @@
-import Box from '@component/Box';
-import Button from '@component/buttons/Button';
-import Card from '@component/Card';
-import { Chip } from '@component/Chip';
-import Container from '@component/Container';
-import FlexBox from '@component/FlexBox';
-import { H2, H3, Paragraph } from '@component/Typography';
-import { getTheme } from '@utils/utils';
+import Box from 'components/Box';
+import Button from 'components/buttons/Button';
+import Card from 'components/Card';
+import { Chip } from 'components/Chip';
+import Container from 'components/Container';
+import FlexBox from 'components/FlexBox';
+import { H2, H3, Paragraph } from 'components/Typography';
+import { getTheme } from 'utils/utils';
 import React from 'react';
 import styled from 'styled-components';
 

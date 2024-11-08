@@ -1,8 +1,9 @@
-import Box from "@component/Box";
-import CarouselCard1 from "@component/carousel-cards/CarouselCard1";
-import Carousel from "@component/carousel/Carousel";
-import Container from "@component/Container";
-import Navbar from "@component/navbar/Navbar";
+
+import Box from "components/Box";
+import CarouselCard1 from "components/carousel-cards/CarouselCard1";
+import Carousel from "components/carousel/Carousel";
+import Container from "components/Container";
+import Navbar from "components/navbar/Navbar";
 import React, { Fragment } from "react";
 
 const Section1: React.FC = () => {

@@ -1,8 +1,8 @@
-import Box from "@component/Box";
-import Card from "@component/Card";
-import Container from "@component/Container";
-import { H2, SemiSpan, Small } from "@component/Typography";
-import Link from "next/link";
+import Box from "components/Box";
+import Card from "components/Card";
+import Container from "components/Container";
+import { H2, SemiSpan, Small } from "components/Typography";
+import { Link } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
 import { deviceSize } from "utils/constants";
@@ -43,16 +43,15 @@ const Section10: React.FC<Section10Props> = () => {
             Everything you need to create your youtube studio
           </SemiSpan>
 
-          <Link href="/">
-            <a>
-              <Small
-                fontWeight="700"
-                borderBottom="2px solid"
-                borderColor="primary.main"
-              >
-                DISCOVER EQUIPMENTS
-              </Small>
-            </a>
+          {/* Removed the unnecessary <a> tag */}
+          <Link to="/">
+            <Small
+              fontWeight="700"
+              borderBottom="2px solid"
+              borderColor="primary.main"
+            >
+              DISCOVER EQUIPMENTS
+            </Small>
           </Link>
         </Box>
       </StyledCard>

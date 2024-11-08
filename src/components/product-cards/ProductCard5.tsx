@@ -1,7 +1,7 @@
-import Box from "@component/Box";
-import HoverBox from "@component/HoverBox";
-import LazyImage from "@component/LazyImage";
-import { H4 } from "@component/Typography";
+import Box from "components/Box";
+import HoverBox from "components/HoverBox";
+import LazyImage from "components/LazyImage";
+import { H4 } from "components/Typography";
 import React from "react";
 
 export interface ProductCard5Props {
@@ -17,8 +17,7 @@ const ProductCard5: React.FC<ProductCard5Props> = ({ imgUrl, title }) => {
           src={imgUrl}
           width={260}
           height={175}
-          layout="responsive"
-          objectFit="cover"
+          style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
           alt={title}
         />
       </HoverBox>

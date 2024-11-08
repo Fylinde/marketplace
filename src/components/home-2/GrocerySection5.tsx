@@ -1,22 +1,24 @@
-import Box from "@component/Box";
-import Carousel from "@component/carousel/Carousel";
-import ProductCard10 from "@component/product-cards/ProductCard10";
-import productDatabase from "@data/product-database";
-import useWindowSize from "@hook/useWindowSize";
+import Box from "components/Box";
+import Carousel from "components/carousel/Carousel";
+import ProductCard10 from "components/product-cards/ProductCard10";
+import productDatabase from "data/product-database";
+import useWindowSize from "hooks/useWindowSize";
 import React, { useEffect, useState } from "react";
 import { H3 } from "../Typography";
 
 const GrocerySection5: React.FC = () => {
   const [visibleSlides, setVisibleSlides] = useState(3);
-  const width = useWindowSize();
+  const { width } = useWindowSize(); // Destructure width
 
   useEffect(() => {
-    if (width && width < 500) setVisibleSlides(1); // Check if width is not null
-    else if (width && width < 650) setVisibleSlides(2);
-    else if (width && width < 950) setVisibleSlides(2);
-    else setVisibleSlides(3);
+    if (width !== undefined && width !== null) { // Check for both undefined and null
+      if (width < 500) setVisibleSlides(1);
+      else if (width < 650) setVisibleSlides(2);
+      else if (width < 950) setVisibleSlides(2);
+      else setVisibleSlides(3);
+    }
   }, [width]);
-  
+
   return (
     <Box>
       <H3 fontSize="25px" mb="2rem">
@@ -33,8 +35,8 @@ const GrocerySection5: React.FC = () => {
           showArrowOnHover={true}
         >
           {productDatabase.slice(229, 241).map((item, ind) => (
-            <Box py="0.25rem">
-              <ProductCard10 {...item} rating={3} off={25} key={ind} />
+            <Box py="0.25rem" key={ind}>
+              <ProductCard10 {...item} rating={3} off={25} />
             </Box>
           ))}
         </Carousel>

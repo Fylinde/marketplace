@@ -1,9 +1,10 @@
-import Box from "@component/Box";
-import Button from "@component/buttons/Button";
-import FlexBox from "@component/FlexBox";
-import Icon from "@component/icon/Icon";
-import TextField from "@component/text-field/TextField";
-import { H3, Paragraph } from "@component/Typography";
+
+import Box from "components/Box";
+import Button from "components/buttons/Button";
+import FlexBox from "components/FlexBox";
+import Icon from "components/icon/Icon";
+import TextField from "components/text-field/TextField";
+import { H3, Paragraph  } from "components/Typography";
 import React from "react";
 
 const Section9: React.FC = () => {

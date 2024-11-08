@@ -25,7 +25,9 @@ type BoxProps = {
   transition?: string;
 };
 
-const Box = styled.div<
+const Box = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "shadow", // Exclude shadow from DOM
+})<
   BoxProps &
     LayoutProps &
     ColorProps &
@@ -36,12 +38,15 @@ const Box = styled.div<
     FlexboxProps &
     TypographyProps
 >(
-  ({ shadow, cursor, transition, theme }) => ({
-    boxShadow: shadow !== undefined ? theme.shadows[shadow] : undefined, // Check if shadow is defined
-    cursor,
-    transition,
-  }),
-  
+  ({ shadow = 0, cursor = "unset", transition, theme }) => {
+    const boxShadow = theme.shadows && theme.shadows[shadow] ? theme.shadows[shadow] : "none";
+
+    return {
+      boxShadow,
+      cursor,
+      transition,
+    };
+  },
   compose(layout, space, color, position, flexbox, flex, border, typography)
 );
 

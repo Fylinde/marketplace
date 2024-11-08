@@ -1,27 +1,28 @@
-import GroceryHeader from "@component/header/GroceryHeader";
-import MobileNavigationBar from "@component/mobile-navigation/MobileNavigationBar";
-import Navbar2 from "@component/navbar/Navbar2";
-import Sticky from "@component/sticky/Sticky";
-import Head from "next/head";
+import GroceryHeader from "components/header/GroceryHeader";
+import MobileNavigationBar from "components/mobile-navigation/MobileNavigationBar";
+import Navbar2 from "components/navbar/Navbar2";
+import Sticky from "components/sticky/Sticky";
+import { Helmet } from "react-helmet-async"; 
 import React from "react";
 import StyledAppLayout from "./AppLayoutStyle";
 
 type Props = {
   title?: string;
   navbar?: React.ReactChild;
-  children?: React.ReactNode; // Add 'children' prop to the type definition
+  children?: React.ReactNode;
 };
 
 const GroceryLayout: React.FC<Props> = ({
   children,
-  title = "React Next.js Ecommerce Template",
+  title = "React Ecommerce Template",
 }) => (
   <StyledAppLayout>
-    <Head>
+    {/* Use Helmet to replace Next.js Head */}
+    <Helmet>
       <title>{title}</title>
       <meta charSet="utf-8" />
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-    </Head>
+    </Helmet>
 
     <Sticky fixedOn={0}>
       <GroceryHeader />

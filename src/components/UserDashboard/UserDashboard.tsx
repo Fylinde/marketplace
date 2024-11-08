@@ -1,10 +1,10 @@
+// src/components/UserDashboard/UserDashboard.tsx
+
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setAuthData, logout } from '../../redux/slices/authSlice';
-import { selectUserFullName } from '../../redux/slices/authSlice';
-
 import './UserDashboard.css';
 
 const UserDashboard: React.FC = () => {
@@ -13,57 +13,64 @@ const UserDashboard: React.FC = () => {
   const location = useLocation();
 
   // Access tokens and user from Redux store
-  const accessToken = useSelector((state: RootState) => state.auth.access_token );
-  const user = useSelector((state: RootState) => state.auth.user);
-  const userFullName = useSelector(selectUserFullName);
+  const { access_token, user, status } = useSelector((state: RootState) => state.auth);
+
+  // Set auth data on initial load if tokens exist in URL or localStorage
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const access_token = queryParams.get('access_token');
-    const refresh_token = queryParams.get('refresh_token');
-  
-    if (access_token && refresh_token) {
-      // Check if user data is present in the URL or fetch it if necessary
+    const access_token_param = queryParams.get('access_token');
+    const refresh_token_param = queryParams.get('refresh_token');
+
+    if (access_token_param && refresh_token_param) {
       const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
-      dispatch(setAuthData({ access_token, refresh_token, user: storedUser }));
-      localStorage.setItem('access_token', access_token);
-      localStorage.setItem('refresh_token', refresh_token);
+      dispatch(setAuthData({ access_token: access_token_param, refresh_token: refresh_token_param, user: storedUser }));
+      
+      // Store tokens in localStorage
+      localStorage.setItem('access_token', access_token_param);
+      localStorage.setItem('refresh_token', refresh_token_param);
+      
+      // Remove query parameters from URL after processing
       window.history.replaceState({}, document.title, "/user-dashboard");
     } else {
+      // Retrieve tokens from localStorage if already authenticated
       const storedAccessToken = localStorage.getItem('access_token');
       const storedRefreshToken = localStorage.getItem('refresh_token');
       const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
-  
+
       if (!storedAccessToken || !storedRefreshToken) {
-        navigate('/registration/sign-in');
-      } else {
-        if (!accessToken) {
-          dispatch(setAuthData({ 
-            access_token: storedAccessToken, 
-            refresh_token: storedRefreshToken, 
-            user: storedUser
-          }));
-        }
+        navigate('/register/sign-in');
+      } else if (!access_token) {
+        dispatch(setAuthData({
+          access_token: storedAccessToken,
+          refresh_token: storedRefreshToken,
+          user: storedUser
+        }));
       }
     }
-  }, [dispatch, navigate, location, accessToken]);
-  
+  }, [dispatch, navigate, location, access_token]);
 
-  // Logout and clear all tokens from Redux and localStorage
+  // Redirect to sign-in if not authenticated after loading
+  useEffect(() => {
+    if (status === 'succeeded' && !access_token) {
+      navigate('/register/sign-in');
+    }
+  }, [status, access_token, navigate]);
+
+  // Logout function to clear auth data
   const handleLogout = () => {
     localStorage.clear();
     dispatch(logout());
-    navigate('/registration/sign-in');
+    navigate('/register/sign-in');
   };
 
-  const goToAddressList = () => {
-    navigate('/addresses');
-  };
-
+  // Redirect while loading auth status
+  if (status === 'loading') {
+    return <div>Loading dashboard...</div>;
+  }
 
   return (
     <div className="user-dashboard">
-       <h1>Welcome, {userFullName ? `Hello, ${userFullName}` : 'Hello, Guest'}</h1>
-      {/*} <h1>Welcome, {user?.full_name || 'User'}</h1> */}
+      <h1>Welcome, {user?.full_name ? `Hello, ${user.full_name}` : 'Hello, Guest'}</h1>
       <div className="dashboard-sections">
         <div className="dashboard-section">
           <div className="dashboard-card">
@@ -78,7 +85,7 @@ const UserDashboard: React.FC = () => {
             <h3>Prime</h3>
             <p>Manage your membership, view benefits, and payment settings</p>
           </div>
-          <div className="dashboard-card" onClick={goToAddressList}>
+          <div className="dashboard-card" onClick={() => navigate('/addresses')}>
             <h3>Your Addresses</h3>
             <p>Edit, remove or set default address</p>
           </div>
@@ -113,7 +120,7 @@ const UserDashboard: React.FC = () => {
         </div>
       </div>
       <div className="extra-sections">
-        {/* Other sections */}
+        {/* Placeholder for other sections */}
       </div>
       <button onClick={handleLogout} className="logout-button">
         Logout

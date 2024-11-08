@@ -5,8 +5,7 @@ import Typography from "../Typography";
 import Grid from "../grid/Grid";
 import TextField from "../text-field/TextField";
 import Button from "../buttons/Button";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { Link, useNavigate } from "react-router-dom"; 
 import { Card1 } from "../Card1";
 import Radio from "../radio/Radio";
 import FlexBox from "../FlexBox";
@@ -14,19 +13,28 @@ import Divider from "../Divider";
 import Box from "../Box";
 import useWindowSize from "../../hooks/useWindowSize";
 
+// Define the form values type
+interface FormValues {
+  card_no: string;
+  name: string;
+  exp_date: string;
+  cvc: string;
+}
+
 const PaymentForm = () => {
   const [paymentMethod, setPaymentMethod] = useState("credit-card");
 
-  const width = useWindowSize();
-  const router = useRouter();
+  // Use destructuring to get width correctly
+  const { width } = useWindowSize();
+  const navigate = useNavigate();  // useNavigate replaces useRouter for navigation
   const isMobile = width < 769;
 
-  const handleFormSubmit = async (values) => {
+  const handleFormSubmit = async (values: FormValues) => {
     console.log(values);
-    router.push("/payment");
+    navigate("/payment");  // Replaces router.push with navigate
   };
 
-  const handlePaymentMethodChange = ({ target: { name } }) => {
+  const handlePaymentMethodChange = ({ target: { name } }: { target: { name: string } }) => {
     setPaymentMethod(name);
   };
 
@@ -101,19 +109,19 @@ const PaymentForm = () => {
                     </Grid>
                     <Grid item sm={6} xs={12}>
                       <TextField
-                        name="name"
-                        label="Name on Card"
+                        name="cvc"
+                        label="CVC"
                         fullwidth
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        value={values.name || ""}
-                        errorText={touched.name && errors.name}
+                        value={values.cvc || ""}
+                        errorText={touched.cvc && errors.cvc}
                       />
                     </Grid>
                   </Grid>
                 </Box>
 
-                <Button variant="outlined" color="primary" mb="30px">
+                <Button variant="outlined" color="primary" mb="30px" type="submit">
                   Submit
                 </Button>
 
@@ -171,14 +179,14 @@ const PaymentForm = () => {
 
       <Grid container spacing={7}>
         <Grid item sm={6} xs={12}>
-          <Link href="/checkout">
+          <Link to="/checkout">
             <Button variant="outlined" color="primary" type="button" fullwidth>
               Back to checkout details
             </Button>
           </Link>
         </Grid>
         <Grid item sm={6} xs={12}>
-          <Link href="/orders">
+          <Link to="/orders">
             <Button variant="contained" color="primary" type="submit" fullwidth>
               Review
             </Button>
@@ -189,24 +197,11 @@ const PaymentForm = () => {
   );
 };
 
-const initialValues = {
+const initialValues: FormValues = {
   card_no: "",
   name: "",
   exp_date: "",
   cvc: "",
-  shipping_zip: "",
-  shipping_country: "",
-  shipping_address1: "",
-  shipping_address2: "",
-
-  billing_name: "",
-  billing_email: "",
-  billing_contact: "",
-  billing_company: "",
-  billing_zip: "",
-  billing_country: "",
-  billing_address1: "",
-  billing_address2: "",
 };
 
 const checkoutSchema = yup.object().shape({
@@ -214,15 +209,6 @@ const checkoutSchema = yup.object().shape({
   name: yup.string().required("required"),
   exp_date: yup.string().required("required"),
   cvc: yup.string().required("required"),
-  // shipping_zip: yup.string().required("required"),
-  // shipping_country: yup.object().required("required"),
-  // shipping_address1: yup.string().required("required"),
-  // billing_name: yup.string().required("required"),
-  // billing_email: yup.string().required("required"),
-  // billing_contact: yup.string().required("required"),
-  // billing_zip: yup.string().required("required"),
-  // billing_country: yup.string().required("required"),
-  // billing_address1: yup.string().required("required"),
 });
 
 export default PaymentForm;

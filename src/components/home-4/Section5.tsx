@@ -1,15 +1,23 @@
-import Box from "@component/Box";
-import IconButton from "@component/buttons/IconButton";
-import Card from "@component/Card";
-import Carousel from "@component/carousel/Carousel";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import Icon from "@component/icon/Icon";
-import Image from "@component/Image";
-import { H2 } from "@component/Typography";
-import Link from "next/link";
-import React, { useState } from "react";
+import Box from "components/Box";
+import IconButton from "components/buttons/IconButton";
+import Card from "components/Card";
+import Carousel from "components/carousel/Carousel";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import Icon from "components/icon/Icon";
+import Image from "components/Image";
+import { H2 } from "components/Typography";
+import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import axios from "axios";
+
+// Define the type for the products
+interface Product {
+  imgUrl: string;
+  brand: string;
+  off: number;
+}
 
 const SectionWrapper = styled.div`
   margin-bottom: 3.75rem;
@@ -37,21 +45,36 @@ const SectionWrapper = styled.div`
 const Section5: React.FC = () => {
   const totalSlides = 3;
   const [currentSlide, setCurrentSlide] = useState(0);
+  // Use Product[] as the type for productList
+  const [productList, setProductList] = useState<Product[]>([]);
 
-  const handleSlideChange = (count: number) => () => { // Typing 'count' as number
+  const handleSlideChange = (count: number) => () => {
     if (count < 0) setCurrentSlide(0);
     else if (count > totalSlides - 1) setCurrentSlide(totalSlides - 1);
     else setCurrentSlide(count);
   };
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("/api/products/deals");
+        setProductList(response.data); // Set productList with data from the API
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <SectionWrapper>
-      <FlexBox justifyContent="space-between" alignItems="center" mb="1.5rem">
+      <FlexBox style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }} mb="1.5rem">
         <H2 fontWeight="bold" lineHeight="1">
           Deal Of The Week
         </H2>
 
-        <FlexBox>
+        <FlexBox style={{ display: "flex" }}>
           <IconButton
             variant="contained"
             color="primary"
@@ -90,36 +113,34 @@ const Section5: React.FC = () => {
               <Grid container spacing={6}>
                 {productList.map((item, ind) => (
                   <Grid item md={6} xs={12} key={ind}>
-                    <Link href="/">
-                      <a>
-                        <Card position="relative">
-                          <Image src={item.imgUrl} width="100%" />
+                    <Link to="/">
+                      <Card position="relative">
+                        <Image src={item.imgUrl} width="100%" />
 
-                          <Box
-                            position="absolute"
-                            bg="gray.200"
-                            fontWeight="600"
-                            p="6px 12px"
-                            top="1.25rem"
-                            left="1.25rem"
-                            borderRadius={5}
-                          >
-                            {item.brand}
-                          </Box>
-                          <Box
-                            position="absolute"
-                            bg="primary.main"
-                            color="white"
-                            fontWeight="600"
-                            p="6px 12px"
-                            top="1.25rem"
-                            right="1.25rem"
-                            borderRadius={5}
-                          >
-                            {item.off}% OFF
-                          </Box>
-                        </Card>
-                      </a>
+                        <Box
+                          position="absolute"
+                          bg="gray.200"
+                          fontWeight="600"
+                          p="6px 12px"
+                          top="1.25rem"
+                          left="1.25rem"
+                          borderRadius={5}
+                        >
+                          {item.brand}
+                        </Box>
+                        <Box
+                          position="absolute"
+                          bg="primary.main"
+                          color="white"
+                          fontWeight="600"
+                          p="6px 12px"
+                          top="1.25rem"
+                          right="1.25rem"
+                          borderRadius={5}
+                        >
+                          {item.off}% OFF
+                        </Box>
+                      </Card>
                     </Link>
                   </Grid>
                 ))}
@@ -131,28 +152,5 @@ const Section5: React.FC = () => {
     </SectionWrapper>
   );
 };
-
-const productList = [
-  {
-    imgUrl: "/assets/images/products/rayban.png",
-    brand: "Say Ban Sunglass",
-    off: 50,
-  },
-  {
-    imgUrl: "/assets/images/products/nike.png",
-    brand: "Yike Shoe Air Max",
-    off: 30,
-  },
-  {
-    imgUrl: "/assets/images/products/apple-watch.png",
-    brand: "Air Jordan",
-    off: 40,
-  },
-  {
-    imgUrl: "/assets/images/products/perfume.png",
-    brand: "Perfume",
-    off: 20,
-  },
-];
 
 export default Section5;

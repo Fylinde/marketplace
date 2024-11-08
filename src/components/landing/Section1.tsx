@@ -1,11 +1,11 @@
-import Box from '@component/Box';
-import Button from '@component/buttons/Button';
-import Card from '@component/Card';
-import Container from '@component/Container';
-import FlexBox from '@component/FlexBox';
-import Icon from '@component/icon/Icon';
-import LazyImage from '@component/LazyImage';
-import { H2, H4, Paragraph, Span } from '@component/Typography';
+import Box from 'components/Box';
+import Button from 'components/buttons/Button';
+import Card from 'components/Card';
+import Container from 'components/Container';
+import FlexBox from 'components/FlexBox';
+import Icon from 'components/icon/Icon';
+import LazyImage from 'components/LazyImage';
+import { H2, H4, Paragraph, Span } from 'components/Typography';
 import React from 'react';
 import { Link as Scroll } from 'react-scroll';
 import styled from 'styled-components';
@@ -28,7 +28,7 @@ const Section1: React.FC = () => {
               src="/assets/images/landing/this-bonik.svg"
               width={362}
               height={73}
-              layout="responsive"
+              style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
               alt="Bonik - The Best React eCommerce Template" 
             />
           </Box>
@@ -60,7 +60,7 @@ const Section1: React.FC = () => {
           src="/assets/images/landing/page-group.png"
           width={1207}
           height={318}
-          layout="responsive"
+          style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
           alt="Page group of the Bonik eCommerce Template" 
         />
 

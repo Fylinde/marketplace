@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import React from "react";
 import Icon from "../../icon/Icon";
 import { StyledCategoryMenuItem } from "./CategoryMenuItemStyle";
@@ -8,7 +8,7 @@ interface CategoryMenuItemProps {
   icon?: string;
   title: string;
   caret?: boolean;
-  children?: React.ReactNode; // <-- Add children prop here
+  children?: React.ReactNode; // Add children prop here
 }
 
 const CategoryMenuItem: React.FC<CategoryMenuItemProps> = ({
@@ -20,7 +20,7 @@ const CategoryMenuItem: React.FC<CategoryMenuItemProps> = ({
 }) => {
   return (
     <StyledCategoryMenuItem>
-      <Link href={href}>
+      <Link to={href}> {/* Replace href with "to" for react-router-dom */}
         <div className="category-dropdown-link">
           {icon && <Icon variant="small">{icon}</Icon>}
           <span className="title">{title}</span>

@@ -1,22 +1,29 @@
-import Box from "@component/Box";
-import Button from "@component/buttons/Button";
-import { Card1 } from "@component/Card1";
-import Grid from "@component/grid/Grid";
-import DashboardLayout from "@component/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import TextField from "@component/text-field/TextField";
+
+import Box from "components/Box";
+import Button from "components/buttons/Button";
+import { Card1 } from "components/Card1";
+import Grid from "components/grid/Grid";
+import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import TextField from "components/text-field/TextField";
 import { Formik } from "formik";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { Link, useParams } from "react-router-dom"; 
 import React from "react";
 import * as yup from "yup";
 
-const PaymentMethodEditor = () => {
-  const {
-    query: { id },
-  } = useRouter();
+// Define a type for form values
+interface FormValues {
+  card_no: string;
+  name: string;
+  exp: string;
+  cvc: string;
+}
 
-  const handleFormSubmit = async (values) => {
+const PaymentMethodEditor = () => {
+  const { id } = useParams();  // Replaced useRouter with useParams to get the ID
+
+  // Add type annotation for 'values' based on FormValues interface
+  const handleFormSubmit = async (values: FormValues) => {
     console.log(values);
   };
 
@@ -26,7 +33,7 @@ const PaymentMethodEditor = () => {
         iconName="credit-card_filled"
         title={`${id === "add" ? "Add New" : "Edit"} Payment Method`}
         button={
-          <Link href="/payment-methods">
+          <Link to="/payment-methods">  {/* Replaced href with to */}
             <Button color="primary" bg="primary.light" px="2rem">
               Back to Payment Methods
             </Button>
@@ -109,7 +116,8 @@ const PaymentMethodEditor = () => {
   );
 };
 
-const initialValues = {
+// Define the initial values and validation schema
+const initialValues: FormValues = {
   card_no: "",
   name: "",
   exp: "",
@@ -123,6 +131,6 @@ const checkoutSchema = yup.object().shape({
   cvc: yup.string().required("required"),
 });
 
-PaymentMethodEditor.layout = DashboardLayout;
+PaymentMethodEditor.layout = CustomerDashboardLayout;
 
 export default PaymentMethodEditor;

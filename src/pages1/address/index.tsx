@@ -1,13 +1,14 @@
-import Button from "@component/buttons/Button";
-import IconButton from "@component/buttons/IconButton";
-import FlexBox from "@component/FlexBox";
-import Icon from "@component/icon/Icon";
-import DashboardLayout from "@component/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import Pagination from "@component/pagination/Pagination";
-import TableRow from "@component/TableRow";
-import Typography from "@component/Typography";
-import Link from "next/link";
+
+import Button from "components/buttons/Button";
+import IconButton from "components/buttons/IconButton";
+import FlexBox from "components/FlexBox";
+import Icon from "components/icon/Icon";
+import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import Pagination from "components/pagination/Pagination";
+import TableRow from "components/TableRow";
+import Typography from "components/Typography";
+import { Link } from "react-router-dom";
 import React from "react";
 
 const AddressList = () => {
@@ -36,7 +37,7 @@ const AddressList = () => {
           </Typography>
 
           <Typography className="pre" textAlign="center" color="text.muted">
-            <Link href="/address/xkssThds6h37sd">
+            <Link to="/address/xkssThds6h37sd">
               <Typography as="a" href="/address/xkssThds6h37sd" color="inherit">
                 <IconButton size="small">
                   <Icon variant="small" defaultcolor="currentColor">
@@ -45,11 +46,12 @@ const AddressList = () => {
                 </IconButton>
               </Typography>
             </Link>
-            <IconButton size="small" onClick={(e) => e.stopPropagation()}>
+            <IconButton size="small" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
               <Icon variant="small" defaultcolor="currentColor">
                 delete
               </Icon>
             </IconButton>
+
           </Typography>
         </TableRow>
       ))}
@@ -99,6 +101,6 @@ const orderList = [
   },
 ];
 
-AddressList.layout = DashboardLayout;
+AddressList.layout = CustomerDashboardLayout;
 
 export default AddressList;

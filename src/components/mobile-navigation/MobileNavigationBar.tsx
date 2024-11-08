@@ -1,4 +1,4 @@
-import { Chip } from "@component/Chip";
+import { Chip } from "components/Chip";
 import { useAppContext } from "contexts/app/AppContext";
 import React from "react";
 import useWindowSize from "../../hooks/useWindowSize";
@@ -7,38 +7,40 @@ import NavLink from "../nav-link/NavLink";
 import StyledMobileNavigationBar from "./MobileNavigationBar.style";
 
 const MobileNavigationBar: React.FC = () => {
-  const width = useWindowSize();
+  const { width } = useWindowSize();  // Access the width property from useWindowSize hook
   const { state } = useAppContext();
   const { cartList } = state.cart;
 
-  // Ensure width is not null before rendering
-  return (
-    width !== null && width <= 900 && (
-      <StyledMobileNavigationBar>
-        {list.map((item) => (
-          <NavLink className="link" href={item.href} key={item.title}>
-            <Icon className="icon" variant="small">
-              {item.icon}
-            </Icon>
-            {item.title}
+  // Return null if width is greater than 900 or is undefined
+  if (width === null || width > 900) {
+    return null;
+  }
 
-            {item.title === "Cart" && !!cartList.length && (
-              <Chip
-                bg="primary.main"
-                position="absolute"
-                color="primary.text"
-                fontWeight="600"
-                px="0.25rem"
-                top="4px"
-                left="calc(50% + 8px)"
-              >
-                {cartList.length}
-              </Chip>
-            )}
-          </NavLink>
-        ))}
-      </StyledMobileNavigationBar>
-    )
+  return (
+    <StyledMobileNavigationBar>
+      {list.map((item) => (
+        <NavLink className="link" to={item.href} key={item.title}>
+          <Icon className="icon" variant="small">
+            {item.icon}
+          </Icon>
+          {item.title}
+
+          {item.title === "Cart" && !!cartList.length && (
+            <Chip
+              bg="primary.main"
+              position="absolute"
+              color="primary.text"
+              fontWeight="600"
+              px="0.25rem"
+              top="4px"
+              left="calc(50% + 8px)"
+            >
+              {cartList.length}
+            </Chip>
+          )}
+        </NavLink>
+      ))}
+    </StyledMobileNavigationBar>
   );
 };
 

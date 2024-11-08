@@ -1,9 +1,9 @@
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import NavbarLayout from "@component/layout/NavbarLayout";
-import Pagination from "@component/pagination/Pagination";
-import ShopCard1 from "@component/shop/ShopCard1";
-import { H2, SemiSpan } from "@component/Typography";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import NavbarLayout from "components/layout/NavbarLayout";
+import Pagination from "components/pagination/Pagination";
+import ShopCard1 from "components/shop/ShopCard1";
+import { H2, SemiSpan } from "components/Typography";
 import React from "react";
 
 const ShopList = () => {

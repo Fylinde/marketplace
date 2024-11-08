@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link, useNavigate } from "react-router-dom";
 import React from "react";
 import Avatar from "../avatar/Avatar";
 import Box from "../Box";
@@ -16,8 +16,8 @@ const AvailableShops: React.FC<AvailableShopsProps> = () => {
       <Grid container spacing={8}>
         {shopList.map((item) => (
           <Grid item lg={2} md={3} sm={4} xs={12} key={item.name}>
-            <Link href="/shop/53324">
-              <a>
+            <Link to="/shop/53324">
+       
                 <FlexBox
                   as={Card}
                   p="26px"
@@ -31,7 +31,7 @@ const AvailableShops: React.FC<AvailableShopsProps> = () => {
                     {item.name}
                   </H4>
                 </FlexBox>
-              </a>
+        
             </Link>
           </Grid>
         ))}

@@ -1,15 +1,17 @@
-import Button from "@component/buttons/Button";
-import IconButton from "@component/buttons/IconButton";
-import Card from "@component/Card";
-import FlexBox from "@component/FlexBox";
-import Icon from "@component/icon/Icon";
-import DashboardLayout from "@component/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import Pagination from "@component/pagination/Pagination";
-import TableRow from "@component/TableRow";
-import Typography, { H5 } from "@component/Typography";
-import Link from "next/link";
+
+import Button from "components/buttons/Button";
+import IconButton from "components/buttons/IconButton";
+import Card from "components/Card";
+import FlexBox from "components/FlexBox";
+import Icon from "components/icon/Icon";
+import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import Pagination from "components/pagination/Pagination";
+import TableRow from "components/TableRow";
+import Typography from "components/Typography";
+import { Link } from "react-router-dom";
 import React from "react";
+import { H5 } from "components/Typography";
 
 const AddressList = () => {
   return (
@@ -18,7 +20,7 @@ const AddressList = () => {
         title="Payment Methods"
         iconName="credit-card_filled"
         button={
-          <Link href="/payment-methods/add">
+          <Link to="/payment-methods/add">
             <a>
               <Button color="primary" bg="primary.light" px="2rem">
                 Add New Payment Method
@@ -50,7 +52,7 @@ const AddressList = () => {
           </Typography>
 
           <Typography className="pre" textAlign="center" color="text.muted">
-            <Link href="/payment-methods/xkssThds6h37sd">
+            <Link to="/payment-methods/xkssThds6h37sd">
               <Typography
                 as="a"
                 href="/payment-methods/xkssThds6h37sd"
@@ -63,7 +65,7 @@ const AddressList = () => {
                 </IconButton>
               </Typography>
             </Link>
-            <IconButton size="small" onClick={(e) => e.stopPropagation()}>
+            <IconButton size="small" onClick={(e: React.MouseEvent)  => e.stopPropagation()}>
               <Icon variant="small" defaultcolor="currentColor">
                 delete
               </Icon>
@@ -111,6 +113,6 @@ const orderList = [
   },
 ];
 
-AddressList.layout = DashboardLayout;
+AddressList.layout = CustomerDashboardLayout;
 
 export default AddressList;

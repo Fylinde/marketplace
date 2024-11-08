@@ -1,4 +1,5 @@
-import { deviceSize, layoutConstant } from "@utils/constants";
+
+import { deviceSize, layoutConstant } from "utils/constants";
 import styled from "styled-components";
 
 type Home2WrapperProps = {

@@ -1,5 +1,5 @@
-import Icon from "@component/icon/Icon";
-import LazyImage from "@component/LazyImage";
+import Icon from "components/icon/Icon";
+import LazyImage from "components/LazyImage";
 import React from "react";
 import FlexBox from "../FlexBox";
 import Typography from "../Typography";
@@ -21,8 +21,7 @@ const MobileCategoryImageBox: React.FC<MobileCategoryImageBoxProps> = ({
         <LazyImage
           src={imgUrl}
           borderRadius="5px"
-          layout="responsive"  // Makes the image responsive based on the container
-          objectFit="cover"
+          style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
           alt={title}  // Always add alt for accessibility
         />
       ) : (

@@ -1,9 +1,11 @@
-import Container from "@component/Container";
-import FlexBox from "@component/FlexBox";
-import Icon from "@component/icon/Icon";
-import React from "react";
+import Container from "components/Container";
+import FlexBox from "components/FlexBox";
+import Icon from "components/icon/Icon";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import axios from "axios"; // To fetch dynamic data
 
+// Styled Wrapper with responsive adjustments using styled-system
 const Wrapper = styled(Container)`
   @media only screen and (max-width: 400px) {
     .flex {
@@ -14,7 +16,27 @@ const Wrapper = styled(Container)`
   }
 `;
 
+interface IconItem {
+  iconName: string;
+  url: string;
+}
+
 const Footer: React.FC = () => {
+  const [iconList, setIconList] = useState<IconItem[]>([]);
+
+  useEffect(() => {
+    const fetchIcons = async () => {
+      try {
+        const response = await axios.get("/api/icons"); // Replace with your API endpoint
+        setIconList(response.data);
+      } catch (error) {
+        console.error("Failed to fetch icons:", error);
+      }
+    };
+
+    fetchIcons();
+  }, []);
+
   return (
     <Wrapper py="4rem">
       <FlexBox justifyContent="space-between" flexWrap="wrap">
@@ -31,7 +53,7 @@ const Footer: React.FC = () => {
             <a
               href={item.url}
               target="_blank"
-              rel="noreferrer noopenner"
+              rel="noreferrer noopener"
               key={item.iconName}
             >
               <Icon size="1.25rem" defaultcolor="auto" mx="0.5rem">
@@ -44,15 +66,5 @@ const Footer: React.FC = () => {
     </Wrapper>
   );
 };
-
-const iconList = [
-  { iconName: "facebook-1", url: "https://www.facebook.com/UILibOfficial" },
-  { iconName: "twitter-1", url: "/" },
-  {
-    iconName: "youtube-1",
-    url: "https://www.youtube.com/channel/UCsIyD-TSO1wQFz-n2Y4i3Rg",
-  },
-  { iconName: "instagram-1", url: "/" },
-];
 
 export default Footer;

@@ -1,4 +1,4 @@
-import Box from "@component/Box";
+import Box from "components/Box";
 import React, { useEffect, useState } from "react";
 import useWindowSize from "../../hooks/useWindowSize";
 import Carousel from "../carousel/Carousel";
@@ -8,14 +8,16 @@ import ProductCard1 from "../product-cards/ProductCard1";
 // Define Section2 component
 const Section2: React.FC = () => {
   const [visibleSlides, setVisibleSlides] = useState(4);
-  const width = useWindowSize();
+  const { width } = useWindowSize(); // Destructure width from the object returned by useWindowSize
 
   // Adjust the number of visible slides based on screen width
   useEffect(() => {
-    if (width && width < 500) setVisibleSlides(1); // Check if width is not null
-    else if (width && width < 650) setVisibleSlides(2);
-    else if (width && width < 950) setVisibleSlides(3);
-    else setVisibleSlides(4);
+    if (width !== null) {  // Ensure width is not null before comparison
+      if (width < 500) setVisibleSlides(1);
+      else if (width < 650) setVisibleSlides(2);
+      else if (width < 950) setVisibleSlides(3);
+      else setVisibleSlides(4);
+    }
   }, [width]);
 
   return (

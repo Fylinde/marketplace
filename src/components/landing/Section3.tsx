@@ -1,9 +1,10 @@
-import Box from '@component/Box';
-import Button from '@component/buttons/Button';
-import Container from '@component/Container';
-import FlexBox from '@component/FlexBox';
-import Grid from '@component/grid/Grid';
-import { H2, H4, Paragraph } from '@component/Typography';
+
+import Box from 'components/Box';
+import Button from 'components/buttons/Button';
+import Container from 'components/Container';
+import FlexBox from 'components/FlexBox';
+import Grid from 'components/grid/Grid';
+import { H2, H4, Paragraph } from 'components/Typography';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PageCard from './PageCard';

@@ -8,21 +8,21 @@ export interface SaleNavbarProps {
     icon: string;
     title: string;
   }[];
-  onChange?: (value) => void;
+  onChange?: (value: { icon: string; title: string }) => void; // Explicit type for `value`
 }
 
 const SaleNavbar: React.FC<SaleNavbarProps> = ({
   saleCategoryList,
   onChange,
 }) => {
-  const [selected, setSelected] = useState(1);
+  const [selected, setSelected] = useState<number>(1); // Explicit type for state
 
   const handleCategoryClick = useCallback(
-    (categoryIndex) => () => {
+    (categoryIndex: number) => () => { // Explicit type for `categoryIndex`
       setSelected(categoryIndex);
       if (onChange) onChange(saleCategoryList[categoryIndex]);
     },
-    []
+    [onChange, saleCategoryList] // Corrected dependency array
   );
 
   return (

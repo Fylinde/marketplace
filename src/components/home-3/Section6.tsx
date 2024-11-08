@@ -1,10 +1,10 @@
-import Box from "@component/Box";
-import Card from "@component/Card";
-import CategorySectionCreator from "@component/CategorySectionCreator";
-import Grid from "@component/grid/Grid";
-import LazyImage from "@component/LazyImage";
-import { H3, H5 } from "@component/Typography";
-import Link from "next/link";
+import Box from "components/Box";
+import Card from "components/Card";
+import CategorySectionCreator from "components/CategorySectionCreator";
+import Grid from "components/grid/Grid";
+import LazyImage from "components/LazyImage";
+import { H3, H5 } from "components/Typography";
+import { Link } from "react-router-dom";
 import React from "react";
 
 export interface Section6Props {}
@@ -14,20 +14,18 @@ const Section6: React.FC<Section6Props> = () => {
     <CategorySectionCreator title="Featured Categories">
       <Grid container spacing={6} containerHeight="100%">
         <Grid item md={6} xs={12}>
-          <Link href="/product/34543543">
-            <a>
-              <Card height="100%" hoverEffect>
-                <LazyImage
-                  src="/assets/images/products/Rectangle 133.png"
-                  layout="responsive" // Remove width and height
-                  objectFit="cover"
-                  alt="Camera" // Added alt attribute for accessibility
-                />
-                <H3 fontWeight="600" p="1.5rem">
-                  CAMERA
-                </H3>
-              </Card>
-            </a>
+          {/* Removed unnecessary <a> tag */}
+          <Link to="/product/34543543">
+            <Card height="100%" hoverEffect>
+              <LazyImage
+                src="/assets/images/products/Rectangle 133.png"
+                style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
+                alt="Camera" // Added alt attribute for accessibility
+              />
+              <H3 fontWeight="600" p="1.5rem">
+                CAMERA
+              </H3>
+            </Card>
           </Link>
         </Grid>
         <Grid item md={6} xs={12}>
@@ -35,20 +33,18 @@ const Section6: React.FC<Section6Props> = () => {
             <Grid container spacing={6} containerHeight="100%">
               {gridProductList.map((item) => (
                 <Grid item sm={6} xs={12} key={item.title}>
-                  <Link href={item.productUrl}>
-                    <a>
-                      <Card height="100%" hoverEffect>
-                        <LazyImage
-                          src={item.imgUrl}
-                          layout="responsive" // Remove width and height
-                          objectFit="cover"
-                          alt={item.title} // Added alt attribute for accessibility
-                        />
-                        <H5 fontWeight="600" p="1rem" mt="1rem">
-                          {item.title}
-                        </H5>
-                      </Card>
-                    </a>
+                  {/* Removed unnecessary <a> tag */}
+                  <Link to={item.productUrl}>
+                    <Card height="100%" hoverEffect>
+                      <LazyImage
+                        src={item.imgUrl}
+                        style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
+                        alt={item.title} // Added alt attribute for accessibility
+                      />
+                      <H5 fontWeight="600" p="1rem" mt="1rem">
+                        {item.title}
+                      </H5>
+                    </Card>
                   </Link>
                 </Grid>
               ))}

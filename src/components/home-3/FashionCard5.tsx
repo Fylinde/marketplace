@@ -1,5 +1,5 @@
-import LazyImage from "@component/LazyImage";
-import Link from "next/link";
+import LazyImage from "components/LazyImage";
+import { Link } from "react-router-dom";
 import React from "react";
 import Box from "../Box";
 import Card from "../Card";
@@ -26,50 +26,49 @@ const FashionCard5: React.FC<FashionCard5Props> = ({
   subtitleColor,
 }) => {
   return (
-    <Link href={productUrl}>
-      <a>
-        <Card height="100%" bg={bg || "body.paper"} color={color}>
-          <Grid
-            container
-            spacing={1}
-            flexWrap="wrap-reverse"
-            alignItems="center"
-          >
-            <Grid item sm={6} xs={12}>
-              <Box p="2rem">
-                <H3 mb="0.5rem">{title}</H3>
-                <SemiSpan color={subtitleColor || "text.muted"} display="block">
-                  {subtitle}
-                </SemiSpan>
-                <Link href={productUrl}>
-                  <a>
-                    <H6
-                      display="inline-block"
-                      mt="1.5rem"
-                      fontSize="12px"
-                      textAlign="center"
-                      borderBottom="2px solid"
-                      borderColor="primary.main"
-                      pb="2px"
-                      color={color || "inherit"}
-                    >
-                      SHOP NOW
-                    </H6>
-                  </a>
-                </Link>
-              </Box>
-            </Grid>
-            <Grid item sm={6} xs={12}>
-              <LazyImage
-                src={imgUrl}
-                layout="responsive" // This will handle the responsive aspect of the image
-                objectFit="contain"
-                alt={title} // Use the title or a descriptive text for accessibility
-              />
-            </Grid>
+    <Link to={productUrl}>
+      <Card height="100%" bg={bg || "body.paper"} color={color}>
+        <Grid
+          container
+          spacing={1}
+          style={{ display: "flex", alignItems: "center", flexWrap: "wrap-reverse" }}
+        >
+          <Grid item sm={6} xs={12}>
+            <Box p="2rem">
+              <H3 mb="0.5rem">{title}</H3>
+              <SemiSpan color={subtitleColor || "text.muted"} display="block">
+                {subtitle}
+              </SemiSpan>
+
+              <Link to={productUrl}>
+                <H6
+                  display="inline-block"
+                  mt="1.5rem"
+                  fontSize="12px"
+                  textAlign="center"
+                  borderBottom="2px solid"
+                  borderColor="primary.main"
+                  pb="2px"
+                  color={color || "inherit"}
+                >
+                  SHOP NOW
+                </H6>
+              </Link>
+            </Box>
           </Grid>
-        </Card>
-      </a>
+          <Grid item sm={6} xs={12}>
+            <LazyImage
+              src={imgUrl}
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "auto",
+                objectFit: "contain",
+              }}
+            />
+          </Grid>
+        </Grid>
+      </Card>
     </Link>
   );
 };

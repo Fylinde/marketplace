@@ -1,7 +1,7 @@
-import CheckoutForm2 from "@component/checkout/CheckoutForm2";
-import CheckoutSummary2 from "@component/checkout/CheckoutSummary2";
-import Container from "@component/Container";
-import GroceryLayout from "@component/layout/GroceryLayout";
+import CheckoutForm2 from "components/checkout/CheckoutForm2";
+import CheckoutSummary2 from "components/checkout/CheckoutSummary2";
+import Container from "components/Container";
+import GroceryLayout from "components/layout/GroceryLayout";
 import React from "react";
 import Grid from "../components/grid/Grid";
 

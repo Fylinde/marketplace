@@ -1,9 +1,9 @@
-import Avatar from "@component/avatar/Avatar";
-import FlexBox from "@component/FlexBox";
-import LazyImage from "@component/LazyImage";
+import Avatar from "components/avatar/Avatar";
+import FlexBox from "components/FlexBox";
+import LazyImage from "components/LazyImage";
 import { useAppContext } from "contexts/app/AppContext";
-import { CartItem } from "@reducer/cartReducer";
-import Link from "next/link";
+import { CartItem } from "reducers/cartReducer";
+import { Link } from "react-router-dom";
 import React, { Fragment, useCallback } from "react";
 import Button from "../buttons/Button";
 import Divider from "../Divider";
@@ -63,9 +63,8 @@ const MiniCart: React.FC<MiniCartProps> = ({ toggleSidenav }) => {
           >
             <LazyImage
               src="/assets/images/logos/shopping-bag.svg"
-              width={90}  // You can adjust this value
-              layout="responsive"  // This allows the image to be responsive
-              alt="Shopping bag"  // Add alt text for accessibility
+              style={{ width: "100%", height: "auto", borderRadius: "4px" }}
+              alt="Shopping bag" // Add alt text for accessibility
             />
             <Paragraph
               mt="1rem"
@@ -109,24 +108,22 @@ const MiniCart: React.FC<MiniCartProps> = ({ toggleSidenav }) => {
                 </Button>
               </FlexBox>
 
-              <Link href={`/product/${item.id}`}>
-                <a>
-                  <Avatar
-                    src={item.imgUrl || "/assets/images/products/iphone-x.png"}
-                    mx="1rem"
-                    alt={item.name}
-                    size={76}
-                  />
-                </a>
+              {/* Removed unnecessary <a> tag */}
+              <Link to={`/product/${item.id}`}>
+                <Avatar
+                  src={item.imgUrl || "/assets/images/products/iphone-x.png"}
+                  mx="1rem"
+                  alt={item.name}
+                  size={76}
+                />
               </Link>
 
               <div className="product-details">
-                <Link href={`/product/${item.id}`}>
-                  <a>
-                    <H5 className="title" fontSize="14px">
-                      {item.name}
-                    </H5>
-                  </a>
+                {/* Removed unnecessary <a> tag */}
+                <Link to={`/product/${item.id}`}>
+                  <H5 className="title" fontSize="14px">
+                    {item.name}
+                  </H5>
                 </Link>
                 <Tiny color="text.muted">
                   ${item.price.toFixed(2)} x {item.qty}
@@ -157,7 +154,7 @@ const MiniCart: React.FC<MiniCartProps> = ({ toggleSidenav }) => {
 
       {!!cartList.length && (
         <Fragment>
-          <Link href="/checkout">
+          <Link to="/checkout">
             <Button
               variant="contained"
               color="primary"
@@ -169,7 +166,7 @@ const MiniCart: React.FC<MiniCartProps> = ({ toggleSidenav }) => {
               </Typography>
             </Button>
           </Link>
-          <Link href="/cart">
+          <Link to="/cart">
             <Button
               color="primary"
               variant="outlined"

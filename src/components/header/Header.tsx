@@ -1,7 +1,7 @@
-import IconButton from "@component/buttons/IconButton";
-import Image from "@component/Image";
-import { useAppContext } from "@context/app/AppContext";
-import Link from "next/link";
+import IconButton from "components/buttons/IconButton";
+import Image from "components/Image";
+import { useAppContext } from "contexts/app/AppContext";
+import { Link } from "react-router-dom";
 import React, { useState } from "react";
 import Box from "../Box";
 import Categories from "../categories/Categories";
@@ -10,11 +10,10 @@ import FlexBox from "../FlexBox";
 import Icon from "../icon/Icon";
 import MiniCart from "../mini-cart/MiniCart";
 import SearchBox from "../search-box/SearchBox";
-import Login from "../sessions/Login";
 import Sidenav from "../sidenav/Sidenav";
 import { Tiny } from "../Typography";
 import StyledHeader from "./HeaderStyle";
-import UserLoginDialog from "./UserLoginDialog";
+import AccountSectionDialog from "./AccountSectionDialog";
 
 type HeaderProps = {
   isFixed?: boolean;
@@ -28,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ isFixed, className }) => {
   const { cartList } = state.cart;
 
   const cartHandle = (
-    <FlexBox ml="20px" alignItems="flex-start">
+    <FlexBox ml="20px" style={{ display: 'flex', alignItems: "flex-start" }}>  {/* Applied style object */}
       <IconButton bg="gray.200" p="12px">
         <Icon size="20px">bag</Icon>
       </IconButton>
@@ -39,8 +38,7 @@ const Header: React.FC<HeaderProps> = ({ isFixed, className }) => {
           bg="error.main"
           px="5px"
           py="2px"
-          alignItems="center"
-          justifyContent="center"
+          style={{ display: 'flex', alignItems: "center", justifyContent: "center" }}  
           ml="-1rem"
           mt="-9px"
         >
@@ -55,22 +53,17 @@ const Header: React.FC<HeaderProps> = ({ isFixed, className }) => {
   return (
     <StyledHeader className={className}>
       <Container
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        height="100%"
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "100%" }}  // Applied inline styles
       >
-        <FlexBox className="logo" alignItems="center" mr="1rem">
-          <Link href="/">
-            <a>
-              <Image src="/assets/images/logo.svg" alt="logo" />
-            </a>
+        <FlexBox className="logo" style={{ display: 'flex', alignItems: "center", marginRight: "1rem" }}>  {/* Applied style object */}
+          <Link to="/">
+            <Image src="/assets/images/logo.svg" alt="logo" />
           </Link>
 
           {isFixed && (
             <div className="category-holder">
               <Categories>
-                <FlexBox color="text.hint" alignItems="center" ml="1rem">
+                <FlexBox color="text.hint" style={{ display: 'flex', alignItems: "center", marginLeft: "1rem" }}> {/* Applied style object */}
                   <Icon>categories</Icon>
                   <Icon>arrow-down-filled</Icon>
                 </FlexBox>
@@ -83,18 +76,14 @@ const Header: React.FC<HeaderProps> = ({ isFixed, className }) => {
           <SearchBox />
         </FlexBox>
 
-        <FlexBox className="header-right" alignItems="center">
-          <UserLoginDialog
+        <FlexBox className="header-right" style={{ display: 'flex', alignItems: "center" }}> {/* Applied style object */}
+          <AccountSectionDialog
             handle={
               <IconButton ml="1rem" bg="gray.200" p="8px">
                 <Icon size="28px">user</Icon>
               </IconButton>
             }
-          >
-            <Box>
-              <Login />
-            </Box>
-          </UserLoginDialog>
+          />
 
           <Sidenav
             handle={cartHandle}

@@ -5,9 +5,9 @@ import { color, compose, space, SpaceProps } from "styled-system";
 import { convertHexToRGB } from "../../utils/utils";
 import { TextFieldProps } from "./TextField";
 
-export const SyledTextField = styled.input<
-  InputHTMLAttributes<HTMLInputElement> & TextFieldProps
->(
+export const SyledTextField = styled.input.withConfig({
+  shouldForwardProp: (prop) => prop !== "fullwidth" // Prevents fullwidth from being passed to the DOM
+})<InputHTMLAttributes<HTMLInputElement> & TextFieldProps>(
   (props) =>
     systemCss({
       padding: "8px 12px",
@@ -17,7 +17,7 @@ export const SyledTextField = styled.input<
       borderRadius: 5,
       border: "1px solid",
       borderColor: "text.disabled",
-      width: props.fullwidth ? "100%" : "inherit",
+      width: props.fullwidth ? "100%" : "inherit", // fullwidth applied as style only
       outline: "none",
       fontFamily: "inherit",
 
@@ -25,15 +25,16 @@ export const SyledTextField = styled.input<
         borderColor: "gray.500",
       },
       "&:focus": {
-        outlineColor: "primary.main",
-        borderColor: "primary.main",
-        boxShadow: `1px 1px 8px 4px rgba(${convertHexToRGB(
-          props.theme.colors.primary.light
-        )}, 0.1)`,
+        outlineColor: props.theme?.colors?.primary?.main || "#007bff",
+        borderColor: props.theme?.colors?.primary?.main || "#007bff",
+        boxShadow: `1px 1px 8px 4px rgba(${
+          convertHexToRGB(props.theme?.colors?.primary?.light || "#007bff")
+        }, 0.1)`,
       },
     }),
   compose(color)
 );
+
 
 export const TextFieldWrapper = styled.div<TextFieldProps & SpaceProps>(
   (props) =>

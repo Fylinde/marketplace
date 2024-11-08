@@ -1,7 +1,7 @@
 // src/redux/slices/addressSlice.ts
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { Address } from '../../models/Address'; // Make sure 'id' is part of Address interface
-import { getUserAddresses, addUserAddress, deleteUserAddress } from '../../services/addressService';
+import { getUserAddresses } from 'services/addressService';
 
 // Define the slice's initial state
 interface AddressState {
@@ -16,18 +16,18 @@ const initialState: AddressState = {
   error: null,
 };
 
-// Async thunk to fetch addresses from the API
 export const fetchUserAddresses = createAsyncThunk(
   'addresses/fetchUserAddresses',
   async (userId: number, { rejectWithValue }) => {
     try {
       const response = await getUserAddresses(userId);
       return response; // Assuming response is an array of Address[]
-    } catch (err: any) {
-      return rejectWithValue(err.response.data);
+    } catch (err) {
+      return rejectWithValue((err as any).response.data);
     }
   }
 );
+
 
 // Slice definition
 const addressSlice = createSlice({

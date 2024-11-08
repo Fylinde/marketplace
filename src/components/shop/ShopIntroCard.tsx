@@ -46,12 +46,14 @@ const ShopIntroCard: React.FC<ShopIntroCardProps> = () => {
 
             <FlexBox my="8px">
               {socialLinks.map((item, ind) => (
-                <a href={item.url} target="_blank" rel="noreferrer noopener">
+                <a href={item.url} target="_blank" rel="noreferrer noopener" key={item.name}>
                   <Icon
-                    mr={ind < socialLinks.length - 1 && "10px"}
+                    mr={ind < socialLinks.length - 1 ? "10px" : undefined} // Updated mr logic
                     defaultcolor="auto"
                     size="30px"
-                  >{`${item.name}_filled`}</Icon>
+                  >
+                    {`${item.name}_filled`}
+                  </Icon>
                 </a>
               ))}
             </FlexBox>

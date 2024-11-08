@@ -1,22 +1,23 @@
-import Box from "@component/Box";
-import Carousel from "@component/carousel/Carousel";
-import CategorySectionCreator from "@component/CategorySectionCreator";
-import ProductCard2 from "@component/product-cards/ProductCard2";
-import useWindowSize from "@hook/useWindowSize";
+import Box from "components/Box";
+import Carousel from "components/carousel/Carousel";
+import CategorySectionCreator from "components/CategorySectionCreator";
+import ProductCard2 from "components/product-cards/ProductCard2";
+import useWindowSize from "hooks/useWindowSize";
 import React, { useEffect, useState } from "react";
 
 const Section4: React.FC = () => {
   const [visibleSlides, setVisibleSlides] = useState(6);
-  const width = useWindowSize();
+  const { width } = useWindowSize(); // Assuming useWindowSize returns an object
 
   useEffect(() => {
-    if (width !== null) {  // Add null check for width
+    if (width !== undefined && width !== null) {  // Add undefined and null check for width
       if (width < 500) setVisibleSlides(1);
       else if (width < 650) setVisibleSlides(2);
       else if (width < 950) setVisibleSlides(3);
       else setVisibleSlides(4);
     }
   }, [width]);
+
   return (
     <CategorySectionCreator
       iconName="new-product-1"

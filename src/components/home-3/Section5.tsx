@@ -1,7 +1,7 @@
-import Carousel from "@component/carousel/Carousel";
-import ProductCard11 from "@component/product-cards/ProductCard11";
-import productDatabase from "@data/product-database";
-import useWindowSize from "@hook/useWindowSize";
+import Carousel from "components/carousel/Carousel";
+import ProductCard11 from "components/product-cards/ProductCard11";
+import productDatabase from "data/product-database";
+import useWindowSize from "hooks/useWindowSize";
 import React, { useEffect, useState } from "react";
 import Box from "../Box";
 
@@ -9,16 +9,17 @@ export interface Section5Props {}
 
 const Section5: React.FC<Section5Props> = () => {
   const [visibleSlides, setVisibleSlides] = useState(4);
-  const width = useWindowSize();
+  const { width } = useWindowSize(); // Destructure the width property from the hook's return value
 
   useEffect(() => {
-    if (width !== null) {  // Add null check for width
+    if (width !== undefined && width !== null) {  // Check for both undefined and null
       if (width < 500) setVisibleSlides(1);
       else if (width < 650) setVisibleSlides(2);
       else if (width < 950) setVisibleSlides(3);
       else setVisibleSlides(4);
     }
   }, [width]);
+
   return (
     <Box>
       <Carousel

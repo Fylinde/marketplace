@@ -1,6 +1,6 @@
+import React, { cloneElement, useEffect, useRef, useState } from "react";
 import systemCss from "@styled-system/css";
 import { themeGet } from "@styled-system/theme-get";
-import { cloneElement, useEffect, useRef, useState } from "react";
 import styled, { CSSProperties } from "styled-components";
 import { variant } from "styled-system";
 
@@ -12,7 +12,9 @@ interface MenuProps {
   style?: CSSProperties;
 }
 
-const StyledMenu = styled.div<{ direction: string }>(
+const StyledMenu = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "direction", // Exclude direction from reaching the DOM
+})<{ direction: string }>(
   systemCss({
     position: "relative",
     ".menu-item-holder": {
@@ -49,7 +51,7 @@ const StyledMenu = styled.div<{ direction: string }>(
 const Menu: React.FC<MenuProps> = ({
   handler,
   children,
-  direction,
+  direction = "left", // Default value for direction
   ...props
 }) => {
   const [show, setShow] = useState(false);
@@ -60,7 +62,7 @@ const Menu: React.FC<MenuProps> = ({
     if (popoverRef.current) setShow(false);
   };
 
-  const togglePopover = (e) => {
+  const togglePopover = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShow(!show);
   };
@@ -78,10 +80,6 @@ const Menu: React.FC<MenuProps> = ({
       {show && <div className="menu-item-holder">{children}</div>}
     </StyledMenu>
   );
-};
-
-Menu.defaultProps = {
-  direction: "left",
 };
 
 export default Menu;

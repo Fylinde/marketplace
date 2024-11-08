@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import Layout from "../components/layout/AppLayout";
 
 const AboutPage = () => (
@@ -6,7 +6,7 @@ const AboutPage = () => (
     <h1>About</h1>
     <p>This is the about page</p>
     <p>
-      <Link href="/">
+      <Link to="/">
         <a>Go home</a>
       </Link>
     </p>

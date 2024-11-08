@@ -1,4 +1,4 @@
-import Box from "@component/Box";
+import Box from "components/Box";
 import React from "react";
 import FlexBox from "../FlexBox";
 import Grid from "../grid/Grid";
@@ -11,11 +11,14 @@ const GrocerySection2: React.FC = () => {
       {serviceList.map((item, ind) => (
         <Grid item md={4} sm={6} xs={12} key={ind}>
           <FlexBox
-            alignItems="center"
-            p="1.5rem"
-            border="1px solid"
-            borderColor="gray.400"
-            borderRadius={8}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "1.5rem",
+              border: "1px solid",
+              borderColor: "gray.400",
+              borderRadius: "8px",
+            }}
           >
             <Box color="text.muted" mr="1rem">
               <Icon size="50px" defaultcolor="currentColor">

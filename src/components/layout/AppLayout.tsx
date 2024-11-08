@@ -1,29 +1,30 @@
-import Footer from "@component/footer/Footer";
-import Header from "@component/header/Header";
-import MobileNavigationBar from "@component/mobile-navigation/MobileNavigationBar";
-import Sticky from "@component/sticky/Sticky";
-import Topbar from "@component/topbar/Topbar";
-import Head from "next/head";
+import Footer from "components/footer/Footer";
+import Header from "components/header/Header";
+import MobileNavigationBar from "components/mobile-navigation/MobileNavigationBar";
+import Sticky from "components/sticky/Sticky";
+import Topbar from "components/topbar/Topbar";
+import { Helmet } from "react-helmet-async"; 
 import React from "react";
 import StyledAppLayout from "./AppLayoutStyle";
 
 type Props = {
   title?: string;
   navbar?: React.ReactChild;
-  children?: React.ReactNode; // Add children prop
+  children?: React.ReactNode;
 };
 
 const AppLayout: React.FC<Props> = ({
   children,
   navbar,
-  title = "React Next.js Ecommerce Template",
+  title = "React Ecommerce Template",
 }) => (
   <StyledAppLayout>
-    <Head>
+    {/* Use Helmet to replace Next.js Head */}
+    <Helmet>
       <title>{title}</title>
       <meta charSet="utf-8" />
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-    </Head>
+    </Helmet>
 
     <Topbar />
 

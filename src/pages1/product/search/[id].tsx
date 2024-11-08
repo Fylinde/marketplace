@@ -1,27 +1,31 @@
-import Box from "@component/Box";
-import IconButton from "@component/buttons/IconButton";
-import Card from "@component/Card";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import Hidden from "@component/hidden/Hidden";
-import Icon from "@component/icon/Icon";
-import NavbarLayout from "@component/layout/NavbarLayout";
-import ProductCard1List from "@component/products/ProductCard1List";
-import ProductCard9List from "@component/products/ProductCard9List";
-import ProductFilterCard from "@component/products/ProductFilterCard";
-import Select from "@component/Select";
-import Sidenav from "@component/sidenav/Sidenav";
-import { H5, Paragraph } from "@component/Typography";
-import React, { useCallback, useState } from "react";
+import Box from "components/Box";
+import IconButton from "components/buttons/IconButton";
+import Card from "components/Card";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import Hidden from "components/hidden/Hidden";
+import Icon from "components/icon/Icon";
+import NavbarLayout from "components/layout/NavbarLayout";
+import ProductCard1List from "components/products/ProductCard1List";
+import ProductCard9List from "components/products/ProductCard9List";
+import ProductFilterCard from "components/products/ProductFilterCard";
+import Select from "components/Select";
+import Sidenav from "components/sidenav/Sidenav";
+import { H5, Paragraph } from "components/Typography";
+import React, { ReactNode, useCallback, useState } from "react";
 import useWindowSize from "../../../hooks/useWindowSize";
 
-const ProductSearchResult = () => {
-  const [view, setView] = useState("grid");
-  const width = useWindowSize();
+type PageWithLayout = React.FC & {
+  layout?: React.FC<{ children: ReactNode }>;
+};
+
+const ProductSearchResult: PageWithLayout = () => {
+  const [view, setView] = useState<"grid" | "list">("grid");
+  const { width = 1025 } = useWindowSize();  // Set a default width to avoid undefined
   const isTablet = width < 1025;
 
   const toggleView = useCallback(
-    (v) => () => {
+    (v: "grid" | "list") => () => {
       setView(v);
     },
     []
@@ -44,12 +48,12 @@ const ProductSearchResult = () => {
         </div>
         <FlexBox alignItems="center" flexWrap="wrap">
           <Paragraph color="text.muted" mr="1rem">
-            Short by:
+            Sort by:
           </Paragraph>
           <Box flex="1 1 0" mr="1.75rem" minWidth="150px">
             <Select
-              placeholder="Short by"
-              defaultValue={sortOptions[0]}
+              placeholder="Sort by"
+              defaultValue={sortOptions[0] ?? { label: "Relevance", value: "Relevance" }}
               options={sortOptions}
             />
           </Box>
@@ -112,6 +116,7 @@ const sortOptions = [
   { label: "Price High to Low", value: "Price High to Low" },
 ];
 
-ProductSearchResult.layout = NavbarLayout;
+// Ensure NavbarLayout is properly assigned
+ProductSearchResult.layout = NavbarLayout as React.FC<{ children: ReactNode }>;
 
 export default ProductSearchResult;

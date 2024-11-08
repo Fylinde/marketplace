@@ -1,19 +1,32 @@
-import Button from "@component/buttons/Button";
-import Card from "@component/Card";
-import DropZone from "@component/DropZone";
-import Grid from "@component/grid/Grid";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import VendorDashboardLayout from "@component/layout/VendorDashboardLayout";
-import Select from "@component/Select";
-import TextField from "@component/text-field/TextField";
-import TextArea from "@component/textarea/TextArea";
+
+import Button from "components/buttons/Button";
+import Card from "components/Card";
+import DropZone from "components/DropZone";
+import Grid from "components/grid/Grid";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
+import Select from "components/Select";
+import TextField from "components/text-field/TextField";
+import TextArea from "components/textarea/TextArea";
 import { Formik } from "formik";
-import Link from "next/link";
+import { Link } from "react-router-dom"; 
 import React from "react";
 import * as yup from "yup";
 
+// Define interface for form values
+interface FormValues {
+  name: string;
+  stock: string;
+  price: string;
+  sale_price: string;
+  description: string;
+  tags: string;
+  category: string;
+}
+
 const AddProduct = () => {
-  const handleFormSubmit = async (values) => {
+  // Annotate values with FormValues type
+  const handleFormSubmit = async (values: FormValues) => {
     console.log(values);
   };
 
@@ -23,7 +36,7 @@ const AddProduct = () => {
         title="Add Product"
         iconName="delivery-box"
         button={
-          <Link href="/vendor/products">
+          <Link to="/vendor/products">
             <Button color="primary" bg="primary.light" px="2rem">
               Back to Product List
             </Button>
@@ -62,14 +75,14 @@ const AddProduct = () => {
                 </Grid>
                 <Grid item sm={6} xs={12}>
                   <Select
-                    label="Caterogy"
+                    label="Category"
                     placeholder="Select category"
                     options={[]}
-                    value={values.tags || "US"}
+                    value={values.category || "US"}
                     onChange={(country) => {
-                      setFieldValue("tags", country);
+                      setFieldValue("category", country);
                     }}
-                    errorText={touched.tags && errors.tags}
+                    errorText={touched.category && errors.category}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -159,7 +172,8 @@ const AddProduct = () => {
   );
 };
 
-const initialValues = {
+// Define initial values for the form
+const initialValues: FormValues = {
   name: "",
   stock: "",
   price: "",
@@ -169,6 +183,7 @@ const initialValues = {
   category: "",
 };
 
+// Validation schema for the form
 const checkoutSchema = yup.object().shape({
   name: yup.string().required("required"),
   category: yup.string().required("required"),
@@ -176,7 +191,7 @@ const checkoutSchema = yup.object().shape({
   stock: yup.number().required("required"),
   price: yup.number().required("required"),
   sale_price: yup.number().required("required"),
-  tags: yup.object().required("required"),
+  tags: yup.string().required("required"),
 });
 
 AddProduct.layout = VendorDashboardLayout;

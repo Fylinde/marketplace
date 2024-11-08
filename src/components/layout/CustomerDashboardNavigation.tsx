@@ -1,16 +1,13 @@
-import Box from "@component/Box";
-import { useRouter } from "next/router";
+import Box from "components/Box";
+import { useLocation } from "react-router-dom"; // Replace useRouter with useLocation
 import React, { Fragment } from "react";
 import FlexBox from "../FlexBox";
 import Icon from "../icon/Icon";
 import Typography from "../Typography";
-import {
-  DashboardNavigationWrapper,
-  StyledDashboardNav,
-} from "./DashboardStyle";
+import { DashboardNavigationWrapper, StyledDashboardNav } from "./DashboardStyle";
 
 const CustomerDashboardNavigation = () => {
-  const { pathname } = useRouter();
+  const { pathname } = useLocation(); // Use useLocation to get the current path
 
   return (
     <DashboardNavigationWrapper px="0px" pb="1.5rem" color="gray.900">
@@ -19,23 +16,23 @@ const CustomerDashboardNavigation = () => {
           <Typography p="26px 30px 1rem" color="text.muted" fontSize="12px">
             {item.title}
           </Typography>
-          {item.list.map((item) => (
+          {item.list.map((subItem) => (
             <StyledDashboardNav
-              isCurrentPath={pathname.includes(item.href)}
-              href={item.href}
-              key={item.title}
+              to={subItem.href} // Use 'to' for react-router-dom navigation
+              isCurrentPath={pathname.includes(subItem.href)} // Check if current path matches
+              key={subItem.title}
               px="1.5rem"
               mb="1.25rem"
             >
               <FlexBox alignItems="center">
                 <Box className="dashboard-nav-icon-holder">
                   <Icon variant="small" defaultcolor="currentColor" mr="10px">
-                    {item.iconName}
+                    {subItem.iconName}
                   </Icon>
                 </Box>
-                <span>{item.title}</span>
+                <span>{subItem.title}</span>
               </FlexBox>
-              <span>{item.count}</span>
+              <span>{subItem.count}</span>
             </StyledDashboardNav>
           ))}
         </Fragment>

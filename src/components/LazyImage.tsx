@@ -1,4 +1,4 @@
-import NextImage, { ImageProps } from "next/image";
+import React from "react"; 
 import styled from "styled-components";
 import {
   border,
@@ -9,11 +9,16 @@ import {
   SpaceProps,
 } from "styled-system";
 
-type LazyImageProps = ImageProps & BorderProps & SpaceProps & ColorProps;
+// Define LazyImageProps with alt prop as required
+type LazyImageProps = React.ImgHTMLAttributes<HTMLImageElement> &
+  BorderProps &
+  SpaceProps &
+  ColorProps;
 
-const LazyImage = styled(({ borderRadius, ...props }: LazyImageProps) => {
-  return <NextImage {...props} />;
-})<ImageProps>`
+const LazyImage = styled(({ borderRadius, alt, ...props }: LazyImageProps) => {
+  // Ensure alt prop is always present by providing a default empty string if none is provided
+  return <img alt={alt || ""} {...props} />;
+})<LazyImageProps>`
   display: block;
 
   ${color}

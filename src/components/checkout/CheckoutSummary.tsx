@@ -3,7 +3,7 @@ import Button from "../buttons/Button";
 import { Card1 } from "../Card1";
 import Divider from "../Divider";
 import FlexBox from "../FlexBox";
-import TextField from "@component/text-field/TextField";
+import TextField from "components/text-field/TextField";
 import Typography from "../Typography";
 
 const CheckoutSummary: React.FC = () => {

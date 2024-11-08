@@ -1,15 +1,16 @@
-import Avatar from "@component/avatar/Avatar";
-import Box from "@component/Box";
-import Button from "@component/buttons/Button";
-import Card from "@component/Card";
-import FlexBox from "@component/FlexBox";
-import Grid from "@component/grid/Grid";
-import DashboardLayout from "@component/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "@component/layout/DashboardPageHeader";
-import TableRow from "@component/TableRow";
-import Typography, { H3, H5, Small } from "@component/Typography";
+
+import Avatar from "components/avatar/Avatar";
+import Box from "components/Box";
+import Button from "components/buttons/Button";
+import Card from "components/Card";
+import FlexBox from "components/FlexBox";
+import Grid from "components/grid/Grid";
+import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import TableRow from "components/TableRow";
+import Typography, { H3, H5, Small } from "components/Typography";
 import { format } from "date-fns";
-import Link from "next/link";
+import { Link } from "react-router-dom"; 
 import React from "react";
 
 const Profile = () => {
@@ -19,7 +20,7 @@ const Profile = () => {
         iconName="user_filled"
         title="My Profile"
         button={
-          <Link href="/profile/edit">
+          <Link to="/profile/edit">
             <Button color="primary" bg="primary.light" px="2rem">
               Edit Profile
             </Button>
@@ -144,6 +145,6 @@ const infoList = [
   },
 ];
 
-Profile.layout = DashboardLayout;
+Profile.layout = CustomerDashboardLayout;
 
 export default Profile;

@@ -1,10 +1,10 @@
-import AppStore from "@component/AppStore";
-import Box from "@component/Box";
-import Card from "@component/Card";
-import Carousel from "@component/carousel/Carousel";
-import FlexBox from "@component/FlexBox";
-import LazyImage from "@component/LazyImage";
-import { H1, H5, H6 } from "@component/Typography";
+import AppStore from "components/AppStore";
+import Box from "components/Box";
+import Card from "components/Card";
+import Carousel from "components/carousel/Carousel";
+import FlexBox from "components/FlexBox";
+import LazyImage from "components/LazyImage";
+import { H1, H5, H6 } from "components/Typography";
 import React from "react";
 import { GrocerySection1Wrapper } from "./GrocerySectionStyle";
 
@@ -27,9 +27,9 @@ const GrocerySection1: React.FC = () => {
             color="white"
             borderRadius={0}
             position="relative"
-            key={Math.random()} // Added key for React map
+            key={Math.random()}
           >
-            <FlexBox alignItems="center" flexWrap="wrap">
+            <FlexBox style={{ alignItems: "center", flexWrap: "wrap", display: "flex" }}>
               <Box className="card__inner-box" flex="1 1 0">
                 <H1 maxWidth="280px" mb="0.5rem" lineHeight="1.27">
                   Get Your Grocery Within 40 Minutes
@@ -58,9 +58,15 @@ const GrocerySection1: React.FC = () => {
               >
                 <LazyImage
                   src="/assets/images/products/cumin.png"
-                  layout="fill"
-                  objectFit="contain"
-                  alt="Cumin Product" // Added the alt attribute
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
+                  alt="Cumin Product"
                 />
               </Box>
             </FlexBox>

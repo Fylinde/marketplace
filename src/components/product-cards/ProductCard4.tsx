@@ -1,7 +1,7 @@
-import Box from "@component/Box";
-import HoverBox from "@component/HoverBox";
-import LazyImage from "@component/LazyImage";
-import { H4, Small } from "@component/Typography";
+import Box from "components/Box";
+import HoverBox from "components/HoverBox";
+import LazyImage from "components/LazyImage";
+import { H4, Small } from "components/Typography";
 import React from "react";
 import { CSSProperties } from "styled-components";
 import FlexBox from "../FlexBox";
@@ -29,9 +29,9 @@ const ProductCard4: React.FC<ProductCard4Props> = ({
       <HoverBox mb="1rem" mx="auto" borderRadius={8}>
         <LazyImage
           src={imgUrl}
-          width="100%"
-          height="auto"
-          layout="responsive"
+          width={300}  
+          height={300} 
+          style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
           alt={title}
           mx="auto"
         />

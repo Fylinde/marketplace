@@ -1,12 +1,12 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveContactDetails, selectContactDetails } from '../../redux/slices/registrationSlice';
+import { saveContactDetails, selectCompanyDetails, selectAccountDetails } from '../../redux/slices/registrationSlice';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import './ContactDetailsForm.css';
 import ProgressIndicator from './ProgressIndicator';
-import DateInput from '../../services/DateInput';
-import { RootState } from '../../redux/store';  // Import RootState
+import DateInput from 'services/DataInput';
+import { RootState } from '../../redux/store';
 
 type ContactDetails = {
   firstName: string;
@@ -41,20 +41,26 @@ type ContactDetails = {
   };
 };
 
+// Define the props interface
 interface ContactDetailsFormProps {
-  onNext: (data: ContactDetails) => void;
+  data: ContactDetails;
+  onUpdate: (updatedData: Partial<ContactDetails>) => void;
+  onNext: () => void;
 }
 
-const ContactDetailsForm: React.FC<ContactDetailsFormProps> = ({ onNext }) => {
+const ContactDetailsForm: React.FC<ContactDetailsFormProps> = ({ data, onUpdate, onNext }) => {
   const dispatch = useDispatch();
 
   // Retrieve saved data from Redux store
   const savedContactDetails = useSelector((state: RootState) => state.registration.contactDetails);
+  const accountDetails = useSelector(selectAccountDetails);
+  const companyDetails = useSelector(selectCompanyDetails);
 
-  const initialValues: ContactDetails = {
+   // Initial values, merging Redux state and new form fields
+   const initialValues: ContactDetails = {
     ...savedContactDetails,
-    firstName: savedContactDetails.firstName || '',
-    lastName: savedContactDetails.lastName || '',
+    firstName: accountDetails.name.split(' ')[0] || companyDetails.firstName || '',
+    lastName: accountDetails.name.split(' ')[1] || companyDetails.lastName || '',
     countryOfCitizenship: '',
     countryOfResidence: '',
     residentialAddress: '',
@@ -63,8 +69,17 @@ const ContactDetailsForm: React.FC<ContactDetailsFormProps> = ({ onNext }) => {
     state: '',
     phoneNumber: '',
     dateOfBirth: { day: '', month: '', year: '' },
-    passportInfo: { passportNumber: '', countryOfIssue: '', expiryDate: { day: '', month: '', year: '' } },
-    additionalAddressInfo: { secondaryAddress: '', secondaryPostalCode: '', secondaryBuilding: '', secondaryState: '' },
+    additionalAddressInfo: {
+      secondaryAddress: '',
+      secondaryPostalCode: '',
+      secondaryBuilding: '',
+      secondaryState: '',
+    },
+    passportInfo: {
+      passportNumber: '',
+      countryOfIssue: '',
+      expiryDate: { day: '', month: '', year: '' },
+    },
   };
 
   // Yup validation schema
@@ -106,10 +121,11 @@ const ContactDetailsForm: React.FC<ContactDetailsFormProps> = ({ onNext }) => {
   const handleSubmit = (values: ContactDetails) => {
     // Save form data to Redux
     dispatch(saveContactDetails(values));
-
+  
     // Move to the next step
-    onNext(values);
+    onNext();
   };
+  
 
   return (
     <Formik
@@ -233,7 +249,7 @@ const ContactDetailsForm: React.FC<ContactDetailsFormProps> = ({ onNext }) => {
             <ErrorMessage name="phoneNumber" component="div" className="error-message" />
           </div>
 
-          <button type="submit" className="submit-button">Next</button>
+          <button type="submit" className="submit-button" onClick={onNext}>Next</button>
         </Form>
       )}
     </Formik>
@@ -241,3 +257,4 @@ const ContactDetailsForm: React.FC<ContactDetailsFormProps> = ({ onNext }) => {
 };
 
 export default ContactDetailsForm;
+
