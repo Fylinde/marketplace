@@ -25,6 +25,7 @@ type PaymentDetails = {
     month: string;
     year: string;
   };
+  cvv: string;
   billingAddress: BillingAddress;
   currency: string; // Updated to make currency dynamic
 };
@@ -55,6 +56,7 @@ const PaymentDetailsForm: React.FC<PaymentDetailsFormProps> = ({
       month: data.expiryDate.month || '1',
       year: data.expiryDate.year || new Date().getFullYear().toString(),
     },
+    cvv: data.cvv || '',
     billingAddress: {
       street: data.billingAddress.street || '',
       city: data.billingAddress.city || '',

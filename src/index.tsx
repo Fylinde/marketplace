@@ -10,6 +10,8 @@ import theme from 'utils/theme';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import ErrorBoundary from './components/ErrorBoundary';
+import "@google/model-viewer";
+
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 

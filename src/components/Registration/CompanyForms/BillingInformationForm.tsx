@@ -30,8 +30,11 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({ data, o
   const [paymentDetails, setPaymentDetails] = useState({
     cardNumber: '',
     cardholderName: '',
-    expiryMonth: '',
-    expiryYear: '',
+    expiryDate: {
+      month: '',
+      year: '',
+    },
+    cvv: '',
     currency: 'USD', // Default currency, can be changed by user
   });
 
@@ -60,11 +63,27 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({ data, o
 
   const handlePaymentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setPaymentDetails((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  
+    setPaymentDetails((prevData) => {
+      if (name === "expiryMonth" || name === "expiryYear") {
+        // Update nested `expiryDate` fields
+        return {
+          ...prevData,
+          expiryDate: {
+            ...prevData.expiryDate,
+            [name === "expiryMonth" ? "month" : "year"]: value,
+          },
+        };
+      } else {
+        // Update other fields directly
+        return {
+          ...prevData,
+          [name]: value,
+        };
+      }
+    });
   };
+  
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -87,50 +106,54 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({ data, o
 
   const securePaymentTokenization = async (paymentData: typeof paymentDetails) => {
     try {
-      const requestBody = {
-        cardNumber: paymentData.cardNumber,
-        cardholderName: paymentData.cardholderName,
-        expiryMonth: paymentData.expiryMonth,
-        expiryYear: paymentData.expiryYear,
-      };
-  
-      console.log("Sending request to tokenize card:", JSON.stringify(requestBody));
-  
-      const response = await fetch('http://localhost:8013/api/tokenize-card', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      });
-  
-      console.log("Received response status:", response.status);
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Network response was not ok:', response.statusText, " - Details:", errorText);
-        setError(`Failed to connect to the payment service: ${response.statusText}`);
-        return null;
-      }
-  
-      const contentType = response.headers.get("content-type");
-      console.log("Response Content-Type:", contentType);
-  
-      if (contentType && contentType.includes("application/json")) {
-        const result = await response.json();
-        console.log("Received tokenization response:", result);
-        return result.token;
-      } else {
-        const nonJsonResponse = await response.text();
-        console.error('Unexpected non-JSON response:', nonJsonResponse);
-        setError('Unexpected response from the server.');
-        return null;
-      }
+        const requestBody = {
+            cardNumber: paymentData.cardNumber,
+            cardholderName: paymentData.cardholderName,
+            expiryDate: {
+                month: paymentData.expiryDate.month,
+                year: paymentData.expiryDate.year,
+            },
+            cvv: paymentData.cvv,
+            currency: paymentData.currency  // Ensure currency is included here
+        };
+
+        console.log("Sending request to tokenize card:", JSON.stringify(requestBody));
+
+        const response = await fetch('http://localhost:8013/api/tokenize-card', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody),
+        });
+
+        console.log("Received response status:", response.status);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Network response was not ok:', response.statusText, " - Details:", errorText);
+            setError(`Failed to connect to the payment service: ${response.statusText}`);
+            return null;
+        }
+
+        const contentType = response.headers.get("content-type");
+        console.log("Response Content-Type:", contentType);
+
+        if (contentType && contentType.includes("application/json")) {
+            const result = await response.json();
+            console.log("Received tokenization response:", result);
+            return result.token;
+        } else {
+            const nonJsonResponse = await response.text();
+            console.error('Unexpected non-JSON response:', nonJsonResponse);
+            setError('Unexpected response from the server.');
+            return null;
+        }
     } catch (error) {
-      console.error('Error tokenizing payment:', error);
-      setError('An error occurred during payment tokenization.');
-      return null;
+        console.error('Error tokenizing payment:', error);
+        setError('An error occurred during payment tokenization.');
+        return null;
     }
-  };
-  
+};
+
 
   return (
     <form onSubmit={handleSubmit} className="billing-form">
@@ -208,8 +231,8 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({ data, o
         <label>Expiry Month</label>
         <input
           type="text"
-          name="expiryMonth"
-          value={paymentDetails.expiryMonth}
+          name="expiryMonth"  // Keep as "expiryMonth" for handlePaymentChange logic
+          value={paymentDetails.expiryDate.month}
           onChange={handlePaymentChange}
           placeholder="MM"
         />
@@ -219,12 +242,25 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({ data, o
         <label>Expiry Year</label>
         <input
           type="text"
-          name="expiryYear"
-          value={paymentDetails.expiryYear}
+          name="expiryYear"  // Keep as "expiryYear" for handlePaymentChange logic
+          value={paymentDetails.expiryDate.year}
           onChange={handlePaymentChange}
           placeholder="YY"
         />
       </div>
+
+
+      <div className="form-group">
+        <label>CVV</label>
+        <input
+            type="text"
+            name="cvv"
+            value={paymentDetails.cvv}
+            onChange={handlePaymentChange}
+            placeholder="CVV"
+        />
+    </div>
+
 
       <div className="form-group">
         <label>Card Holder's Name</label>

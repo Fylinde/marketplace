@@ -1,12 +1,11 @@
-
+import React from "react";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
 import Box from "components/Box";
 import FlexBox from "components/FlexBox";
 import LazyImage from "components/LazyImage";
 import Rating from "components/rating/Rating";
 import { H6, SemiSpan, Small } from "components/Typography";
-import { Link } from "react-router-dom";
-import React from "react";
-import styled from "styled-components";
 
 export interface ProductCard11Props {
   imgUrl?: string;
@@ -43,62 +42,46 @@ const StyledProductCard = styled.div`
 `;
 
 const ProductCard11: React.FC<ProductCard11Props> = ({
-  imgUrl,
-  title,
-  productUrl,
-  price,
+  imgUrl = "/assets/images/default.png", // Default fallback image
+  title = "Product Title", // Default fallback title
+  productUrl = "/", // Default fallback URL
+  price = 0, // Default fallback price
   oldPrice,
-  rating,
+  rating = 0, // Default fallback rating
 }) => {
   return (
-    <Link to={productUrl || "/"}>
-      <a>
-        <StyledProductCard>
-          <Box className="image-holder">
-            <LazyImage
-              // Provide a default fallback image if imgUrl is undefined
-              src={imgUrl || "/assets/images/default.png"}  
-              alt={title || "Product Image"}  // Add the alt attribute
-              width={undefined} // Set to undefined or a number like 500
-              height={undefined} // Set to undefined or a number like 500
-              style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
-              mb="1rem"
-            />
-          </Box>
+    <Link to={productUrl}>
+      <StyledProductCard>
+        <Box className="image-holder" mb="1rem">
+          <LazyImage
+            src={imgUrl}
+            alt={title}
+            style={{ width: "100%", height: "auto", borderRadius: "4px" }}
+          />
+        </Box>
 
-          <Box mb="0.5rem">
-            <Rating value={rating} outof={5} color="warn" readonly />
-          </Box>
+        <Box mb="0.5rem">
+          <Rating value={rating} outof={5} color="warn" readonly />
+        </Box>
 
-          <H6 className="ellipsis" mb="6px" title={title || "Product Title"}>
-            {title || "Product Title"}  {/* Fallback title */}
-          </H6>
+        <H6 className="ellipsis" mb="6px" title={title}>
+          {title}
+        </H6>
 
-          <FlexBox alignItems="center">
-            <SemiSpan pr="0.25rem" fontWeight="600" color="primary.main">
-              ${price?.toLocaleString() || "0"} {/* Fallback price */}
-            </SemiSpan>
+        <FlexBox alignItems="center">
+          <SemiSpan pr="0.25rem" fontWeight="600" color="primary.main">
+            ${price.toLocaleString()} {/* Fallback price formatting */}
+          </SemiSpan>
 
-            {oldPrice && (
-              <Small color="text.muted" lineHeight="1.3">
-                ${oldPrice}
-              </Small>
-            )}
-          </FlexBox>
-        </StyledProductCard>
-      </a>
+          {oldPrice && (
+            <Small color="text.muted" lineHeight="1.3">
+              <del>${oldPrice.toLocaleString()}</del>
+            </Small>
+          )}
+        </FlexBox>
+      </StyledProductCard>
     </Link>
   );
-};
-
-// Default values for props
-ProductCard11.defaultProps = {
-  rating: 5,
-  price: 1300,
-  oldPrice: 1500,
-  imgUrl: "/assets/images/products/mask.png",
-  title: "Blutooth Speaker",
-  productUrl: "/product/324523",
 };
 
 export default ProductCard11;

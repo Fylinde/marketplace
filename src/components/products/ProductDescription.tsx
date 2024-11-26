@@ -3,9 +3,12 @@ import { useParams } from "react-router-dom"; // To get the product ID from the 
 import Box from "../Box";
 import Typography, { H3 } from "../Typography";
 import { getProducts } from "services/productService";
-export interface ProductDescriptionProps {}
 
-const ProductDescription: React.FC<ProductDescriptionProps> = () => {
+export interface ProductDescriptionProps {
+  description?: string; // Add the description prop
+}
+
+const ProductDescription: React.FC<ProductDescriptionProps> = ({ description }) => {
   const { id } = useParams<{ id: string }>(); // Get product ID from URL
   const [product, setProduct] = useState<any>(null);
 
@@ -24,6 +27,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = () => {
     <Box>
       <H3 mb="1rem">Specification:</H3>
       <Typography>
+        {description} <br />
         Brand: {product.brand || "N/A"} <br />
         Model: {product.model || "N/A"} <br />
         {product.features?.join(", ") || "No additional features"} <br />

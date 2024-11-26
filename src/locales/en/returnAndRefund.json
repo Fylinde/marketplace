@@ -1,0 +1,16 @@
+{
+    "returnAndRefundTitle": "Return & Refund",
+    "orderID": "Order ID",
+    "paymentType": "Payment Type",
+    "orderAmount": "Order Amount",
+    "orderStatus": "Order Status",
+    "requestRefund": "Request Refund",
+    "refundProcessed": "Refund has been processed.",
+    "errorFetchingOrder": "Failed to fetch order details. Please try again.",
+    "refundSuccessful": "Refund processed successfully!",
+    "refundFailed": "Refund failed. Reason: {{reason}}",
+    "refundError": "An error occurred while processing the refund.",
+    "orderNotAvailable": "The order details are not available.",
+    "orderNotFound": "The order could not be found."
+  }
+  

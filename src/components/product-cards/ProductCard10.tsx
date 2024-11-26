@@ -1,8 +1,7 @@
-
-import LazyImage from "components/LazyImage";
-import { Link } from "react-router-dom";
 import React, { Fragment, useCallback, useState } from "react";
+import { Link } from "react-router-dom";
 import { CSSProperties } from "styled-components";
+import LazyImage from "components/LazyImage";
 import Box from "../Box";
 import Button from "../buttons/Button";
 import Card from "../Card";
@@ -29,28 +28,30 @@ export interface ProductCard10Props {
 }
 
 const ProductCard10: React.FC<ProductCard10Props> = ({
-  imgUrl,
-  title,
-  price,
+  imgUrl = "/assets/images/products/macbook.png", // Default image
+  title = "Product Title", // Default title
+  price = 0, // Default price
   off,
   subcategories,
-  rating,
+  rating = 0, // Default rating
   ...props
 }) => {
   const [cartAmount, setCartAmount] = useState(0);
   const [open, setOpen] = useState(false);
 
-  const toggleDialog = useCallback(() => {
-    setOpen((open) => !open);
-  }, []);
+  const toggleDialog = useCallback(() => setOpen((prev) => !prev), []);
 
   const handleCartAmountChange = useCallback(
-    (amount: number) => () => {
-      console.log(amount);
+    (amount: number) => {
       if (amount >= 0) setCartAmount(amount);
     },
     []
   );
+
+  const discountedPrice =
+    off && price
+      ? (price - (price * off) / 100).toFixed(2)
+      : price.toFixed(2);
 
   return (
     <StyledProductCard1 {...props}>
@@ -71,65 +72,51 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
         )}
 
         <FlexBox className="extra-icons">
-          <Icon
-            color="secondary"
-            variant="small"
-            mb="0.5rem"
-            onClick={toggleDialog}
-          >
+          <Icon color="secondary" variant="small" mb="0.5rem" onClick={toggleDialog}>
             eye-alt
           </Icon>
-
           <Icon className="favorite-icon outlined-icon" variant="small">
             heart
           </Icon>
         </FlexBox>
 
-        <Link to="/product/34324321">
-          <a>
-            {/* Provide a fallback for imgUrl and title */}
-            <LazyImage
-              src={imgUrl || "/assets/images/products/macbook.png"}
-              width={500}  // Set a valid numeric value
-              height={500} // Set a valid numeric value
-              style={{ width: '100%', height: 'auto', borderRadius: '4px' }}
-              alt={title || "Product Image"}
-            />
-          </a>
+        <Link to={`/product/${title}`}>
+          <LazyImage
+            src={imgUrl}
+            width={500}
+            height={500}
+            style={{ width: "100%", height: "auto", borderRadius: "4px" }}
+            alt={title}
+          />
         </Link>
       </div>
 
       <div className="details">
         <FlexBox>
           <Box flex="1 1 0" minWidth="0px" mr="0.5rem">
-            <Link to="/product/34324321">
-              <a>
-                <H3
-                  className="title"
-                  fontSize="14px"
-                  textAlign="left"
-                  fontWeight="600"
-                  color="text.secondary"
-                  mb="6px"
-                  title={title || "Product Title"}
-                >
-                  {title || "Product Title"}
-                </H3>
-              </a>
+            <Link to={`/product/${title}`}>
+              <H3
+                className="title"
+                fontSize="14px"
+                textAlign="left"
+                fontWeight="600"
+                color="text.secondary"
+                mb="6px"
+                title={title}
+              >
+                {title}
+              </H3>
             </Link>
 
             <SemiSpan>300ml</SemiSpan>
 
             <FlexBox alignItems="center" mt="6px">
               <SemiSpan pr="0.5rem" fontWeight="600" color="primary.main">
-                ${price?.toFixed(2) || "0.00"}
+                ${discountedPrice}
               </SemiSpan>
               {off && (
                 <SemiSpan color="text.muted" fontWeight="600">
-                  {/* Provide fallback values for price and off */}
-                  <del>
-                    ${((price ?? 0) - ((price ?? 0) * (off ?? 0)) / 100).toFixed(2)}
-                  </del>
+                  <del>${price.toFixed(2)}</del>
                 </SemiSpan>
               )}
             </FlexBox>
@@ -138,7 +125,7 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
           <FlexBox
             flexDirection="column-reverse"
             alignItems="center"
-            justifyContent={!!cartAmount ? "space-between" : "flex-start"}
+            justifyContent={cartAmount ? "space-between" : "flex-start"}
             width="30px"
           >
             <Button
@@ -147,12 +134,12 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
               padding="5px"
               size="small"
               borderColor="primary.light"
-              onClick={handleCartAmountChange(cartAmount + 1)}
+              onClick={() => handleCartAmountChange(cartAmount + 1)}
             >
               <Icon variant="small">plus</Icon>
             </Button>
 
-            {!!cartAmount && (
+            {cartAmount > 0 && (
               <Fragment>
                 <SemiSpan color="text.primary" fontWeight="600">
                   {cartAmount}
@@ -163,7 +150,7 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
                   padding="5px"
                   size="small"
                   borderColor="primary.light"
-                  onClick={handleCartAmountChange(cartAmount - 1)}
+                  onClick={() => handleCartAmountChange(cartAmount - 1)}
                 >
                   <Icon variant="small">minus</Icon>
                 </Button>
@@ -175,24 +162,18 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
 
       <Modal open={open} onClose={toggleDialog}>
         <Card p="1rem" position="relative">
-          {/* Provide fallback for imgUrl and title */}
           <ProductIntro
-            imgUrl={[imgUrl || "/assets/images/products/macbook.png"]}
-            title={title || "Product Title"}
-            price={price ?? 0}
+            product={{
+              id: title, // Assuming title acts as id
+              images: [imgUrl], // Pass imgUrl as an array
+              title,
+              price,
+              brand: undefined,
+              stock: undefined,
+            }}
           />
-          <Box
-            position="absolute"
-            top="0.75rem"
-            right="0.75rem"
-            cursor="pointer"
-          >
-            <Icon
-              className="close"
-              color="primary"
-              variant="small"
-              onClick={toggleDialog}
-            >
+          <Box position="absolute" top="0.75rem" right="0.75rem" cursor="pointer">
+            <Icon className="close" color="primary" variant="small" onClick={toggleDialog}>
               close
             </Icon>
           </Box>
@@ -200,29 +181,6 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
       </Modal>
     </StyledProductCard1>
   );
-};
-
-// Default props with fallback values
-ProductCard10.defaultProps = {
-  title: "KSUS ROG Strix G15 ASUS ROG Strix G15 ASUS ROG Strix G15",
-  imgUrl: "/assets/images/products/macbook.png",
-  off: 50,
-  price: 450,
-  rating: 0,
-  subcategories: [
-    {
-      title: "Bike",
-      url: "/#",
-    },
-    {
-      title: "Ducati",
-      url: "/#",
-    },
-    {
-      title: "Motors",
-      url: "/#",
-    },
-  ],
 };
 
 export default ProductCard10;

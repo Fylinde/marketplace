@@ -1,26 +1,25 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "checkJs": false,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
+    "lib": ["dom", "dom.iterable", "esnext"], // Includes modern browser and ES features
+    "allowJs": true, // Allows JavaScript files in the project
+    "checkJs": false, // Avoids TypeScript errors in JS files
+    "skipLibCheck": true, // Skips type checks for libraries in node_modules
+    "strict": true, // Enables strict mode for TypeScript
+    "forceConsistentCasingInFileNames": true, // Enforces consistent casing for imports
+    "noEmit": true, // Prevents TypeScript from emitting compiled files
+    "esModuleInterop": true, // Allows compatibility with CommonJS and ES modules
     "module": "esnext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "baseUrl": "./src",
-    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true, // Enables importing JSON files
+    "isolatedModules": true, // Ensures module compatibility
+    "jsx": "react-jsx", // Enables JSX for React
+    "baseUrl": "./src", // Sets the base path for imports
     "paths": {
-      "@/*": ["*"] // Corrected: Moved inside compilerOptions
+      "@/*": ["*"] // Enables aliasing for simplified imports
     },
-    "types": ["@testing-library/jest-dom"]
+    "types": ["node"] // Includes Node.js type definitions
   },
-  "include": ["src/**/*", "src/types/**/*"],
-  "exclude": ["node_modules", "build", "dist"]
+  "include": ["src/**/*", "src/types/**/*", "custom.d.ts"], // Ensures custom types are included
+  "exclude": ["node_modules", "build", "dist"] // Excludes build artifacts and dependencies
 }

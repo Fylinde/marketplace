@@ -27,7 +27,7 @@ const AccountSection: React.FC = () => {
   };
 
   const handleCreateSellerAccount = () => {
-    navigate("/register/seller/type-selection");
+    navigate("/welcome");
   };
 
   return (

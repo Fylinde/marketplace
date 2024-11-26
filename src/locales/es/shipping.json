@@ -1,0 +1,14 @@
+{
+    "shippingManagementTitle": "Gestión de Envíos",
+    "loadingShippingMethods": "Cargando métodos de envío...",
+    "errorFetchingShippingMethods": "Error al obtener los métodos de envío.",
+    "shippingMethodName": "Nombre del Método de Envío",
+    "cost": "Costo",
+    "currency": "Moneda",
+    "actions": "Acciones",
+    "edit": "Editar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "allFieldsRequired": "¡Todos los campos son obligatorios!"
+  }
+  

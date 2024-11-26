@@ -8,38 +8,65 @@ import Icon from "../icon/Icon";
 import Pagination from "../pagination/Pagination";
 import TableRow from "../TableRow";
 import Typography, { H5 } from "../Typography";
-import { fetchProducts } from "redux/slices/productSlice";
-import { RootState, AppDispatch } from "redux/store";
+import { fetchProducts } from "../../redux/slices/productSlice"; // Adjust import path as needed
+import { RootState } from "../../redux/store";
+import type { AppDispatch } from "../../redux/store";
 
-// Define the Product interface here if it’s not defined elsewhere
+// Define Product interface
 interface Product {
-  id: string;
-  title: string;
-  price: number;
-  createdAt: string;
+  id: string | number;
   status?: string;
-  // Add other fields as needed
+  createdAt: string;
+  price: number;
 }
 
+// Props for VendorProductList
 export interface VendorProductListProps {
   vendorId: string;
 }
 
 const VendorProductList: React.FC<VendorProductListProps> = ({ vendorId }) => {
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { products, loading, error, totalPages } = useSelector((state: RootState) => state.products);
-  const buttonSize: "small" = "small"; // Strongly type the value
+  const buttonSize: "small" = "small";
 
+  // Fetch products for the specific vendor
   useEffect(() => {
-    // Fetch products for the specific vendor
-    dispatch(fetchProducts({ vendorId, page: 1 })); // Start with page 1
+    dispatch(fetchProducts({ vendorId, page: 1 }));
   }, [dispatch, vendorId]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  // Handle pagination changes
+  const handlePageChange = (data: { selected: number }) => {
+    dispatch(fetchProducts({ vendorId, page: data.selected + 1 }));
+  };
+
+  if (loading) {
+    return (
+      <FlexBox justifyContent="center" alignItems="center" height="100vh">
+        <Typography>Loading products...</Typography>
+      </FlexBox>
+    );
+  }
+
+  if (error) {
+    return (
+      <FlexBox justifyContent="center" alignItems="center" height="100vh">
+        <Typography color="error.main">Error: {error}</Typography>
+      </FlexBox>
+    );
+  }
+
+  if (!products.length) {
+    return (
+      <FlexBox justifyContent="center" alignItems="center" height="100vh">
+        <Typography>No products found for this vendor.</Typography>
+      </FlexBox>
+    );
+  }
 
   return (
     <Fragment>
+      {/* Header Row for Desktop */}
       <Hidden down={769}>
         <TableRow padding="0px 18px" boxShadow="none">
           <H5 color="text.muted" my="0px" mx="6px" textAlign="left">
@@ -58,8 +85,13 @@ const VendorProductList: React.FC<VendorProductListProps> = ({ vendorId }) => {
         </TableRow>
       </Hidden>
 
+      {/* Product List */}
       {products.map((item: Product) => (
-        <Link to={`/vendor/products/${item.id}`} key={item.id} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link
+          to={`/vendor/products/${item.id}`}
+          key={item.id}
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
           <TableRow my="1rem" padding="6px 18px">
             <H5 m="6px" textAlign="left">
               {item.id}
@@ -71,7 +103,7 @@ const VendorProductList: React.FC<VendorProductListProps> = ({ vendorId }) => {
               {new Date(item.createdAt).toLocaleDateString()}
             </Typography>
             <Typography m="6px" textAlign="left" color="text.muted">
-              ${item.price}
+              ${item.price.toFixed(2)}
             </Typography>
 
             <Hidden flex="0 0 0 !important" down={769}>
@@ -87,13 +119,9 @@ const VendorProductList: React.FC<VendorProductListProps> = ({ vendorId }) => {
         </Link>
       ))}
 
+      {/* Pagination */}
       <FlexBox justifyContent="center" mt="2.5rem">
-        <Pagination
-          pageCount={totalPages}
-          onChange={(data) => {
-            dispatch(fetchProducts({ vendorId, page: data.selected + 1 }));
-          }}
-        />
+        <Pagination pageCount={totalPages} onChange={handlePageChange} />
       </FlexBox>
     </Fragment>
   );

@@ -1,3 +1,4 @@
+import React, { ReactNode, useCallback, useState } from "react";
 import Box from "components/Box";
 import IconButton from "components/buttons/IconButton";
 import Card from "components/Card";
@@ -12,16 +13,29 @@ import ProductFilterCard from "components/products/ProductFilterCard";
 import Select from "components/Select";
 import Sidenav from "components/sidenav/Sidenav";
 import { H5, Paragraph } from "components/Typography";
-import React, { ReactNode, useCallback, useState } from "react";
-import useWindowSize from "../../../hooks/useWindowSize";
+import useWindowSize from "hooks/useWindowSize";
+import { SingleValue, ActionMeta } from "react-select";
 
 type PageWithLayout = React.FC & {
   layout?: React.FC<{ children: ReactNode }>;
 };
 
+type SelectOption = {
+  label: string;
+  value: string;
+};
+
+const sortOptions: SelectOption[] = [
+  { label: "Relevance", value: "Relevance" },
+  { label: "Date", value: "Date" },
+  { label: "Price Low to High", value: "Price Low to High" },
+  { label: "Price High to Low", value: "Price High to Low" },
+];
+
 const ProductSearchResult: PageWithLayout = () => {
   const [view, setView] = useState<"grid" | "list">("grid");
-  const { width = 1025 } = useWindowSize();  // Set a default width to avoid undefined
+  const [sortOption, setSortOption] = useState(sortOptions[0]?.value || "Relevance");
+  const { width = 1025 } = useWindowSize();
   const isTablet = width < 1025;
 
   const toggleView = useCallback(
@@ -30,6 +44,15 @@ const ProductSearchResult: PageWithLayout = () => {
     },
     []
   );
+
+  const handleSortChange = (
+    option: SingleValue<SelectOption>,
+    actionMeta: ActionMeta<SelectOption>
+  ) => {
+    if (option) {
+      setSortOption(option.value);
+    }
+  };
 
   return (
     <Box pt="20px">
@@ -53,8 +76,9 @@ const ProductSearchResult: PageWithLayout = () => {
           <Box flex="1 1 0" mr="1.75rem" minWidth="150px">
             <Select
               placeholder="Sort by"
-              defaultValue={sortOptions[0] ?? { label: "Relevance", value: "Relevance" }}
+              defaultValue={sortOptions.find((option) => option.value === sortOption)}
               options={sortOptions}
+              onChange={handleSortChange}
             />
           </Box>
 
@@ -83,7 +107,7 @@ const ProductSearchResult: PageWithLayout = () => {
           {isTablet && (
             <Sidenav
               position="left"
-              scroll={true}
+              scroll
               handle={
                 <IconButton size="small">
                   <Icon>options</Icon>
@@ -109,14 +133,7 @@ const ProductSearchResult: PageWithLayout = () => {
   );
 };
 
-const sortOptions = [
-  { label: "Relevance", value: "Relevance" },
-  { label: "Date", value: "Date" },
-  { label: "Price Low to High", value: "Price Low to High" },
-  { label: "Price High to Low", value: "Price High to Low" },
-];
-
-// Ensure NavbarLayout is properly assigned
+// Assign NavbarLayout
 ProductSearchResult.layout = NavbarLayout as React.FC<{ children: ReactNode }>;
 
 export default ProductSearchResult;

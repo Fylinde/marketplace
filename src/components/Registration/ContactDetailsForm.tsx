@@ -59,8 +59,8 @@ const ContactDetailsForm: React.FC<ContactDetailsFormProps> = ({ data, onUpdate,
    // Initial values, merging Redux state and new form fields
    const initialValues: ContactDetails = {
     ...savedContactDetails,
-    firstName: accountDetails.name.split(' ')[0] || companyDetails.firstName || '',
-    lastName: accountDetails.name.split(' ')[1] || companyDetails.lastName || '',
+    firstName: accountDetails.full_name.split(' ')[0] || companyDetails.firstName || '',
+    lastName: accountDetails.full_name.split(' ')[1] || companyDetails.lastName || '',
     countryOfCitizenship: '',
     countryOfResidence: '',
     residentialAddress: '',

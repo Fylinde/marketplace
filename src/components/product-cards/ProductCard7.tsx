@@ -1,10 +1,8 @@
-
+import React, { useCallback } from "react";
+import { Link } from "react-router-dom";
+import { SpaceProps } from "styled-system";
 import Box from "components/Box";
 import Image from "components/Image";
-import { useAppContext } from "contexts/app/AppContext";
-import { Link } from "react-router-dom";
-import React, { useCallback } from "react";
-import { SpaceProps } from "styled-system";
 import Button from "../buttons/Button";
 import IconButton from "../buttons/IconButton";
 import FlexBox from "../FlexBox";
@@ -25,32 +23,21 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
   name,
   qty,
   price,
-  imgUrl,
+  imgUrl = "/assets/images/products/iphone-xi.png", // Default image
   ...props
 }) => {
-  const { dispatch } = useAppContext();
-  
-  // Explicitly type amount as number
   const handleCartAmountChange = useCallback(
-    (amount: number) => () => {
-      dispatch({
-        type: "CHANGE_CART_AMOUNT",
-        payload: {
-          qty: amount,
-          name,
-          price,
-          imgUrl,
-          id,
-        },
-      });
+    (amount: number) => {
+      // Handle cart amount change logic dynamically
+      console.log(`Cart updated for product ${id}: new amount ${amount}`);
     },
-    [dispatch, name, price, imgUrl, id]
+    [id]
   );
 
   return (
     <StyledProductCard7 {...props}>
       <Image
-        src={imgUrl || "/assets/images/products/iphone-xi.png"}
+        src={imgUrl}
         size={140}
         display="block"
         alt={name}
@@ -63,34 +50,26 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
         width="100%"
       >
         <Link to={`/product/${id}`}>
-          <a>
-            <Typography
-              className="title"
-              fontWeight="600"
-              fontSize="18px"
-              mb="0.5rem"
-            >
-              {name}
-            </Typography>
-          </a>
+          <Typography
+            className="title"
+            fontWeight="600"
+            fontSize="18px"
+            mb="0.5rem"
+          >
+            {name}
+          </Typography>
         </Link>
         <Box position="absolute" right="1rem" top="1rem">
-        <IconButton
-          padding="4px"
-          ml="12px"
-          onClick={handleCartAmountChange(0)}
-        >
-          <Icon size="1.25rem">close</Icon>
-        </IconButton>
-
-
+          <IconButton
+            padding="4px"
+            ml="12px"
+            onClick={() => handleCartAmountChange(0)} // Remove product
+          >
+            <Icon size="1.25rem">close</Icon>
+          </IconButton>
         </Box>
 
-        <FlexBox
-          // width="100%"
-          justifyContent="space-between"
-          alignItems="flex-end"
-        >
+        <FlexBox justifyContent="space-between" alignItems="flex-end">
           <FlexBox flexWrap="wrap" alignItems="center">
             <Typography color="gray.600" mr="0.5rem">
               ${price.toFixed(2)} x {qty}
@@ -105,9 +84,9 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
               variant="outlined"
               color="primary"
               padding="5px"
-              size="small"  // Change "none" to "small"
+              size="small"
               borderColor="primary.light"
-              onClick={handleCartAmountChange(qty - 1)}
+              onClick={() => handleCartAmountChange(qty - 1)}
               disabled={qty === 1}
             >
               <Icon variant="small">minus</Icon>
@@ -119,9 +98,9 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
               variant="outlined"
               color="primary"
               padding="5px"
-              size="small"  // Change "none" to "small"
+              size="small"
               borderColor="primary.light"
-              onClick={handleCartAmountChange(qty + 1)}
+              onClick={() => handleCartAmountChange(qty + 1)}
             >
               <Icon variant="small">plus</Icon>
             </Button>

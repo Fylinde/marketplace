@@ -9,8 +9,6 @@ interface SellerInformationFormProps {
     contactPersonFirstName: string;
     contactPersonMiddleName: string;
     contactPersonLastName: string;
-    smsVerificationLanguage: string;
-    verificationMethod: string;
   };
   onUpdate: (newData: Partial<{
     companyRegistrationNumber: string;
@@ -19,8 +17,6 @@ interface SellerInformationFormProps {
     contactPersonFirstName: string;
     contactPersonMiddleName: string;
     contactPersonLastName: string;
-    smsVerificationLanguage: string;
-    verificationMethod: string;
   }>) => void;  // Correctly typed update callback
   onNext: () => void;  // Callback to move to the next step
 }
@@ -33,8 +29,6 @@ const SellerInformationForm: React.FC<SellerInformationFormProps> = ({ data, onU
     contactPersonFirstName: '',
     contactPersonMiddleName: '',
     contactPersonLastName: '',
-    smsVerificationLanguage: 'English',
-    verificationMethod: 'SMS',
   });
 
   // Sync formData with incoming props data when the component mounts or when the data prop changes
@@ -45,7 +39,7 @@ const SellerInformationForm: React.FC<SellerInformationFormProps> = ({ data, onU
   }, [data]);
 
   // Handle input changes and update the form data
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const updatedData = {
       ...formData,
       [e.target.name]: e.target.value,
@@ -97,23 +91,6 @@ const SellerInformationForm: React.FC<SellerInformationFormProps> = ({ data, onU
           onChange={handleChange}
           placeholder="+1 (555) 555-5555"
         />
-      </div>
-
-      <div className="form-group">
-        <label>Verification Method</label>
-        <select name="verificationMethod" value={formData.verificationMethod} onChange={handleChange}>
-          <option value="SMS">SMS</option>
-          <option value="Call">Call</option>
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label>SMS Verification Language</label>
-        <select name="smsVerificationLanguage" value={formData.smsVerificationLanguage} onChange={handleChange}>
-          <option value="English">English</option>
-          <option value="Spanish">Spanish</option>
-          <option value="French">French</option>
-        </select>
       </div>
 
       <div className="form-group">

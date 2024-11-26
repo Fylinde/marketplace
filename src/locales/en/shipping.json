@@ -1,0 +1,14 @@
+{
+    "shippingManagementTitle": "Shipping Management",
+    "loadingShippingMethods": "Loading shipping methods...",
+    "errorFetchingShippingMethods": "Error fetching shipping methods.",
+    "shippingMethodName": "Shipping Method Name",
+    "cost": "Cost",
+    "currency": "Currency",
+    "actions": "Actions",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "allFieldsRequired": "All fields are required!"
+  }
+  

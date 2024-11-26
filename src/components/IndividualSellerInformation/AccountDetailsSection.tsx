@@ -8,7 +8,7 @@ interface AccountDetailsSectionProps {
 const AccountDetailsSection: React.FC<AccountDetailsSectionProps> = ({ accountDetails }) => (
   <div>
     <h3>Account Details</h3>
-    <p>Name: {accountDetails.name}</p>
+    <p>Name: {accountDetails.full_name}</p>
     <p>Email: {accountDetails.email}</p>
   </div>
 );

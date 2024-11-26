@@ -1,0 +1,16 @@
+{
+    "returnAndRefundTitle": "Devoluciones y Reembolsos",
+    "orderID": "ID del Pedido",
+    "paymentType": "Tipo de Pago",
+    "orderAmount": "Monto del Pedido",
+    "orderStatus": "Estado del Pedido",
+    "requestRefund": "Solicitar Reembolso",
+    "refundProcessed": "El reembolso ha sido procesado.",
+    "errorFetchingOrder": "No se pudieron obtener los detalles del pedido. Inténtelo de nuevo.",
+    "refundSuccessful": "¡Reembolso procesado con éxito!",
+    "refundFailed": "El reembolso falló. Razón: {{reason}}",
+    "refundError": "Ocurrió un error al procesar el reembolso.",
+    "orderNotAvailable": "Los detalles del pedido no están disponibles.",
+    "orderNotFound": "No se pudo encontrar el pedido."
+  }
+  

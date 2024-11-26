@@ -1,96 +1,134 @@
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Formik } from "formik";
+import * as yup from "yup";
+import { format } from "date-fns";
+import axios from "axios";
+
 import Avatar from "components/avatar/Avatar";
 import Box from "components/Box";
 import Card from "components/Card";
 import FlexBox from "components/FlexBox";
-import LazyImage from "components/LazyImage";
+import Select from "components/Select";
 import TextField from "components/text-field/TextField";
-import { format } from "date-fns"; // Ensure this is installed
-import { Formik } from "formik";
-import { useNavigate } from "react-router-dom"; 
-import React, { useEffect, useState } from "react";
-import * as yup from "yup";
-import Button from "../buttons/Button";
-import { Card1 } from "../Card1";
-import Grid from "../grid/Grid";
-import Select from "../Select";
-import Typography, { H6, Paragraph } from "../Typography";
+import Typography, { H6, Paragraph } from "components/Typography";
+import Button from "components/buttons/Button";
+import Grid from "components/grid/Grid";
+
+import { setDeliveryOption, setPaymentMethod, applyDiscount } from "../../redux/slices/checkoutSlice";
+import { loadAddresses } from "../../redux/slices/addressSlice";
+import type { AppDispatch, RootState } from "../../redux/store";
+import { Address } from "../../redux/slices/addressSlice";
+
 
 // Define types for form values
 interface FormValues {
   address: string;
   contact: string;
   card: string;
-  date: Date | null;
+  date: string;
   time: string;
   voucher: string;
 }
 
-// Define types for address, contact, and payment data
-interface AddressItem {
-  addressType: string;
-  address: string;
+// Define types for Select options
+interface SelectOption {
+  label: string;
+  value: string;
 }
 
-interface ContactItem {
-  contactType: string;
-  contact: string;
-}
-
-interface PaymentMethodItem {
-  cardType: string;
-  last4Digits: string;
-  name: string;
-}
-
-// Define the type for setFieldValue function in Formik
-type SetFieldValue = (field: string, value: any, shouldValidate?: boolean) => void;
+// Use user's timezone dynamically if `date-fns-tz` is not available
+const getCurrentTimezone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const CheckoutForm2 = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  const { addresses } = useSelector((state: RootState) => state.address);
+  const { deliveryOption, paymentMethod } = useSelector((state: RootState) => state.checkout);
+
+  const [dateList, setDateList] = useState<SelectOption[]>([]);
+  const [timeList, setTimeList] = useState<SelectOption[]>([]);
   const [hasVoucher, setHasVoucher] = useState(false);
-  const [dateList, setDateList] = useState<{ label: string; value: Date }[]>([]); // Typed date list
-  const navigate = useNavigate(); // Replaced useRouter with useNavigate
 
-  // Handle form submission
-  const handleFormSubmit = async (values: FormValues) => {
-    console.log(values);
-    navigate("/payment"); // Replaced router.push with navigate
+  const fetchTimeSlots = async (selectedDate: string) => {
+    try {
+      const response = await axios.get(`/api/delivery-time-slots`, {
+        params: { date: selectedDate },
+      });
+      const slots = response.data.map((slot: { label: string; value: string }) => ({
+        label: slot.label,
+        value: slot.value,
+      }));
+      setTimeList(slots);
+    } catch (error) {
+      console.error("Failed to fetch delivery time slots", error);
+    }
   };
 
-  // Handle change of field values in Formik
-  const handleFieldValueChange =
-    (value: string | Date, fieldName: keyof FormValues, setFieldValue: SetFieldValue) => () => {
-      setFieldValue(fieldName, value);
-    };
-
-  const toggleHasVoucher = () => {
-    setHasVoucher((has) => !has);
-  };
-
-  // Populate date list on component mount
   useEffect(() => {
-    let list = [];
+    const list: SelectOption[] = [];
     let today = new Date();
-    let dateCount = today.getDate();
 
-    list.push({
-      label: format(today, "dd MMMM"),
-      value: today,
-    });
-
-    for (let i = 1; i < 10; i++) {
-      today.setDate(dateCount + i);
+    for (let i = 0; i < 10; i++) {
       list.push({
         label: format(today, "dd MMMM"),
-        value: new Date(today), // create new Date object to avoid mutation
+        value: today.toISOString(),
       });
+      today.setDate(today.getDate() + 1);
+    }
+    setDateList(list);
+
+    fetchTimeSlots(new Date().toISOString());
+    dispatch(loadAddresses());
+  }, [dispatch]);
+
+  const handleFormSubmit = (values: FormValues) => {
+    const selectedAddress = addresses.find((address: Address) => address.id === values.address);
+
+    if (selectedAddress) {
+      const deliveryOptionPayload = {
+        ...deliveryOption,
+        date: values.date,
+        time: values.time,
+        price: deliveryOption?.price ?? 0,
+      };
+
+      dispatch(setDeliveryOption(deliveryOptionPayload));
+      if (paymentMethod) {
+        dispatch(setPaymentMethod(paymentMethod));
+      } else {
+        console.error("Payment method is null, cannot dispatch setPaymentMethod");
+      }
     }
 
-    setDateList(list);
-  }, []);
+    navigate("/payment");
+  };
+
+  const handleDateChange = (selectedDate: string) => {
+    fetchTimeSlots(selectedDate);
+  };
+
+  const checkoutSchema = yup.object().shape({
+    address: yup.string().required("Delivery address is required"),
+    contact: yup.string().required("Contact information is required"),
+    card: yup.string().required("Payment method is required"),
+    date: yup.string().required("Delivery date is required"),
+    time: yup.string().required("Delivery time is required"),
+    voucher: yup.string(),
+  });
 
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={{
+        address: "",
+        contact: "",
+        card: "",
+        date: "",
+        time: "",
+        voucher: "",
+      }}
       validationSchema={checkoutSchema}
       onSubmit={handleFormSubmit}
     >
@@ -103,7 +141,7 @@ const CheckoutForm2 = () => {
         setFieldValue,
       }) => (
         <form onSubmit={handleSubmit}>
-          <Card1 mb="1.5rem">
+          <Card mb="1.5rem">
             <FlexBox alignItems="center" mb="1.75rem">
               <Avatar bg="primary.main" size={32} color="primary.text" mr="0.875rem">
                 1
@@ -117,22 +155,22 @@ const CheckoutForm2 = () => {
                   <Select
                     label="Delivery Date"
                     options={dateList}
-                    value={values.date || ""}
-                    onChange={(date) => {
-                      setFieldValue("date", date);
+                    value={dateList.find((date) => date.value === values.date)}
+                    onChange={(option) => {
+                      const selectedDate = option?.value || "";
+                      setFieldValue("date", selectedDate);
+                      handleDateChange(selectedDate);
                     }}
-                    errorText={touched.date && errors.date}
+                    errorText={touched.date && typeof errors.date === "string" ? errors.date : undefined}
                   />
                 </Grid>
                 <Grid item sm={6} xs={12}>
                   <Select
                     label="Delivery Time"
                     options={timeList}
-                    value={values.time || ""}
-                    onChange={(time) => {
-                      setFieldValue("time", time);
-                    }}
-                    errorText={touched.time && errors.time}
+                    value={timeList.find((time) => time.value === values.time)}
+                    onChange={(option) => setFieldValue("time", option?.value || "")}
+                    errorText={touched.time && typeof errors.time === "string" ? errors.time : undefined}
                   />
                 </Grid>
               </Grid>
@@ -140,206 +178,42 @@ const CheckoutForm2 = () => {
 
             <Typography mb="0.75rem">Delivery Address</Typography>
             <Grid container spacing={6}>
-              {addressList.map((item, ind) => (
-                <Grid item md={4} sm={6} xs={12} key={ind}>
+              {addresses.map((item: Address) => (
+                <Grid item md={4} sm={6} xs={12} key={item.id}>
                   <Card
                     bg="gray.100"
                     p="1rem"
                     boxShadow="none"
                     border="1px solid"
                     cursor="pointer"
-                    borderColor={item.address === values.address ? "primary.main" : "transparent"}
-                    onClick={handleFieldValueChange(item.address, "address", setFieldValue)}
+                    borderColor={item.id === values.address ? "primary.main" : "transparent"}
+                    onClick={() => setFieldValue("address", item.id)}
                   >
-                    <H6 mb="0.25rem">{item.addressType}</H6>
-                    <Paragraph color="gray.700">{item.address}</Paragraph>
+                    <H6 mb="0.25rem">{item.fullName}</H6>
+                    <Paragraph color="gray.700">{item.addressLine1}</Paragraph>
                   </Card>
                 </Grid>
               ))}
             </Grid>
-          </Card1>
+          </Card>
 
-          <Card1 mb="1.5rem">
+          {/* Payment Method */}
+          <Card mb="1.5rem">
             <FlexBox alignItems="center" mb="1.75rem">
               <Avatar bg="primary.main" size={32} color="primary.text" mr="0.875rem">
                 2
               </Avatar>
-              <Typography fontSize="20px">Personal Details</Typography>
-            </FlexBox>
-
-            <Typography mb="0.75rem">Contact Information</Typography>
-
-            <Grid container spacing={6}>
-              {contactList.map((item) => (
-                <Grid item md={4} sm={6} xs={12} key={item.contact}>
-                  <Card
-                    bg="gray.100"
-                    p="1rem"
-                    boxShadow="none"
-                    border="1px solid"
-                    cursor="pointer"
-                    borderColor={item.contact === values.contact ? "primary.main" : "transparent"}
-                    onClick={handleFieldValueChange(item.contact, "contact", setFieldValue)}
-                  >
-                    <H6 mb="0.25rem">{item.contactType}</H6>
-                    <Paragraph color="gray.700">{item.contact}</Paragraph>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Card1>
-
-          <Card1 mb="1.5rem">
-            <FlexBox alignItems="center" mb="1.75rem">
-              <Avatar bg="primary.main" size={32} color="primary.text" mr="0.875rem">
-                3
-              </Avatar>
               <Typography fontSize="20px">Payment Details</Typography>
             </FlexBox>
+          </Card>
 
-            <Typography mb="0.75rem">Saved Payment Methods</Typography>
-            <Grid container spacing={6}>
-              {paymentMethodList.map((item) => (
-                <Grid item md={4} sm={6} xs={12} key={item.last4Digits}>
-                  <Card
-                    bg="gray.100"
-                    p="1rem"
-                    boxShadow="none"
-                    border="1px solid"
-                    cursor="pointer"
-                    borderColor={item.last4Digits === values.card ? "primary.main" : "transparent"}
-                    onClick={handleFieldValueChange(item.last4Digits, "card", setFieldValue)}
-                  >
-                    <Box height="24px" width="36px" position="relative" mb="0.5rem">
-                      <LazyImage
-                        src={`/assets/images/payment-methods/${item.cardType}.svg`}
-                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}  // Fixed the 'layout' issue
-                        alt={item.cardType}  // Added 'alt' attribute
-                      />
-                    </Box>
-
-                    <Paragraph color="gray.700">**** **** **** {item.last4Digits}</Paragraph>
-                    <Paragraph color="gray.700">{item.name}</Paragraph>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-
-            <Paragraph
-              className="cursor-pointer"
-              color="primary.main"
-              mt="1.5rem"
-              lineHeight="1"
-              onClick={toggleHasVoucher}
-            >
-              I have a voucher.
-            </Paragraph>
-
-            {hasVoucher && (
-              <FlexBox mt="1.5rem" maxWidth="400px">
-                <TextField
-                  name="voucher"
-                  placeholder="Enter voucher code here"
-                  fullwidth
-                  value={values.voucher || ""}
-                  onChange={handleChange}
-                />
-                <Button variant="contained" color="primary" type="button" ml="1rem">
-                  Apply
-                </Button>
-              </FlexBox>
-            )}
-
-            <Button variant="contained" color="primary" mt="1.5rem" type="submit" fullwidth>
-              Place Order
-            </Button>
-          </Card1>
+          <Button variant="contained" color="primary" mt="1.5rem" type="submit" fullwidth>
+            Place Order
+          </Button>
         </form>
       )}
     </Formik>
   );
 };
 
-const addressList: AddressItem[] = [
-  {
-    addressType: "Home",
-    address: "435 Bristol Avenue, Abington MA 2351",
-  },
-  {
-    addressType: "Office",
-    address: "777 Brockton Avenue, Abington MA 2351",
-  },
-  {
-    addressType: "Office 2",
-    address: "777 Kazi Avenue, Abington MA 2351",
-  },
-];
-
-const contactList: ContactItem[] = [
-  {
-    contactType: "Primary",
-    contact: "+1-202-555-0119",
-  },
-  {
-    contactType: "Secondary",
-    contact: "+1-202-555-0222",
-  },
-];
-
-const paymentMethodList: PaymentMethodItem[] = [
-  {
-    cardType: "Amex",
-    last4Digits: "4765",
-    name: "Jaslynn Land",
-  },
-  {
-    cardType: "Mastercard",
-    last4Digits: "5432",
-    name: "Jaslynn Land",
-  },
-  {
-    cardType: "Visa",
-    last4Digits: "4543",
-    name: "Jaslynn Land",
-  },
-];
-
-const timeList = [
-  {
-    label: "9AM - 11AM",
-    value: "9AM - 11AM",
-  },
-  {
-    label: "11AM - 1PM",
-    value: "11AM - 1PM",
-  },
-  {
-    label: "3PM - 5PM",
-    value: "3PM - 5PM",
-  },
-  {
-    label: "5PM - 7PM",
-    value: "5PM - 7PM",
-  },
-];
-
-const initialValues: FormValues = {
-  address: "",
-  contact: "",
-  card: "",
-  date: null, // date is of type Date | null
-  time: "",
-  voucher: "",
-};
-
-const checkoutSchema = yup.object().shape({
-  address: yup.string().required("required"),
-  contact: yup.string().required("required"),
-  card: yup.string().required("required"),
-  date: yup.date().required("required"),
-  time: yup.string().required("required"),
-  voucher: yup.string(),
-});
-
 export default CheckoutForm2;
-

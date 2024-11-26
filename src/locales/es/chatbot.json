@@ -1,0 +1,14 @@
+{
+    "chatbotTitle": "Chatea con el Asistente",
+    "chatbotLoading": "Enviando tu mensaje...",
+    "chatbotError": "Ocurrió un error. Por favor, inténtalo de nuevo.",
+    "chatbotPlaceholder": "Escribe tu mensaje...",
+    "chatbotSendButton": "Enviar",
+    "chatbotEscalateButton": "Escalar a Soporte Humano",
+    "performanceMetrics": "Métricas de Rendimiento del Chatbot",
+    "totalConversations": "Total de Conversaciones",
+    "resolvedByChatbot": "Resueltas por el Chatbot",
+    "escalatedToHuman": "Escaladas a Humanos",
+    "averageResponseTime": "Tiempo de Respuesta Promedio"
+  }
+  

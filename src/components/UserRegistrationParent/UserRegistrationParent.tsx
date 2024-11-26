@@ -9,11 +9,31 @@ import RequestOTPForm from "components/Registration/RequestOTPForm";
 import VerifyOTPForm from "components/Registration/VerifyOTPForm";
 import Signout from "components/Registration/Signout";
 import CreateSellerAccount from "components/Registration/CreateSellerAccount";
-
+import {
+  saveAccountDetails,
+  selectAccountDetails,
+  AccountDetails
+} from '../../redux/slices/registrationSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 
 const UserRegistrationParent: React.FC = () => {
- 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+
+    // Get account details from Redux
+    const accountDetailsData = useSelector(selectAccountDetails);
+
+    // Update handler to save account details to Redux
+    const handleAccountDetailsUpdate = (updatedData: Partial<AccountDetails>) => {
+      dispatch(saveAccountDetails({
+        ...accountDetailsData,
+        ...updatedData
+      } as AccountDetails));
+    };
+    
   const handleNext = () => {
     // Define the behavior for the 'next' step
     console.log("Next step triggered");
@@ -73,8 +93,12 @@ const UserRegistrationParent: React.FC = () => {
         path="create-seller-account"
         element={
           <UserRegistrationLayout title="Create Seller">
-            <CreateSellerAccount onNext={handleNext} />
-          </UserRegistrationLayout>
+          <CreateSellerAccount
+            data={accountDetailsData}                // Pass the data prop
+            onUpdate={handleAccountDetailsUpdate}    // Pass the onUpdate prop
+            onNext={handleNext}                      // Pass the onNext prop
+          />
+        </UserRegistrationLayout>
         }
       />
 

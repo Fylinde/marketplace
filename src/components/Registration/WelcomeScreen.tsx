@@ -6,7 +6,10 @@ const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
 
   const handleStart = () => {
-    navigate('/register/seller/individual/company-details');
+  //  navigate("/register/seller/type-selection");
+    navigate("/register/seller/create");
+
+    
   };
 
   return (

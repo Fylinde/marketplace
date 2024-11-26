@@ -1,3 +1,5 @@
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import Box from "components/Box";
 import FlexBox from "components/FlexBox";
 import NavbarLayout from "components/layout/NavbarLayout";
@@ -8,28 +10,35 @@ import ProductIntro from "components/products/ProductIntro";
 import ProductReview from "components/products/ProductReview";
 import RelatedProducts from "components/products/RelatedProducts";
 import { H5 } from "components/Typography";
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
 
 const ProductDetails = () => {
-  const { id: productId } = useParams<{ id: string }>(); 
-  
+  const { id } = useParams<{ id: string }>();
+  const productId = id ?? ""; // Ensure productId is always a string
 
-  const state = {
+  const [selectedOption, setSelectedOption] = useState<"description" | "review">(
+    "description"
+  );
+
+  const productState = {
+    id: "12345",
+    images: ["image1.jpg", "image2.jpg"],
     title: "Mi Note 11 Pro",
     price: 1135,
+    brand: "Xiaomi",
+    stock: true,
+    vendorId: "vendor-123",
+    vendorName: "Xiaomi Official Store",
+    description: "A great phone with excellent features.",
   };
 
-  const [selectedOption, setSelectedOption] = useState("description");
-
-  // Provide type annotations for opt to avoid 'any' error
-  const handleOptionClick = (opt: "description" | "review") => () => {
-    setSelectedOption(opt);
+  const handleOptionClick = (option: "description" | "review") => () => {
+    setSelectedOption(option);
   };
 
   return (
     <div>
-      <ProductIntro {...state} />
+      {/* Pass product details dynamically */}
+      <ProductIntro product={productState} />
 
       <FlexBox
         borderBottom="1px solid"
@@ -69,16 +78,16 @@ const ProductDetails = () => {
         {selectedOption === "review" && <ProductReview />}
       </Box>
 
-      <FrequentlyBought />
+      <FrequentlyBought productId={productId} />
 
-      <AvailableShops />
+      <AvailableShops productId={productId} />
 
-      {/* Pass the productId prop to RelatedProducts */}
       {productId && <RelatedProducts productId={productId} />}
     </div>
   );
 };
 
+// Assign NavbarLayout to ProductDetails
 ProductDetails.layout = NavbarLayout;
 
 export default ProductDetails;

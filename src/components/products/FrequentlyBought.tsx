@@ -1,71 +1,83 @@
-import productDatabase from "data/product-database";
-import React, { Fragment } from "react";
-import Button from "../buttons/Button";
-import FlexBox from "../FlexBox";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import ProductCard8 from "../product-cards/ProductCard8";
-import { H2, H3, SemiSpan } from "../Typography";
+import { H3 } from "../Typography";
 import FrequentlyBoughtWrapper from "./FrequentlyBoughtStyle";
 
-export interface FrequentlyBoughtProps {}
+// Updated Product interface to include all required fields
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  primaryImage?: string; // Added primaryImage property
+  category?: string; // Added category property
+  images?: string[];
+  description?: string;
+}
 
-const FrequentlyBought: React.FC<FrequentlyBoughtProps> = () => {
-  const list = productDatabase.slice(179, 183);
+// Updated Config interface for type-safety
+interface Config {
+  defaultProductImage: string;
+  categoryFallbackImages: Record<string, string>; // Record for category fallback images
+}
+
+export interface FrequentlyBoughtProps {
+  productId: string;
+}
+
+const FrequentlyBought: React.FC<FrequentlyBoughtProps> = ({ productId }) => {
+  const [products, setProducts] = useState<Product[]>([]); // Correctly typed state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [config, setConfig] = useState<Config>({ defaultProductImage: "", categoryFallbackImages: {} });
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await axios.get("/api/config");
+        setConfig(response.data);
+      } catch (err) {
+        setError("Failed to load config");
+      }
+    };
+
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`/api/products/frequently-bought/${productId}`);
+        setProducts(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to load products");
+        setLoading(false);
+      }
+    };
+
+    fetchConfig();
+    fetchProducts();
+  }, [productId]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
-    <FrequentlyBoughtWrapper mb="3.75rem">
-      <H3 mb="24px">Frequently Bought Together</H3>
-      <FlexBox className="card-holder" flexWrap="wrap" m="-0.5rem">
-        {list.map((item, ind) => (
-          <Fragment key={item.id}>
-            <ProductCard8
-              m="0.5rem"
-              maxWidth="220px"
-              minWidth="160px"
-              width="100%"
-              flex="1 1 0"
-              {...item}
-            />
-            {ind < list.length - 1 && (
-              <FlexBox justifyContent="center" alignItems="center">
-                <H2 color="text.muted" mx="0.5rem">
-                  +
-                </H2>
-              </FlexBox>
-            )}
-          </Fragment>
+    <FrequentlyBoughtWrapper>
+      <H3>Frequently Bought Together</H3>
+      <div className="product-list">
+        {products.map((item) => (
+          <ProductCard8
+            key={item.id}
+            id={item.id}
+            title={item.title}
+            price={item.price}
+            imgUrl={
+              item.primaryImage ||
+              config.categoryFallbackImages[item.category || ""] ||
+              config.defaultProductImage
+            }
+          />
         ))}
-
-        <FlexBox justifyContent="center" alignItems="center">
-          <H2 color="text.muted" mx="1.5rem">
-            =
-          </H2>
-        </FlexBox>
-
-        <FlexBox
-          className="gray-box"
-          border="1px solid"
-          borderColor="gray.400"
-          m="0.5rem"
-          borderRadius={8}
-          justifyContent="center"
-          alignItems="center"
-          flexDirection="column"
-          minWidth={300}
-          minHeight={200}
-        >
-          <H3 color="primary.main">$2500</H3>
-          <SemiSpan mb="1rem">Save $500</SemiSpan>
-
-          <FlexBox>
-            <Button variant="contained" color="primary" size="small" mr="1rem">
-              Add to Cart
-            </Button>
-            <Button variant="outlined" color="primary" size="small">
-              Add to List
-            </Button>
-          </FlexBox>
-        </FlexBox>
-      </FlexBox>
+      </div>
     </FrequentlyBoughtWrapper>
   );
 };

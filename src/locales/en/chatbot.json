@@ -1,0 +1,14 @@
+{
+    "chatbotTitle": "Chat with Assistant",
+    "chatbotLoading": "Sending your message...",
+    "chatbotError": "An error occurred. Please try again.",
+    "chatbotPlaceholder": "Type your message...",
+    "chatbotSendButton": "Send",
+    "chatbotEscalateButton": "Escalate to Human Support",
+    "performanceMetrics": "Chatbot Performance Metrics",
+    "totalConversations": "Total Conversations",
+    "resolvedByChatbot": "Resolved by Chatbot",
+    "escalatedToHuman": "Escalated to Human",
+    "averageResponseTime": "Average Response Time"
+  }
+  

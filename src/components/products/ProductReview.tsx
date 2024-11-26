@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Box from "../Box";
 import Button from "../buttons/Button";
 import FlexBox from "../FlexBox";
@@ -8,29 +8,28 @@ import { H2, H5 } from "../Typography";
 import ProductComment from "./ProductComment";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { getComments, addComment } from "services/productService"; // Import API functions
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { fetchComments, addComment } from "../../redux/slices/commentSlice";
+import { RootState } from "../../redux/store";
+import type { AppDispatch } from "../../redux/store";
+import type { ReviewComment } from "../../redux/slices/commentSlice";
 
 interface FormValues {
   rating: number;
   comment: string;
-  date: string;
 }
 
-export interface ProductReviewProps {}
+const ProductReview: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { id: productId } = useParams<{ id: string }>();
+  const { comments, loading } = useSelector((state: RootState) => state.comments);
 
-const ProductReview: React.FC<ProductReviewProps> = () => {
-  const { id: productId } = useParams<{ id: string }>(); // Get product ID from URL
-  const [comments, setComments] = useState<any[]>([]); // Hold comments from backend
-
-  // Fetch comments on component load
   useEffect(() => {
     if (productId) {
-      getComments(productId)
-        .then((response) => setComments(response.data))
-        .catch((error) => console.error("Failed to fetch comments", error));
+      dispatch(fetchComments(productId));
     }
-  }, [productId]);
+  }, [dispatch, productId]);
 
   const handleFormSubmit = async (
     values: FormValues,
@@ -40,16 +39,14 @@ const ProductReview: React.FC<ProductReviewProps> = () => {
       console.error("Product ID is not available.");
       return;
     }
-  
+
     try {
-      await addComment(productId, values); // Submit comment to backend
-      setComments((prevComments) => [...prevComments, values]); // Update comments list
+      await dispatch(addComment({ productId, ...values }));
       resetForm();
     } catch (error) {
       console.error("Failed to submit comment", error);
     }
   };
-  
 
   const {
     values,
@@ -62,17 +59,33 @@ const ProductReview: React.FC<ProductReviewProps> = () => {
     handleSubmit,
     setFieldValue,
   } = useFormik<FormValues>({
-    initialValues: initialValues,
+    initialValues,
     validationSchema: reviewSchema,
     onSubmit: handleFormSubmit,
   });
 
+  if (loading) return <p>Loading comments...</p>;
+
   return (
     <Box>
-      {comments.map((item, ind) => (
-        <ProductComment {...item} key={ind} />
-      ))}
+      {/* Render Comments */}
+      {comments.length > 0 ? (
+        comments.map((item: ReviewComment) => (
+          <ProductComment
+            key={item.id}
+            productId={item.productId}
+            name={item.userName}
+            imgUrl={`/api/users/${item.userId}/avatar`}
+            rating={item.rating}
+            date={item.createdAt}
+            comment={item.comment}
+          />
+        ))
+      ) : (
+        <p>No comments available</p>
+      )}
 
+      {/* Write a Review Form */}
       <H2 fontWeight="600" mt="55px" mb="20">
         Write a Review for this product
       </H2>
@@ -130,17 +143,14 @@ const ProductReview: React.FC<ProductReviewProps> = () => {
   );
 };
 
-// Initial values for form
 const initialValues: FormValues = {
   rating: 0,
   comment: "",
-  date: new Date().toISOString(),
 };
 
-// Yup validation schema
 const reviewSchema = yup.object().shape({
-  rating: yup.number().required("required"),
-  comment: yup.string().required("required"),
+  rating: yup.number().required("Rating is required"),
+  comment: yup.string().required("Comment is required"),
 });
 
 export default ProductReview;

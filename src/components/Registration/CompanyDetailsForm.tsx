@@ -93,8 +93,8 @@ const CompanyDetailsForm: React.FC<CompanyDetailsFormProps> = ({ data, onUpdate,
   const formInitialValues = {
     ...initialValues,
     ...savedCompanyDetails,
-    firstName: accountDetails.name.split(' ')[0] || '', 
-    lastName: accountDetails.name.split(' ')[1] || '', 
+    firstName: accountDetails.full_name.split(' ')[0] || '', 
+    lastName: accountDetails.full_name.split(' ')[1] || '', 
   };
 
   // Handle form submission

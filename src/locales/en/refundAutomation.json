@@ -1,0 +1,18 @@
+{
+      "refundAutomationTitle": "Refund Automation",
+      "allFieldsRequired": "All fields are required!",
+      "conditionLabel": "Condition (e.g., Refund < $100)",
+      "actionLabel": "Action (e.g., Auto Refund)",
+     "filterLabel": "Filter Rules",
+      "addRuleButton": "Add Rule",
+      "editRuleButton": "Save Changes",
+      "conditionColumn": "Condition",
+      "actionColumn": "Action",
+      "currencyColumn": "Currency",
+      "paymentTypeColumn": "Payment Type",
+      "actionsColumn": "Actions",
+      "editButton": "Edit",
+      "deleteButton": "Delete",
+      "previewButton": "Preview",
+      "ruleExecutionPreview": "Executing rule: {{condition}} -> {{action}}"
+}
