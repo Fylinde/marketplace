@@ -1,5 +1,5 @@
 import React from 'react';
-import { BillingAddress } from '../../redux/slices/registrationSlice';
+import { BillingAddress } from '../../types/sharedTypes';
 
 
 interface BillingAddressSectionProps {

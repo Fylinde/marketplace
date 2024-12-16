@@ -1,0 +1,19 @@
+{
+    "disputeManagement": "Dispute Management",
+    "selectDisputeToManage": "Select a Dispute to Manage",
+    "disputeDetails": "Dispute Details",
+    "disputeId": "Dispute ID",
+    "buyerMessage": "Buyer Message",
+    "resolveDispute": "Resolve Dispute",
+    "escalateDispute": "Escalate Dispute",
+    "disputeResolved": "The dispute has been resolved successfully.",
+    "disputeEscalated": "The dispute has been escalated successfully.",
+    "selectDispute": "Please select a dispute to view its details.",
+    "resolutionNotePlaceholder": "Enter resolution note here...",
+    "resolutionNoteError": "Please provide a resolution note before resolving the dispute.",
+    "resolveDisputeError": "Failed to resolve the dispute. Error: {{error}}",
+    "escalateDisputeError": "Failed to escalate the dispute. Error: {{error}}",
+    "loading": "Loading...",
+    "errorFetchingDisputes": "An error occurred while fetching disputes. Error: {{error}}"
+  }
+  

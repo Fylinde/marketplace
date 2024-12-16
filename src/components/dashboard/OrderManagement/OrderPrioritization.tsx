@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "redux/slices/reduxHooks";
-import { fetchOrders } from "redux/slices/orderSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
+import { fetchOrders } from "@/redux/slices/orders/orderSlice";
 import Box from "components/Box";
 import Table from "components/table/Table";
 import Input from "components/input/Input";
@@ -25,9 +25,10 @@ const OrderPrioritization: React.FC = () => {
   const [message, setMessage] = useState("");
 
   // Fetch orders from Redux store
+  // Fetch orders on component mount
   useEffect(() => {
-    dispatch(fetchOrders({ page: 1, filters: {}, sort: sortOption }));
-  }, [dispatch, sortOption]);
+    dispatch(fetchOrders({ page: 1, filters: {}, sort: "priority" }));
+  }, [dispatch]);
 
   // Set orders from Redux when available
   useEffect(() => {
@@ -68,11 +69,18 @@ const OrderPrioritization: React.FC = () => {
 
   // Handle order actions (e.g., update priority or send message)
   const handleUpdatePriority = (order: Order, newPriority: string) => {
+    const validPriorities: ("Normal" | "VIP" | "High")[] = ["Normal", "VIP", "High"];
+    if (!validPriorities.includes(newPriority as any)) {
+      console.error("Invalid priority value:", newPriority);
+      return;
+    }
+
     const updatedOrders = orders.map((o) =>
-      o.id === order.id ? { ...o, priority: newPriority } : o
+      o.id === order.id ? { ...o, priority: newPriority as "Normal" | "VIP" | "High" } : o
     );
     setOrders(updatedOrders);
   };
+
 
   const handleSendMessage = () => {
     if (!message.trim() || !selectedOrder) return;

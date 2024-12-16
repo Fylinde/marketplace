@@ -1,0 +1,14 @@
+{
+    "customerMessaging": "Customer Messaging",
+    "conversations": "Conversations",
+    "conversationWith": "Conversation with {{buyerName}}",
+    "lastMessage": "Last Message",
+    "selectConversation": "Please select a conversation to view messages.",
+    "typeMessage": "Type your message here...",
+    "sendMessageError": "Failed to send the message. Please try again.",
+    "messageEmptyError": "Message cannot be empty.",
+    "loading": "Loading...",
+    "errorFetchingMessages": "An error occurred while fetching messages. Error: {{error}}",
+    "send": "Send"
+  }
+  

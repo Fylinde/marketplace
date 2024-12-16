@@ -1,0 +1,19 @@
+{
+    "fraudDetection": "Fraud Detection and Prevention",
+    "fraudulentOrders": "Fraudulent Orders",
+    "fraudInsights": "Fraud Insights",
+    "orderDetails": "Order Details",
+    "orderId": "Order ID",
+    "amount": "Amount",
+    "riskLevel": "Risk Level",
+    "patterns": "Patterns",
+    "markAsFraudulent": "Mark as Fraudulent",
+    "resolveOrder": "Resolve Order",
+    "markedAsFraudulent": "The order has been marked as fraudulent.",
+    "resolvedFraudulentOrder": "The fraudulent order has been resolved.",
+    "markFraudError": "Failed to mark the order as fraudulent. Error: {{error}}",
+    "resolveFraudError": "Failed to resolve the fraudulent order. Error: {{error}}",
+    "errorFetchingFraudOrders": "Failed to fetch fraudulent orders. Error: {{error}}",
+    "loading": "Loading..."
+  }
+  

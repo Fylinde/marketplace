@@ -6,18 +6,19 @@ const ChatComponent: React.FC = () => {
     const [input, setInput] = useState<string>("");
 
     let websocketService: WebSocketService;
-
+    
     useEffect(() => {
         websocketService = new WebSocketService("ws://localhost:8000/ws");
-
-        websocketService.onMessage((data) => {
+    
+        websocketService.onMessage((data: string) => {
             setMessages((prevMessages) => [...prevMessages, data]);
         });
-
+    
         return () => {
             websocketService.closeConnection();
         };
     }, []);
+    
 
     const sendMessage = () => {
         if (input.trim()) {

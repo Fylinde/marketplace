@@ -65,14 +65,22 @@ export const validateBankDetails = (data: {
  * @param minLength - Minimum length for validation
  * @returns Error message or empty string if valid
  */
-export const validateString = (value: string, fieldName: string, minLength: number = 1): string => {
+export const validateString = (
+  value: string,
+  fieldName: string,
+  minLength: number = 1,
+  maxLength: number = Infinity
+): string => {
   if (!value || value.trim().length === 0) {
     return `${fieldName} is required.`;
   } else if (value.trim().length < minLength) {
     return `${fieldName} must be at least ${minLength} characters.`;
+  } else if (value.trim().length > maxLength) {
+    return `${fieldName} must be no more than ${maxLength} characters.`;
   }
   return "";
 };
+
 
 /**
  * Validate numeric input

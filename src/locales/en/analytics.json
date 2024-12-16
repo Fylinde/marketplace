@@ -1,0 +1,17 @@
+{
+    "analyticDashboard": "Analytic Dashboard",
+    "totalSales": "Total Sales",
+    "totalOrders": "Total Orders",
+    "pendingOrders": "Pending Orders",
+    "completedOrders": "Completed Orders",
+    "orderStatusDistribution": "Order Status Distribution",
+    "salesTrends": "Sales Trends",
+    "pending": "Pending",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled",
+    "monthlySales": "Monthly Sales",
+    "loading": "Loading...",
+    "errorLoadingData": "An error occurred while loading data. Error: {{error}}"
+  }
+  

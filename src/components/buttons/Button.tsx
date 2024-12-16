@@ -15,7 +15,7 @@ import {
 } from "styled-system";
 import React from "react";
 
-// Define a ButtonProps interface for all props used in the button
+// ButtonProps interface with additional `loading` prop
 interface ButtonProps
   extends LayoutProps,
     SpaceProps,
@@ -26,12 +26,14 @@ interface ButtonProps
   size?: "small" | "medium" | "large"; // Button size
   color?: "primary" | "secondary" | "text" | "error" | "warning"; // Predefined color variants
   variant?: "text" | "outlined" | "contained"; // Button style variants
+  danger?: boolean; // New danger prop for destructive actions
   fullwidth?: boolean; // Makes the button occupy full width
   disabled?: boolean; // Disables the button
   href?: string; // Used for links
   as?: React.ElementType; // Allows polymorphic behavior
   children: React.ReactNode; // Button content
   borderRadius?: string; // Explicitly define borderRadius
+  loading?: boolean; // Indicates a loading state
 }
 
 // Define a theme for use with styled-components
@@ -45,7 +47,7 @@ const theme = {
   },
 };
 
-// Externalize button variants to avoid inline `props` conflicts
+// Button variants with dynamic styles
 const buttonVariants = variant({
   prop: "variant",
   variants: {
@@ -83,7 +85,7 @@ const buttonVariants = variant({
   },
 });
 
-// Styled button component with fixes
+// Styled Button Component
 const StyledButton = styled.button<ButtonProps>`
   display: flex;
   align-items: center;
@@ -104,52 +106,84 @@ const StyledButton = styled.button<ButtonProps>`
       ? "14px"
       : "12px"};
   font-weight: 600;
-  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
+  cursor: ${(props) => (props.disabled || props.loading ? "not-allowed" : "pointer")};
   text-align: center;
   line-height: 1.5;
   transition: all 0.3s ease-in-out;
+
+  ${(props) =>
+    props.danger &&
+    `
+      background-color: ${props.theme.colors.error.main};
+      color: ${props.theme.colors.error.text};
+      &:hover {
+        background-color: ${props.theme.colors.error.dark};
+      }
+  `}
 
   ${buttonVariants}
 
   &:disabled {
     opacity: 0.6;
     pointer-events: none;
-    cursor: not-allowed;
   }
 
   &:focus {
     outline: 2px solid
-      ${(props) => props.theme?.colors?.[props.color ?? "text"]?.main || "#000"};
+      ${(props) =>
+        props.theme?.colors?.[props.color ?? "text"]?.main || "#000"};
   }
 
   ${compose(styledColor, layout, space, border, shadow)}
+
+  & > .spinner {
+    margin-right: ${(props) => (props.children ? "8px" : "0")};
+    border: 2px solid transparent;
+    border-top: 2px solid ${(props) => props.theme.colors.text.main};
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 `;
 
-// Button component with support for links and polymorphism
+// Button Component
 const Button: React.FC<ButtonProps> = ({
   as: Component = "button",
   href,
+  danger,
   children,
-  type = "button", // Default to "button" to avoid unintended form submissions
+  type = "button",
+  loading,
   ...props
 }) => {
-  // Handle links rendered as buttons
   if (Component === "a" && href) {
     return (
       <StyledButton
         as="a"
         href={href}
+        danger={danger}
         {...props}
-        onClick={(e) => props.disabled && e.preventDefault()} // Prevent click if disabled
+        onClick={(e) => props.disabled && e.preventDefault()}
       >
+        {loading && <span className="spinner" />}
         {children}
       </StyledButton>
     );
   }
 
-  // Handle buttons or other components
   return (
-    <StyledButton as={Component} type={type} {...props}>
+    <StyledButton as={Component} type={type} danger={danger} loading={loading} {...props}>
+      {loading && <span className="spinner" />}
       {children}
     </StyledButton>
   );
@@ -161,6 +195,7 @@ Button.defaultProps = {
   color: "primary",
   variant: "contained",
   borderRadius: "4px",
+  loading: false, // Default to false
 };
 
 export default Button;

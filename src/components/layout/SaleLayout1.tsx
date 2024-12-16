@@ -9,25 +9,51 @@ import StyledAppLayout from "./AppLayoutStyle";
 
 interface SaleLayout1Props {
   title?: string;
-  children: React.ReactNode; // Explicitly define the 'children' prop
+  children: React.ReactNode;
+  metaDescription?: string; // Dynamic meta description
+  metaKeywords?: string[]; // Meta keywords for SEO
+  showNavbar?: boolean; // Control visibility of Navbar
+  showFooter?: boolean; // Control visibility of Footer
+  showMobileNav?: boolean; // Control visibility of Mobile Navigation
+  additionalStyles?: React.CSSProperties; // Custom styles for layout
 }
 
 const SaleLayout1: React.FC<SaleLayout1Props> = ({
   children,
   title = "Multivendor Ecommerce | Sale",
+  metaDescription = "Discover amazing deals and discounts on our multivendor ecommerce platform.",
+  metaKeywords = ["ecommerce", "sale", "multivendor", "shopping"],
+  showNavbar = true,
+  showFooter = true,
+  showMobileNav = true,
+  additionalStyles = {},
 }) => (
-  <StyledAppLayout>
+  <StyledAppLayout style={additionalStyles}>
     <Helmet>
       <title>{title}</title>
       <meta charSet="utf-8" />
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      <meta name="description" content={metaDescription} />
+      <meta name="keywords" content={metaKeywords.join(", ")} />
     </Helmet>
+
+    {/* Topbar */}
     <Topbar />
+
+    {/* Header */}
     <Header />
-    <Navbar />
-    {children}
-    <MobileNavigationBar />
-    <Footer />
+
+    {/* Conditional Navbar */}
+    {showNavbar && <Navbar />}
+
+    {/* Main Content */}
+    <main>{children}</main>
+
+    {/* Conditional Mobile Navigation */}
+    {showMobileNav && <MobileNavigationBar />}
+
+    {/* Conditional Footer */}
+    {showFooter && <Footer />}
   </StyledAppLayout>
 );
 

@@ -45,6 +45,7 @@ export const StyledPagination = styled.div`
         a {
           border: 1px solid ${getTheme("colors.primary.main")};
           color: ${getTheme("colors.primary.main")};
+          background-color: ${getTheme("colors.primary.light")};
         }
       }
     }
@@ -54,6 +55,7 @@ export const StyledPagination = styled.div`
       a {
         border: 1px solid ${getTheme("colors.primary.main")};
         color: ${getTheme("colors.primary.main")};
+        background-color: ${getTheme("colors.primary.lighter")};
         font-weight: bold; /* Highlight active item */
       }
     }
@@ -73,6 +75,16 @@ export const StyledPagination = styled.div`
     width: 32px;
     min-width: 32px;
     border: 1px solid ${getTheme("colors.primary.main")};
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-color: ${getTheme("colors.gray.200")};
+
+    &:hover {
+      border-color: ${getTheme("colors.primary.main")};
+      background-color: ${getTheme("colors.primary.light")};
+    }
 
     /* Adjust size for smaller screens */
     @media only screen and (max-width: 768px) {
@@ -83,6 +95,32 @@ export const StyledPagination = styled.div`
     @media only screen and (max-width: 450px) {
       height: 24px;
       width: 24px;
+    }
+  }
+
+  /* First and Last Buttons */
+  .first-page-button,
+  .last-page-button {
+    margin: 0 8px;
+    font-size: 14px;
+    color: ${getTheme("colors.secondary.main")};
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      color: ${getTheme("colors.secondary.dark")};
+      text-decoration: underline;
+    }
+
+    &:disabled {
+      color: ${getTheme("colors.gray.400")};
+      cursor: not-allowed;
+    }
+
+    /* Adjust for smaller screens */
+    @media only screen and (max-width: 450px) {
+      font-size: 12px;
     }
   }
 

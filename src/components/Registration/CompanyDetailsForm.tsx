@@ -1,12 +1,12 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveCompanyDetails, selectAccountDetails } from '../../redux/slices/registrationSlice';
+import { saveCompanyDetails, selectAccountDetails } from '../../redux/slices/auth/registrationSlice';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import './CompanyDetailsForm.css';
 import { RootState } from '../../redux/store';
-import { CompanyDetails } from '../../redux/slices/registrationSlice';
+import { CompanyDetails } from '../../types/sharedTypes';
 
 interface CompanyDetailsFormProps {
   data: CompanyDetails;
@@ -73,7 +73,7 @@ const initialValues = {
 };
 
 const countryOptions = [
-  'United States', 'United Kingdom', 'Canada', 'Germany', 'France', 
+  'United States', 'United Kingdom', 'Canada', 'Germany', 'France',
   'India', 'Japan', 'Australia', 'Nigeria', 'Netherlands',
 ];
 
@@ -93,8 +93,8 @@ const CompanyDetailsForm: React.FC<CompanyDetailsFormProps> = ({ data, onUpdate,
   const formInitialValues = {
     ...initialValues,
     ...savedCompanyDetails,
-    firstName: accountDetails.full_name.split(' ')[0] || '', 
-    lastName: accountDetails.full_name.split(' ')[1] || '', 
+    firstName: accountDetails.full_name.split(' ')[0] || '',
+    lastName: accountDetails.full_name.split(' ')[1] || '',
   };
 
   // Handle form submission

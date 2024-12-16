@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '@/redux/slices/reduxHooks';
-import { fetchRecommendations } from 'redux/slices/aiSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
+import { fetchRecommendations } from '@/redux/slices/support/aiSlice';
 import { Spin, Card, Alert } from 'antd';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next'; // Use i18n for translations

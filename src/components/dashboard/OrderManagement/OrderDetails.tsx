@@ -5,10 +5,10 @@ import Modal from "components/modal/Modal";
 import Input from "components/input/Input";
 import Table from "components/table/Table";
 import { useParams } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../../redux/slices/reduxHooks";
-import { fetchOrderById, updateOrderStatus } from "../../../redux/slices/orderSlice";
+import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
+import { fetchOrderById, updateOrderStatus } from "../../../redux/slices/orders/orderSlice";
 import { RootState } from "../../../redux/store";
-import { sendMessage } from "../../../redux/slices/chatbotSlice ";
+import { sendMessage } from "@/redux/slices/communication/chatbotSlice ";
 import { Order } from "types/order";
 
 const OrderDetails: React.FC = () => {
@@ -81,9 +81,21 @@ const OrderDetails: React.FC = () => {
               <strong>Note:</strong> {order.customerNote || "No customer note provided."}
             </p>
             <p>
-              <strong>Address:</strong> {order.shippingAddress}
+              <strong>Address:</strong>{" "}
+              {order.shippingAddress && order.shippingAddress.length > 0 ? (
+                order.shippingAddress.map((address, index) => (
+                  <div key={index}>
+                    <p>{`${address.addressLine1}, ${address.addressLine2 || ""}`}</p>
+                    <p>{`${address.city}, ${address.state}, ${address.postalCode}`}</p>
+                    <p>{address.country}</p>
+                  </div>
+                ))
+              ) : (
+                <span>No shipping address available.</span>
+              )}
             </p>
           </Box>
+
 
           <Box>
             <h3>Order Items</h3>

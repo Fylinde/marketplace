@@ -1,25 +1,30 @@
-import axios from "../redux/slices/axiosSetup";
+import axios from "../redux/slices/utils/axiosSetup";
 import chatbotService from "./chatbotService";
+import { KnowledgeBaseArticle } from "@/redux/slices/support/supportSlice";
+
+const BASE_URL = "/api/support";
 
 
 export interface SupportTicket {
+  id: string;
+  subject: string;
+  customerId: string;
+  orderId?: string;
+  description: string;
+  status: "Open" | "In Progress" | "Resolved" | "Closed";
+  createdAt: string;
+  updatedAt?: string;
+  title: string;
+  messages: Array<{
     id: string;
-    subject: string;
-    customerId: string;
-    orderId?: string;
-    description: string;
-    status: "Open" | "In Progress" | "Resolved" | "Closed";
-    createdAt: string;
-    updatedAt?: string;
-    messages: Array<{
-      id: string;
-      sender: "Customer" | "Support" | "Seller";
-      message: string;
-      timestamp: string;
-    }>;
-    aiSuggestions?: string[]; // Add AI suggestions property
-  }
-  
+    content: string;
+    sender: "Customer" | "Support" | "Seller";
+    message: string;
+    timestamp: string;
+  }>;
+  aiSuggestions?: string[]; // Add AI suggestions property
+}
+
 
 const supportService = {
   /**
@@ -84,13 +89,13 @@ const supportService = {
     return response.data;
   },
 
-  
-   /**
-   * Fetch AI-suggested solutions for a specific ticket.
-   * @param ticketId The ID of the ticket.
-   * @returns A promise resolving to a list of AI solutions.
-   */
-   getAISolutionsForTicket: async (ticketId: string) => {
+
+  /**
+  * Fetch AI-suggested solutions for a specific ticket.
+  * @param ticketId The ID of the ticket.
+  * @returns A promise resolving to a list of AI solutions.
+  */
+  getAISolutionsForTicket: async (ticketId: string) => {
     return chatbotService.getAISolutions(ticketId);
   },
 
@@ -110,8 +115,61 @@ const supportService = {
    */
   escalateUnresolvedTicket: async (sessionId: string) => {
     return chatbotService.escalateToHuman(sessionId);
-    },
-  
+  },
+
+  getKnowledgeBaseArticles: async () => {
+    const response = await axios.get(`${BASE_URL}/knowledge-base`);
+    return response.data; // Adjust this based on the actual API response
+  },
+
+  async submitAISuggestion(suggestion: string) {
+    const response = await axios.post(`${BASE_URL}/ai-suggestions`, {
+      suggestion,
+    });
+    return response.data;
+  },
+
+  async fetchSupportTickets(): Promise<SupportTicket[]> {
+    const response = await axios.get("/api/support/tickets");
+    return response.data.map((ticket: any) => ({
+      id: ticket.id,
+      title: ticket.title || "Untitled",
+      status: ticket.status as "Open" | "In Progress" | "Resolved" | "Closed",
+      subject: ticket.subject || "No subject provided",
+      customerId: ticket.customerId || "Unknown",
+      orderId: ticket.orderId || null,
+      description: ticket.description || "",
+      createdAt: ticket.createdAt || new Date().toISOString(),
+      updatedAt: ticket.updatedAt || null,
+      messages: ticket.messages?.map((message: any) => ({
+        id: message.id,
+        content: message.content || "",
+        sender: message.sender || "Support",
+        message: message.message || "",
+        timestamp: message.timestamp || new Date().toISOString(),
+      })) || [],
+      aiSuggestions: ticket.aiSuggestions || [],
+    }));
+  },
+
+
+
+
+  async fetchKnowledgeBaseArticles(): Promise<KnowledgeBaseArticle[]> {
+    const response = await axios.get("/api/support/knowledge-base");
+    return response.data.map((article: any) => ({
+      id: article.id || "Unknown",
+      title: article.title || "Untitled",
+      content: article.content || "",
+      tags: article.tags || [], // Ensure tags is an array
+    }));
+  },
+
+
+
 };
+
+
+
 
 export default supportService;

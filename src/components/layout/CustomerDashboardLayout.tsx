@@ -10,7 +10,7 @@ interface CustomerDashboardLayoutProps {
   children: React.ReactNode; // Explicitly type the 'children' prop
 }
 
-const CustomerDashboardLayout: React.FC<CustomerDashboardLayoutProps> = ({ children }) => (
+const CustomerDashboardLayout: React.FC<CustomerDashboardLayoutProps> = ({ children }): JSX.Element => (
   <AppLayout navbar={<Navbar />}>
     <Container my="2rem">
       <Grid container spacing={6}>
@@ -26,3 +26,4 @@ const CustomerDashboardLayout: React.FC<CustomerDashboardLayoutProps> = ({ child
 );
 
 export default CustomerDashboardLayout;
+

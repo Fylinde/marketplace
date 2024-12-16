@@ -1,6 +1,6 @@
 // Track order historyimport React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../redux/slices/reduxHooks";
-import { fetchOrderHistory } from "../../../redux/slices/orderSlice";
+import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
+import { fetchOrderHistory } from "../../../redux/slices/orders/orderSlice";
 import Box from "components/Box";
 import Table from "components/table/Table";
 import Button from "components/buttons/Button";
@@ -10,10 +10,12 @@ import Pagination from "components/pagination/Pagination";
 import { Order } from "types/order";
 import { RootState } from "../../../redux/store";
 import React, { useEffect, useState } from "react";
+import type { AppDispatch } from "../../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
 
 
 const OrderHistory: React.FC = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const orders = useAppSelector((state: RootState) => state.orders.history);
   const isLoading = useAppSelector((state: RootState) => state.orders.loading);
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,8 +26,11 @@ const OrderHistory: React.FC = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    dispatch(fetchOrderHistory());
-  }, [dispatch]);
+    const filters = filterStatus !== "All" ? { status: filterStatus } : {};
+    dispatch(fetchOrderHistory({ page: currentPage, filters }));
+  }, [dispatch, currentPage, filterStatus]);
+
+
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch = order.id.includes(searchTerm) || (order.customerNote || "").toLowerCase().includes(searchTerm.toLowerCase());
@@ -115,7 +120,18 @@ const OrderHistory: React.FC = () => {
           <Box>
             <h3>Customer Information</h3>
             <p>
-              <strong>Shipping Address:</strong> {selectedOrder.shippingAddress}
+              <strong>Shipping Address:</strong>{" "}
+              {selectedOrder.shippingAddress && selectedOrder.shippingAddress.length > 0 ? (
+                selectedOrder.shippingAddress.map((address, index) => (
+                  <div key={index}>
+                    <p>{`${address.addressLine1}, ${address.addressLine2 || ""}`}</p>
+                    <p>{`${address.city}, ${address.state}, ${address.postalCode}`}</p>
+                    <p>{address.country}</p>
+                  </div>
+                ))
+              ) : (
+                <span>No shipping address available.</span>
+              )}
             </p>
             <p>
               <strong>Customer Note:</strong> {selectedOrder.customerNote || "No notes provided"}
@@ -156,6 +172,7 @@ const OrderHistory: React.FC = () => {
             </p>
           </Box>
         </Modal>
+
       )}
     </Box>
   );

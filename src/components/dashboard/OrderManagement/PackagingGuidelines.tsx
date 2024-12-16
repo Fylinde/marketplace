@@ -6,8 +6,8 @@ import Button from "components/buttons/Button";
 import Modal from "components/modal/Modal";
 import Input from "components/input/Input";
 import Pagination from "components/pagination/Pagination";
-import { useAppDispatch, useAppSelector } from "redux/slices/reduxHooks";
-import { fetchPackagingGuidelines, createGuideline, deleteGuideline, updateGuideline } from "redux/slices/enhancementsSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
+import { fetchPackagingGuidelines, createGuideline, deleteGuideline, updateGuideline } from "@/redux/slices/dashboard/enhancementsSlice";
 import { validateString } from "services/validationService";
 
 interface PackagingGuideline {
@@ -48,17 +48,17 @@ const PackagingGuidelines: React.FC = () => {
     // Validate title and description
     const titleError = validateString(currentGuideline.title || "", "Title", 3);
     const descriptionError = validateString(currentGuideline.description || "", "Description", 1);
-  
+
     if (titleError) {
       alert(titleError); // Show the title error if validation fails
       return;
     }
-  
+
     if (descriptionError) {
       alert(descriptionError); // Show the description error if validation fails
       return;
     }
-  
+
     // Handle updates or creation
     if (editMode && currentGuideline.id) {
       dispatch(
@@ -85,8 +85,8 @@ const PackagingGuidelines: React.FC = () => {
         .catch(() => alert("Failed to add the guideline."));
     }
   };
-  
-  
+
+
 
   const handleDeleteGuideline = (id: string) => {
     if (window.confirm("Are you sure you want to delete this guideline?")) {

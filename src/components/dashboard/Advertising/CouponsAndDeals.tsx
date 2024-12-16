@@ -6,65 +6,46 @@ import {
   createCoupon,
   deleteCoupon,
   selectCoupons,
-} from "../../../redux/slices/enhancementsSlice";
-import { fetchPerformance } from "../../../redux/slices/performanceSlice";
+} from "../../../redux/slices/dashboard/enhancementsSlice";
+import { fetchPerformance } from "../../../redux/slices/analytics/performanceSlice";
 import Spinner from "components/Spinner";
 import { CouponCard } from "./CouponCard";
 import { CouponForm } from "./CouponForm";
 import "./CouponsAndDeals.css"; // Ensure custom styling
 import type { AppDispatch } from "../../../redux/store";
 
-
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 
-const CouponsAndDeals: React.FC = () => {
-    const dispatch = useAppDispatch();
-  const coupons = useSelector((state: RootState) => selectCoupons(state));
-  const { performance } = useSelector((state: RootState) => state.performance);
+// Adjusted interface to accept props from parent component
+interface CouponsAndDealsProps {
+  coupons: Coupon[];
+  performance: {
+    couponsUsed: number;
+    couponRevenue: number;
+  };
+  onDeleteCoupon: (couponId: string) => void;
+}
+
+interface Coupon {
+  id: string;
+  title: string;
+  discount: string;
+  expiryDate: string;
+}
+
+const CouponsAndDeals: React.FC<CouponsAndDealsProps> = ({
+  coupons,
+  performance,
+  onDeleteCoupon,
+}) => {
   const [isFormVisible, setFormVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch Coupons and Performance Data on Component Mount
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        await Promise.all([
-          dispatch(fetchCoupons()),
-          dispatch(fetchPerformance()),
-        ]);
-      } catch (err) {
-        setError("Failed to fetch data. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [dispatch]);
-
-  const handleCreateCoupon = async (couponData: any) => {
-    try {
-      setLoading(true);
-      await dispatch(createCoupon(couponData));
-    } catch (err) {
-      setError("Failed to create a new coupon.");
-    } finally {
-      setLoading(false);
-      setFormVisible(false);
-    }
-  };
-
-  const handleDeleteCoupon = async (couponId: string) => {
-    try {
-      setLoading(true);
-      await dispatch(deleteCoupon(couponId));
-    } catch (err) {
-      setError("Failed to delete the coupon.");
-    } finally {
-      setLoading(false);
-    }
+  const handleCreateCoupon = (newCoupon: Coupon) => {
+    // Placeholder logic; should ideally call a parent or Redux action
+    console.log("New Coupon Created", newCoupon);
+    setFormVisible(false);
   };
 
   if (loading) return <Spinner />;
@@ -91,19 +72,19 @@ const CouponsAndDeals: React.FC = () => {
       )}
 
       <div className="coupons-container">
-        {coupons.map((coupon) => (
+        {coupons.map((coupon: Coupon) => (
           <CouponCard
             key={coupon.id}
             coupon={coupon}
-            onDelete={() => handleDeleteCoupon(coupon.id)}
+            onDelete={() => onDeleteCoupon(coupon.id)}
           />
         ))}
       </div>
 
       <div className="performance-metrics">
         <h2>Performance Insights</h2>
-        <p>Total Coupons Used: {performance?.couponsUsed || 0}</p>
-        <p>Revenue From Coupons: ${performance?.couponRevenue || 0}</p>
+        <p>Total Coupons Used: {performance.couponsUsed}</p>
+        <p>Revenue From Coupons: ${performance.couponRevenue}</p>
       </div>
     </div>
   );

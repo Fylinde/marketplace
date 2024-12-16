@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { Table, Alert, Spin } from 'antd';
-import { useAppDispatch, useAppSelector } from 'redux/slices/reduxHooks';
-import { fetchTaxRates } from 'redux/slices/taxSlice';
-import { getLocalizedText } from '../../utils/localizationUtils';
+import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
+import { fetchTaxRates } from '@/redux/slices/logistics/taxSlice';
+import { getLocalizedText } from '../../../utils/localizationUtils';
 
 const ComplianceContainer = styled.div`
   padding: 20px;
@@ -25,38 +25,39 @@ const TaxCompliance: React.FC = () => {
     dispatch(fetchTaxRates({ country: 'US' })); // Replace 'US' with dynamic country selection if needed
   }, [dispatch]);
 
+  const module = 'returnAndRefund'; // Define module once for reuse
   const columns = [
     {
-      title: getLocalizedText('Region'),
+      title: getLocalizedText('Region', module),
       dataIndex: 'region',
       key: 'region',
     },
     {
-      title: getLocalizedText('Category'),
+      title: getLocalizedText('Category', module),
       dataIndex: 'category',
       key: 'category',
     },
     {
-      title: getLocalizedText('Tax Rate'),
+      title: getLocalizedText('Tax Rate', module),
       dataIndex: 'rate',
       key: 'rate',
       render: (rate: number) => `${rate}%`,
     },
     {
-      title: getLocalizedText('Due Date'),
+      title: getLocalizedText('Due Date', module),
       dataIndex: 'dueDate',
       key: 'dueDate',
       render: (dueDate: string) => new Date(dueDate).toLocaleDateString(),
     },
     {
-      title: getLocalizedText('Status'),
+      title: getLocalizedText('Status', module),
       dataIndex: 'status',
       key: 'status',
       render: (status: string) =>
         status === 'overdue' ? (
-          <span style={{ color: 'red' }}>{getLocalizedText('Overdue')}</span>
+          <span style={{ color: 'red' }}>{getLocalizedText('Overdue', module)}</span>
         ) : (
-          <span style={{ color: 'green' }}>{getLocalizedText('Compliant')}</span>
+          <span style={{ color: 'green' }}>{getLocalizedText('Compliant', module)}</span>
         ),
     },
   ];
@@ -64,7 +65,7 @@ const TaxCompliance: React.FC = () => {
   return (
     <ComplianceContainer>
       <Header>
-        <h1>{getLocalizedText('Tax Compliance Tracker')}</h1>
+        <h1>{getLocalizedText('Tax Compliance Tracker', module)}</h1>
       </Header>
       {loading && <Spin size="large" />}
       {error && <Alert message={error} type="error" />}
@@ -72,8 +73,8 @@ const TaxCompliance: React.FC = () => {
         columns={columns}
         dataSource={taxRates.map((rate) => ({
           key: rate.id,
-          region: rate.region || getLocalizedText('National'),
-          category: rate.category || getLocalizedText('All Categories'),
+          region: rate.region || getLocalizedText('National', module),
+          category: rate.category || getLocalizedText('All Categories', module),
           rate: rate.rate,
           dueDate: new Date().toISOString(), // Placeholder for actual due date
           status: Math.random() > 0.5 ? 'compliant' : 'overdue', // Simulate compliance

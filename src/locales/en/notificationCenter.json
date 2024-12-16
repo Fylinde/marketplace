@@ -1,0 +1,19 @@
+{
+    "notificationCenter": "Notification Center",
+    "notifications": "Notifications",
+    "unread": "Unread",
+    "notificationDetails": "Notification Details",
+    "title": "Title",
+    "message": "Message",
+    "timestamp": "Timestamp",
+    "viewDetails": "View Details",
+    "markAsRead": "Mark as Read",
+    "clearAll": "Clear All",
+    "notificationsCleared": "All notifications have been cleared.",
+    "confirmClearAll": "Are you sure you want to clear all notifications?",
+    "markReadError": "Failed to mark the notification as read. Error: {{error}}",
+    "clearNotificationsError": "Failed to clear notifications. Error: {{error}}",
+    "errorFetchingNotifications": "Failed to fetch notifications. Error: {{error}}",
+    "loading": "Loading..."
+  }
+  

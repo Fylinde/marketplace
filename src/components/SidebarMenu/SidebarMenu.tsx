@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { selectUserFullName } from '../../redux/slices/authSlice';
+import { selectUserFullName } from '../../redux/slices/auth/authSlice';
 
 
 const SidebarMenu: React.FC = () => {

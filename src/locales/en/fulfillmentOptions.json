@@ -1,0 +1,25 @@
+{
+    "fulfillmentOptions": "Fulfillment Options",
+    "currentOptions": "Current Fulfillment Options",
+    "addNewOption": "Add New Option",
+    "editOption": "Edit Fulfillment Option",
+    "optionName": "Option Name",
+    "shipping": "Shipping",
+    "pickup": "Pickup",
+    "courier": "Courier",
+    "cost": "Cost",
+    "type": "Type",
+    "addOption": "Add Option",
+    "updateOption": "Update Option",
+    "deleteOptionError": "Failed to delete the option. Error: {{error}}",
+    "optionAdded": "Option has been added successfully.",
+    "optionUpdated": "Option has been updated successfully.",
+    "optionDeleted": "Option has been deleted successfully.",
+    "addOptionError": "Failed to add the option. Error: {{error}}",
+    "updateOptionError": "Failed to update the option. Error: {{error}}",
+    "confirmDelete": "Are you sure you want to delete this option?",
+    "invalidInput": "Please provide valid inputs for the option.",
+    "loading": "Loading...",
+    "errorFetchingOptions": "Failed to fetch fulfillment options. Error: {{error}}"
+  }
+  

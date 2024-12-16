@@ -8,7 +8,7 @@ import Icon from "../icon/Icon";
 import Pagination from "../pagination/Pagination";
 import TableRow from "../TableRow";
 import Typography, { H5 } from "../Typography";
-import { fetchProducts } from "../../redux/slices/productSlice"; // Adjust import path as needed
+import { fetchProducts } from "../../redux/slices/products/productSlice"; // Adjust import path as needed
 import { RootState } from "../../redux/store";
 import type { AppDispatch } from "../../redux/store";
 

@@ -22,7 +22,11 @@ const SpinnerCircle = styled.div`
   animation: ${spin} 1s linear infinite;
 `;
 
-const Spinner: React.FC = () => (
+interface SpinnerProps {
+  size?: string;
+}
+
+const Spinner: React.FC<SpinnerProps> = ({size = 0}) => (
   <SpinnerContainer>
     <SpinnerCircle />
   </SpinnerContainer>

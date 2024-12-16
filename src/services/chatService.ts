@@ -61,9 +61,19 @@ const chatService = {
       const response = await axios.post(`${BASE_URL}/${chatId}/archive`);
       return response.data; // Extract the data
     },
-    startCall: async (chatId: string, participants: string[]) => {
-        const response = await axios.post(`/api/calls/start`, { chatId, participants });
-        return response.data;
+    // Start a call
+    startCall: async (participants: string[], options?: { chatId?: string }) => {
+      const response = await fetch("/api/start-call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ participants, ...options }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to start call");
+      }
+  
+      return await response.json();
     },
     endCall: async (callId: string) => {
         const response = await axios.post(`/api/calls/end`, { callId });

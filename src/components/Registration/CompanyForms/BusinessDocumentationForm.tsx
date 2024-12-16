@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BusinessDocumentationFormContainer, FileUpload } from './BusinessDocumentationFormContainer.styles';
-import { BusinessDocumentation as BusinessDocumentationType } from '../../../redux/slices/registrationSlice';
+import { BusinessDocumentation as BusinessDocumentationType } from '../../../types/sharedTypes';
+
 
 interface BusinessDocumentationFormProps {
   data: BusinessDocumentationType;

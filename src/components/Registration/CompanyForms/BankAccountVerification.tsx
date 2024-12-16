@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { BankAccountVerificationContainer, StyledInput } from './BankAccountVerificationContainer.styled';
-import { BankAccountVerification as BankAccountVerificationType } from '../../../redux/slices/registrationSlice';
+import { BankAccountVerification as BankAccountVerificationType  } from '../../../types/sharedTypes';
+
 
 interface BankAccountVerificationProps {
   data: BankAccountVerificationType;

@@ -1,13 +1,13 @@
-import axios from "../redux/slices/axiosSetup";
+import axios from "../redux/slices/utils/axiosSetup";
 
 const chatbotService = {
- /**
-   * Send a user message to the chatbot and get a response.
-   * @param message The user's message.
-   * @param context Optional context data for the conversation.
-   * @returns A promise resolving to the chatbot's response.
-   */
- sendMessage: async (message: string, context?: object): Promise<string> => {
+  /**
+    * Send a user message to the chatbot and get a response.
+    * @param message The user's message.
+    * @param context Optional context data for the conversation.
+    * @returns A promise resolving to the chatbot's response.
+    */
+  sendMessage: async (message: string, context?: object): Promise<string> => {
     const response = await axios.post("/api/chatbot/message", { message, context });
     return response.data.response;
   },

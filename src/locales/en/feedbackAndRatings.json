@@ -1,0 +1,17 @@
+{
+    "feedbackAndRatings": "Feedback and Ratings",
+    "averageRating": "Average Rating",
+    "allFeedback": "All Feedback",
+    "feedbackDetails": "Feedback Details",
+    "customerName": "Customer Name",
+    "rating": "Rating",
+    "comment": "Comment",
+    "responsePlaceholder": "Write your response here...",
+    "submitResponse": "Submit Response",
+    "responseTextEmptyError": "Response text cannot be empty.",
+    "responseSuccess": "Your response has been submitted successfully.",
+    "responseError": "Failed to submit the response. Error: {{error}}",
+    "loading": "Loading...",
+    "errorFetchingFeedback": "An error occurred while fetching feedback. Error: {{error}}"
+  }
+  

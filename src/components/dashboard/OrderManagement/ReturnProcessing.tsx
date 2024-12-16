@@ -76,6 +76,8 @@ const ReturnProcessing: React.FC = () => {
     },
   ]);
 
+  const [openModalId, setOpenModalId] = useState<number | null>(null); // Modal state
+
   const updateStatus = (id: string, status: Return["status"]) => {
     setReturns((prev) =>
       prev.map((ret) => (ret.id === id ? { ...ret, status } : ret))
@@ -85,7 +87,7 @@ const ReturnProcessing: React.FC = () => {
   return (
     <StyledBox>
       <h2>{t("returnProcessingTitle")}</h2>
-      <Chatbot />
+      <Chatbot sessionId="12345" language="en" />
       <StyledTable>
         <thead>
           <tr>
@@ -102,7 +104,20 @@ const ReturnProcessing: React.FC = () => {
             <tr key={ret.id}>
               <td>
                 {ret.product}
-                <TryOnViewer productId={ret.id} />
+                <TryOnViewer
+                    productId={Number(ret.id)} // Convert id to number
+                    isOpen={openModalId === Number(ret.id)} // Modal is open if id matches
+                    onClose={() => setOpenModalId(null)} // Close modal
+                    fetchAsset={() =>
+                      new Promise((resolve) => {
+                        console.log(`Fetching asset for product ID: ${ret.id}`);
+                        resolve(`Asset for product ID: ${ret.id}`); // Mock resolved value
+                      })
+                    }
+                  />
+                <Button onClick={() => setOpenModalId(Number(ret.id))}>
+                  {t("viewProduct")}
+                </Button>
               </td>
               <td>{ret.reason}</td>
               <td>{t(ret.status.toLowerCase())}</td>
@@ -126,6 +141,7 @@ const ReturnProcessing: React.FC = () => {
             </tr>
           ))}
         </tbody>
+
       </StyledTable>
     </StyledBox>
   );

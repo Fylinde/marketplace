@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Spin, Table, DatePicker, Select, Alert, Button, Modal, Form, Input } from 'antd';
 import { Line } from 'react-chartjs-2';
-import { getLocalizedText } from '../../utils/localizationUtils';
+import { getLocalizedText } from '../../../utils/localizationUtils';
 import slaService from 'services/slaService'; // Hypothetical SLA-related API service
 import { WebSocketService } from 'services/websocketService';
-import { exportToCSV } from '@/components/utils/exportUtils';
+import { exportToCSV } from '@/utils/exportUtils';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 const webSocketService = new WebSocketService('wss://your-websocket-url');
-
 
 const TrackerContainer = styled.div`
   padding: 20px;
@@ -72,7 +71,7 @@ const SLAComplianceTracker: React.FC = () => {
       setSlaData(response.tableData);
       setChartData(response.chartData);
     } catch (err: any) {
-      setError(getLocalizedText('Error fetching SLA data.'));
+      setError(getLocalizedText('Error fetching SLA data.', 'SLACompliance'));
     } finally {
       setLoading(false);
     }
@@ -80,47 +79,43 @@ const SLAComplianceTracker: React.FC = () => {
 
   const setupWebSocketNotifications = () => {
     webSocketService.subscribe('sla-violations', (violation: { message: string }) => {
-      alert(getLocalizedText('SLA Violation Alert: ') + violation.message);
-
+      alert(getLocalizedText('SLA Violation Alert: ', 'SLACompliance') + violation.message);
     });
   };
-
 
   const handleExport = () => {
     exportToCSV(slaData, 'SLA_Report');
   };
 
-
   const handleSaveSlaGoal = async (values: { goal: string }) => {
     try {
       await slaService.saveSlaGoal(values.goal);
-      alert(getLocalizedText('SLA Goal Saved Successfully!'));
+      alert(getLocalizedText('SLA Goal Saved Successfully!', 'SLACompliance'));
       setSlaGoalModalVisible(false);
     } catch (err) {
-      alert(getLocalizedText('Error saving SLA goal.'));
+      alert(getLocalizedText('Error saving SLA goal.', 'SLACompliance'));
     }
   };
 
-
   const columns = [
     {
-      title: getLocalizedText('Metric'),
+      title: getLocalizedText('Metric', 'SLACompliance'),
       dataIndex: 'metric',
       key: 'metric',
     },
     {
-      title: getLocalizedText('Compliance Rate'),
+      title: getLocalizedText('Compliance Rate', 'SLACompliance'),
       dataIndex: 'complianceRate',
       key: 'complianceRate',
       render: (rate: number) => `${rate}%`,
     },
     {
-      title: getLocalizedText('Violations'),
+      title: getLocalizedText('Violations', 'SLACompliance'),
       dataIndex: 'violations',
       key: 'violations',
     },
     {
-      title: getLocalizedText('Recommendations'),
+      title: getLocalizedText('Recommendations', 'SLACompliance'),
       dataIndex: 'recommendations',
       key: 'recommendations',
     },
@@ -138,13 +133,13 @@ const SLAComplianceTracker: React.FC = () => {
   return (
     <TrackerContainer>
       <Header>
-        <h1>{getLocalizedText('SLA Compliance Tracker')}</h1>
+        <h1>{getLocalizedText('SLA Compliance Tracker', 'SLACompliance')}</h1>
         <div>
           <Button type="primary" onClick={() => setSlaGoalModalVisible(true)}>
-            {getLocalizedText('Set SLA Goal')}
+            {getLocalizedText('Set SLA Goal', 'SLACompliance')}
           </Button>
           <Button type="default" onClick={handleExport}>
-            {getLocalizedText('Export as CSV')}
+            {getLocalizedText('Export as CSV', 'SLACompliance')}
           </Button>
         </div>
       </Header>
@@ -160,15 +155,15 @@ const SLAComplianceTracker: React.FC = () => {
         />
         <Select
           style={{ width: 200 }}
-          placeholder={getLocalizedText('Select Category')}
+          placeholder={getLocalizedText('Select Category', 'SLACompliance')}
           onChange={(value) => setCategory(value)}
           allowClear
         >
-          <Option value="last7Days">{getLocalizedText('Last 7 Days')}</Option>
-          <Option value="lastMonth">{getLocalizedText('Last Month')}</Option>
-          <Option value="electronics">{getLocalizedText('Electronics')}</Option>
-          <Option value="fashion">{getLocalizedText('Fashion')}</Option>
-          <Option value="home">{getLocalizedText('Home')}</Option>
+          <Option value="last7Days">{getLocalizedText('Last 7 Days', 'SLACompliance')}</Option>
+          <Option value="lastMonth">{getLocalizedText('Last Month', 'SLACompliance')}</Option>
+          <Option value="electronics">{getLocalizedText('Electronics', 'SLACompliance')}</Option>
+          <Option value="fashion">{getLocalizedText('Fashion', 'SLACompliance')}</Option>
+          <Option value="home">{getLocalizedText('Home', 'SLACompliance')}</Option>
         </Select>
       </FilterContainer>
       {loading && <Spin size="large" />}
@@ -179,7 +174,7 @@ const SLAComplianceTracker: React.FC = () => {
             labels: chartData.labels,
             datasets: [
               {
-                label: getLocalizedText('Compliance Rate'),
+                label: getLocalizedText('Compliance Rate', 'SLACompliance'),
                 data: chartData.data,
                 borderColor: '#4caf50',
                 backgroundColor: 'rgba(76, 175, 80, 0.2)',
@@ -195,24 +190,23 @@ const SLAComplianceTracker: React.FC = () => {
         columns={columns}
         pagination={{ pageSize: 10 }}
       />
-
       <Modal
         visible={slaGoalModalVisible}
-        title={getLocalizedText('Set SLA Goal')}
+        title={getLocalizedText('Set SLA Goal', 'SLACompliance')}
         onCancel={() => setSlaGoalModalVisible(false)}
         footer={null}
       >
         <Form layout="vertical" onFinish={handleSaveSlaGoal}>
           <Form.Item
-            label={getLocalizedText('SLA Goal')}
+            label={getLocalizedText('SLA Goal', 'SLACompliance')}
             name="goal"
-            rules={[{ required: true, message: getLocalizedText('SLA goal is required') }]}
+            rules={[{ required: true, message: getLocalizedText('SLA goal is required', 'SLACompliance') }]}
           >
-            <Input placeholder={getLocalizedText('Enter SLA goal (e.g., 95% compliance)')} />
+            <Input placeholder={getLocalizedText('Enter SLA goal (e.g., 95% compliance)', 'SLACompliance')} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              {getLocalizedText('Save')}
+              {getLocalizedText('Save', 'SLACompliance')}
             </Button>
           </Form.Item>
         </Form>

@@ -16,6 +16,8 @@ const RelatedProducts: React.FC<{ productId: string }> = ({ productId }) => {
           productId={String(product.id)} // Convert product.id to string
           buyerRegion="US"
           buyerCurrency="USD"
+          sellerPrice={product.sellerPrice || 0} // Provide sellerPrice
+          sellerCurrency={product.sellerCurrency || "USD"} // Provide sellerCurrency
         />
       ))}
     </RelatedProductsContainer>

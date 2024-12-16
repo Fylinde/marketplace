@@ -1,25 +1,32 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom"; // To get the product ID from the URL
+import { useParams } from "react-router-dom";
 import Box from "../Box";
 import Typography, { H3 } from "../Typography";
 import { getProducts } from "services/productService";
+import { Product } from "../../types/Product"; // Ensure the type matches the API response
 
 export interface ProductDescriptionProps {
-  description?: string; // Add the description prop
+  description?: string;
 }
 
 const ProductDescription: React.FC<ProductDescriptionProps> = ({ description }) => {
-  const { id } = useParams<{ id: string }>(); // Get product ID from URL
-  const [product, setProduct] = useState<any>(null);
+  const { id } = useParams<{ id: string }>();
+  const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     if (id) {
-      // Fetch product details by ID
       getProducts(id)
-        .then((response) => setProduct(response.data))
+        .then((response) => {
+          const product = response.products.find((p: Product) => p.id === id);
+          if (!product) {
+            throw new Error(`Product with id ${id} not found`);
+          }
+          setProduct(product); // Assign the extracted product
+        })
         .catch((error) => console.error("Failed to fetch product details", error));
     }
   }, [id]);
+  
 
   if (!product) return <p>Loading...</p>;
 

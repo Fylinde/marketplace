@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveAccountDetails, AccountDetails, selectAccountDetails, setSellerVerificationEmail } from '../../redux/slices/registrationSlice';
+import { saveAccountDetails, selectAccountDetails, setSellerVerificationEmail } from '../../redux/slices/auth/registrationSlice';
+import { AccountDetails } from '../../types/sharedTypes';
 import axios from 'axios';
 
 import './CreateSellerAccount.css';
@@ -39,8 +40,8 @@ const CreateSellerAccount: React.FC<CreateSellerAccountProps> = ({ data, onUpdat
     e.preventDefault();
 
     if (password !== confirmPassword) {
-        setError('Passwords do not match');
-        return;
+      setError('Passwords do not match');
+      return;
     }
 
     // Save account details in Redux
@@ -50,14 +51,14 @@ const CreateSellerAccount: React.FC<CreateSellerAccountProps> = ({ data, onUpdat
     dispatch(setSellerVerificationEmail(email));
 
     try {
-        await sendVerificationEmail(full_name, email, password);
-        onNext();
-        navigate('/register/seller/seller-verification');
+      await sendVerificationEmail(full_name, email, password);
+      onNext();
+      navigate('/register/seller/seller-verification');
     } catch (err) {
-        console.error('Failed to send verification email:', err);
-        setError('Failed to send verification email. Please try again later.');
+      console.error('Failed to send verification email:', err);
+      setError('Failed to send verification email. Please try again later.');
     }
-};
+  };
 
 
   // API call function to register vendor and send verification email

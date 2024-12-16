@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useAppDispatch, useAppSelector } from 'redux/slices/reduxHooks';
-import { fetchShippingMethods, setSelectedMethod } from 'redux/slices/shippingSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
+import { fetchShippingMethods } from '@/redux/slices/logistics/shippingSlice';
 import shippingService from 'services/shippingService';
-import { getLocalizedText } from '../../utils/localizationUtils';
+import { getLocalizedText, formatCurrency } from '../../../utils/localizationUtils';
 import DashboardPageHeader from 'components/layout/DashboardPageHeader';
 import VendorDashboardLayout from 'components/layout/VendorDashboardLayout';
 import DataInput from 'components/dataInput/DataInput';
@@ -46,13 +46,29 @@ const StyledTable = styled(Table)`
   }
 `;
 
-const ShippingSetting: React.FC = () => {
+
+interface ShippingSettingsProps {
+  onUpdate: (settings: any) => void;
+}
+
+const ShippingSettings: React.FC<ShippingSettingsProps> = ({ onUpdate }) => {
+  const [settings, setSettings] = useState({
+    autoDispatch: false,
+    defaultWarehouse: "",
+  });
   const dispatch = useAppDispatch();
   const { methods, loading, error } = useAppSelector((state) => state.shipping);
-  const [regions, setRegions] = useState<Array<{ id: string; name: string; rate: number; currency: string }>>([]);
+  const [regions, setRegions] = useState<
+    Array<{ id: string; name: string; rate: number; currency: string }>
+  >([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingRegion, setEditingRegion] = useState(false);
-  const [currentRegion, setCurrentRegion] = useState<{ id: string; name: string; rate: number; currency: string } | null>(null);
+  const [currentRegion, setCurrentRegion] = useState<{
+    id: string;
+    name: string;
+    rate: number;
+    currency: string;
+  } | null>(null);
 
   useEffect(() => {
     dispatch(fetchShippingMethods({ country: 'US', currency: 'USD' }));
@@ -91,32 +107,39 @@ const ShippingSetting: React.FC = () => {
     }
   };
 
+  const handleSubmit = () => {
+    onUpdate(settings);
+  };
+
+  const module = 'shipping'; // Define the module name once for reuse
   const columns: ColumnsType<any> = [
     {
-      title: getLocalizedText('Region Name'),
+      title: getLocalizedText('Region Name', module),
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: getLocalizedText('Rate'),
+      title: getLocalizedText('Rate', module),
       dataIndex: 'rate',
       key: 'rate',
-      render: (rate, record) => `${rate} ${record.currency}`,
+      render: (rate, record) => formatCurrency(rate, record.currency),
     },
     {
-      title: getLocalizedText('Actions'),
+      title: getLocalizedText('Actions', module),
       key: 'actions',
       render: (_, record) => (
         <span>
-          <Button onClick={() => {
-            setEditingRegion(true);
-            setCurrentRegion(record);
-            setModalVisible(true);
-          }}>
-            {getLocalizedText('Edit')}
+          <Button
+            onClick={() => {
+              setEditingRegion(true);
+              setCurrentRegion(record);
+              setModalVisible(true);
+            }}
+          >
+            {getLocalizedText('Edit', module)}
           </Button>
           <Button danger onClick={() => handleDeleteRegion(record.id)}>
-            {getLocalizedText('Delete')}
+            {getLocalizedText('Delete', module)}
           </Button>
         </span>
       ),
@@ -126,15 +149,17 @@ const ShippingSetting: React.FC = () => {
   return (
     <VendorDashboardLayout>
       <ShippingSettingContainer>
-        <DashboardPageHeader title={getLocalizedText('Shipping Settings')} />
+        <DashboardPageHeader title={getLocalizedText('Shipping Settings', module)} />
         <HeaderContainer>
-          <h3>{getLocalizedText('Manage Shipping Regions')}</h3>
-          <StyledButton onClick={() => {
-            setEditingRegion(false);
-            setCurrentRegion(null);
-            setModalVisible(true);
-          }}>
-            {getLocalizedText('Add New Region')}
+          <h3>{getLocalizedText('Manage Shipping Regions', module)}</h3>
+          <StyledButton
+            onClick={() => {
+              setEditingRegion(false);
+              setCurrentRegion(null);
+              setModalVisible(true);
+            }}
+          >
+            {getLocalizedText('Add New Region', module)}
           </StyledButton>
         </HeaderContainer>
         {loading && <Spin size="large" />}
@@ -145,7 +170,7 @@ const ShippingSetting: React.FC = () => {
           pagination={{ pageSize: 10 }}
         />
         <Modal
-          title={editingRegion ? getLocalizedText('Edit Region') : getLocalizedText('Add New Region')}
+          title={editingRegion ? getLocalizedText('Edit Region', module) : getLocalizedText('Add New Region', module)}
           visible={modalVisible}
           onCancel={() => setModalVisible(false)}
           footer={null}
@@ -156,23 +181,27 @@ const ShippingSetting: React.FC = () => {
             initialValues={currentRegion || { name: '', rate: 0, currency: 'USD' }}
           >
             <Form.Item
-              label={getLocalizedText('Region Name')}
+              label={getLocalizedText('Region Name', module)}
               name="name"
-              rules={[{ required: true, message: getLocalizedText('Region name is required') }]}
+              rules={[{ required: true, message: getLocalizedText('Region name is required', module) }]}
             >
-              <DataInput label={getLocalizedText('Region Name')} value="" onChange={() => { }} />
+              <DataInput
+                label={getLocalizedText('Region Name', module)}
+                value={currentRegion?.name || ''}
+                onChange={() => { }}
+              />
             </Form.Item>
             <Form.Item
-              label={getLocalizedText('Rate')}
+              label={getLocalizedText('Rate', module)}
               name="rate"
-              rules={[{ required: true, message: getLocalizedText('Rate is required') }]}
+              rules={[{ required: true, message: getLocalizedText('Rate is required', module) }]}
             >
               <InputNumber style={{ width: '100%' }} />
             </Form.Item>
             <Form.Item
-              label={getLocalizedText('Currency')}
+              label={getLocalizedText('Currency', module)}
               name="currency"
-              rules={[{ required: true, message: getLocalizedText('Currency is required') }]}
+              rules={[{ required: true, message: getLocalizedText('Currency is required', module) }]}
             >
               <Select>
                 <Select.Option value="USD">USD</Select.Option>
@@ -182,7 +211,7 @@ const ShippingSetting: React.FC = () => {
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit">
-                {editingRegion ? getLocalizedText('Update Region') : getLocalizedText('Add Region')}
+                {editingRegion ? getLocalizedText('Update Region', module) : getLocalizedText('Add Region', module)}
               </Button>
             </Form.Item>
           </Form>
@@ -192,4 +221,5 @@ const ShippingSetting: React.FC = () => {
   );
 };
 
-export default ShippingSetting;
+export default ShippingSettings;
+

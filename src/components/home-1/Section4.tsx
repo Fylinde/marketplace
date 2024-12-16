@@ -1,19 +1,49 @@
-import Card from "components/Card";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "redux/store"; // Adjust based on your store setup
+import Card from "components/Card";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
 import Container from "../Container";
 import Grid from "../grid/Grid";
 import ProductCard4 from "../product-cards/ProductCard4";
 import ProductCard5 from "../product-cards/ProductCard5";
+import { fetchTopRatedProducts } from "../../redux/slices/products/productSlice"; // Import the appropriate Redux actions
+import { fetchFeaturedBrands } from "../../redux/slices/products/brandSlice";
+import type { AppDispatch } from "../../redux/store";
 
 const Section4: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  // Fetch state from Redux
+  const {
+    topRatedProducts = [], // Fallback to empty array to avoid undefined issues
+    loading: topRatedLoading,
+    error: topRatedError,
+  } = useSelector((state: RootState) => state.products);
+
+  const {
+    featuredBrands = [], // Fallback to empty array for safety
+    loading: featuredLoading,
+    error: featuredError,
+  } = useSelector((state: RootState) => state.brands);
+
+  useEffect(() => {
+    if (!topRatedProducts.length) {
+      dispatch(fetchTopRatedProducts());
+    }
+    if (!featuredBrands.length) {
+      dispatch(fetchFeaturedBrands());
+    }
+  }, [dispatch, topRatedProducts.length, featuredBrands.length]);
+
   return (
     <Box mb="3.75rem">
       <Container>
         <Box>
           <Grid container spacing={6}>
+            {/* Top Rated Products Section */}
             <Grid item lg={6} xs={12}>
               <CategorySectionHeader
                 iconName="ranking-1"
@@ -21,17 +51,35 @@ const Section4: React.FC = () => {
                 seeMoreLink="#"
               />
               <Card p="1rem">
-                <Grid container spacing={4}>
-                  {topRatedList.map((item) => (
-                    <Grid item md={3} sm={6} xs={6} key={item.title}>
-                      <Link to={item.productUrl}>
-                        <ProductCard4 {...item} />
-                      </Link>
-                    </Grid>
-                  ))}
-                </Grid>
+                {topRatedLoading ? (
+                  <p>Loading Top Rated Products...</p>
+                ) : topRatedError ? (
+                  <p>Error loading top-rated products: {topRatedError}</p>
+                ) : (
+                  <Grid container spacing={4}>
+                    {topRatedProducts.map((item) => (
+                      <Grid item md={3} sm={6} xs={6} key={item.id}>
+                        <Link to={`/product/${item.id}`}>
+                          <ProductCard4
+                            imgUrl={item.imgUrl || "/assets/images/default-product.png"} // Fallback for missing image
+                            title={item.title || "Untitled"} // Fallback for missing title
+                            rating={
+                              typeof item.rating === "number"
+                                ? item.rating
+                                : item.rating?.average || 0 // Handle complex rating structure
+                            }
+                            price={item.price || 0} // Fallback for price
+                            reviewCount={item.reviewCount || 0} // Fallback for review count
+                          />
+                        </Link>
+                      </Grid>
+                    ))}
+                  </Grid>
+                )}
               </Card>
             </Grid>
+
+            {/* Featured Brands Section */}
             <Grid item md={6} xs={12}>
               <CategorySectionHeader
                 iconName="Group"
@@ -39,15 +87,24 @@ const Section4: React.FC = () => {
                 seeMoreLink="#"
               />
               <Card p="1rem">
-                <Grid container spacing={4}>
-                  {brandList.map((item) => (
-                    <Grid item sm={6} xs={12} key={item.title}>
-                      <Link to={item.productUrl}>
-                        <ProductCard5 {...item} />
-                      </Link>
-                    </Grid>
-                  ))}
-                </Grid>
+                {featuredLoading ? (
+                  <p>Loading Featured Brands...</p>
+                ) : featuredError ? (
+                  <p>Error loading featured brands: {featuredError}</p>
+                ) : (
+                  <Grid container spacing={4}>
+                    {featuredBrands.map((item) => (
+                      <Grid item sm={6} xs={12} key={item.id}>
+                        <Link to={`/brand/${item.id}`}>
+                          <ProductCard5
+                            title={item.title || "Untitled"} // Fallback for missing title
+                            imgUrl={item.imgUrl || "/assets/images/default-brand.png"} // Fallback for missing image
+                          />
+                        </Link>
+                      </Grid>
+                    ))}
+                  </Grid>
+                )}
               </Card>
             </Grid>
           </Grid>
@@ -56,53 +113,5 @@ const Section4: React.FC = () => {
     </Box>
   );
 };
-
-const topRatedList = [
-  {
-    imgUrl: "/assets/images/products/camera-1.png",
-    title: "Camera",
-    rating: 4,
-    price: 3300,
-    reviewCount: 49,
-    productUrl: "/product/d1",
-  },
-  {
-    imgUrl: "/assets/images/products/shoes-2.png",
-    title: "Shoe",
-    rating: 4.75,
-    price: 400,
-    reviewCount: 20,
-    productUrl: "/product/d12",
-  },
-  {
-    imgUrl: "/assets/images/products/mobile-1.png",
-    title: "Phone",
-    rating: 5,
-    price: 999,
-    reviewCount: 65,
-    productUrl: "/product/d14",
-  },
-  {
-    imgUrl: "/assets/images/products/watch-1.png",
-    title: "Watch",
-    rating: 5,
-    price: 999,
-    reviewCount: 75,
-    productUrl: "/product/d16",
-  },
-];
-
-const brandList = [
-  {
-    imgUrl: "/assets/images/products/london-britches.png",
-    title: "London Britches",
-    productUrl: "/product/e1",
-  },
-  {
-    imgUrl: "/assets/images/products/jim and jiko.png",
-    title: "Jim & Jago",
-    productUrl: "/product/e14",
-  },
-];
 
 export default Section4;

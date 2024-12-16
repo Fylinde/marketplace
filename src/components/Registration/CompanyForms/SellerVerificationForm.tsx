@@ -5,15 +5,15 @@ import {
     setSellerVerificationCode,
     setVerificationStatus,
     setVerificationError,
-    selectSellerVerification,
-    SellerVerification
-} from '../../../redux/slices/registrationSlice';
+    selectSellerVerification
+} from '../../../redux/slices/auth/registrationSlice';
+import { SellerVerification } from '../../../types/sharedTypes';
 import axios from 'axios';
 
 interface SellerVerificationFormProps {
     data: SellerVerification;
     onUpdate: (updatedData: Partial<SellerVerification>) => void;
-    onNext: () => void; 
+    onNext: () => void;
 }
 
 const SellerVerificationForm: React.FC<SellerVerificationFormProps> = ({ data, onUpdate }) => {
@@ -43,18 +43,18 @@ const SellerVerificationForm: React.FC<SellerVerificationFormProps> = ({ data, o
             return false;
         }
     };
-    
+
 
 
     const handleVerification = async (e: React.FormEvent) => {
         e.preventDefault();
-    
+
         if (!email) {
             console.error("Email is missing from Redux state.");
             dispatch(setVerificationError("Email is missing. Please restart the registration process."));
             return;
         }
-    
+
         const isValidCode = await verifyCodeWithServer(verificationCode);
         if (isValidCode) {
             dispatch(setVerificationStatus(true));
@@ -64,7 +64,7 @@ const SellerVerificationForm: React.FC<SellerVerificationFormProps> = ({ data, o
             dispatch(setVerificationError('Invalid verification code'));
         }
     };
-    
+
 
     return (
         <div className="verification-form">

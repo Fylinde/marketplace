@@ -1,5 +1,5 @@
 import React from 'react';
-import { CompanyDetails } from '../../redux/slices/registrationSlice';
+import { CompanyDetails } from '../../types/sharedTypes';
 
 interface CompanyDetailsSectionProps {
   companyDetails: CompanyDetails;

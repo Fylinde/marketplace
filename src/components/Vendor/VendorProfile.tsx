@@ -1,21 +1,21 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "redux/store";
-import { fetchVendorRating, addVendorRating } from "redux/slices/vendorSlice";
+import { AppDispatch, RootState } from "../../redux/store";
+import { fetchSellerRating, addSellerRating } from "../../redux/slices/auth/sellerSlice";
 import Rating from "../rating/Rating";
 
-const VendorProfile = ({ vendorId }: { vendorId: string }) => {
+const VendorProfile = ({ sellerId }: { sellerId: string }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const rating = useSelector((state: RootState) => state.vendors.ratings[vendorId]);
+  const rating = useSelector((state: RootState) => state.sellers.ratings[sellerId]);
 
   useEffect(() => {
-    if (vendorId) {
-      dispatch(fetchVendorRating(vendorId));
+    if (sellerId) {
+      dispatch(fetchSellerRating(sellerId));
     }
-  }, [dispatch, vendorId]);
+  }, [dispatch, sellerId]);
 
   const handleAddRating = (newRating: number) => {
-    dispatch(addVendorRating({ vendorId, ratingData: { rating: newRating } }));
+    dispatch(addSellerRating({ sellerId, ratingData: { rating: newRating } }));
   };
 
   return (

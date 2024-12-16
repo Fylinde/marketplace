@@ -4,8 +4,8 @@ import Box from "components/Box";
 import Table from "components/table/Table";
 import Button from "components/buttons/Button";
 import Input from "components/input/Input";
-import Dropdown from "components/dropdown/Dropdown";
-import { getLocalizedText } from "../utils/localizationUtils";
+import { Select } from "antd"; // Correctly use `Select` from Ant Design
+import { getLocalizedText } from "@/utils/localizationUtils";
 
 interface RefundRule {
   id: string;
@@ -35,13 +35,15 @@ const StyledTable = styled(Table)`
   width: 100%;
   margin-top: 20px;
 
-  th, td {
+  th,
+  td {
     text-align: left;
     padding: 10px;
   }
 
   @media (max-width: 768px) {
-    th, td {
+    th,
+    td {
       font-size: 14px;
     }
   }
@@ -60,7 +62,7 @@ const RefundAutomation: React.FC = () => {
 
   const addOrEditRule = () => {
     if (!newRule.condition || !newRule.action) {
-      alert(getLocalizedText("allFieldsRequired"));
+      alert(getLocalizedText("allFieldsRequired", "RefundAutomation"));
       return;
     }
     if (editRuleId) {
@@ -81,7 +83,7 @@ const RefundAutomation: React.FC = () => {
 
   const previewRuleExecution = (rule: RefundRule) => {
     alert(
-      getLocalizedText("ruleExecutionPreview", {
+      getLocalizedText("ruleExecutionPreview", "RefundAutomation", {
         condition: rule.condition,
         action: rule.action,
       })
@@ -97,57 +99,68 @@ const RefundAutomation: React.FC = () => {
 
   return (
     <StyledBox>
-      <h2>{getLocalizedText("refundAutomationTitle")}</h2>
+      <h2>{getLocalizedText("refundAutomationTitle", "RefundAutomation")}</h2>
       <Input
-        label={getLocalizedText("filterLabel")}
+        label={getLocalizedText("filterLabel", "RefundAutomation")}
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
       />
       <Box>
         <Input
-          label={getLocalizedText("conditionLabel")}
+          label={getLocalizedText("conditionLabel", "RefundAutomation")}
           value={newRule.condition}
           onChange={(e) =>
             setNewRule((prev) => ({ ...prev, condition: e.target.value }))
           }
         />
         <Input
-          label={getLocalizedText("actionLabel")}
+          label={getLocalizedText("actionLabel", "RefundAutomation")}
           value={newRule.action}
           onChange={(e) =>
             setNewRule((prev) => ({ ...prev, action: e.target.value }))
           }
         />
-        <Dropdown
-          label={getLocalizedText("currencyLabel")}
-          options={["USD", "EUR", "BTC", "ETH"]}
+        {/* Dropdown for Currency */}
+        <Select
+          style={{ width: "100%" }}
           value={newRule.currency}
-          onChange={(value) =>
+          onChange={(value: string) =>
             setNewRule((prev) => ({ ...prev, currency: value }))
           }
+          options={[
+            { value: "USD", label: "USD" },
+            { value: "EUR", label: "EUR" },
+            { value: "BTC", label: "BTC" },
+            { value: "ETH", label: "ETH" },
+          ]}
         />
-        <Dropdown
-          label={getLocalizedText("paymentTypeLabel")}
-          options={["Fiat", "Crypto", "Escrow"]}
+        {/* Dropdown for Payment Type */}
+        <Select
+          style={{ width: "100%" }}
           value={newRule.paymentType}
-          onChange={(value) =>
+          onChange={(value: string) =>
             setNewRule((prev) => ({ ...prev, paymentType: value }))
           }
+          options={[
+            { value: "Fiat", label: "Fiat" },
+            { value: "Crypto", label: "Crypto" },
+            { value: "Escrow", label: "Escrow" },
+          ]}
         />
         <Button onClick={addOrEditRule}>
           {editRuleId
-            ? getLocalizedText("editRuleButton")
-            : getLocalizedText("addRuleButton")}
+            ? getLocalizedText("editRuleButton", "RefundAutomation")
+            : getLocalizedText("addRuleButton", "RefundAutomation")}
         </Button>
       </Box>
       <StyledTable>
         <thead>
           <tr>
-            <th>{getLocalizedText("conditionColumn")}</th>
-            <th>{getLocalizedText("actionColumn")}</th>
-            <th>{getLocalizedText("currencyColumn")}</th>
-            <th>{getLocalizedText("paymentTypeColumn")}</th>
-            <th>{getLocalizedText("actionsColumn")}</th>
+            <th>{getLocalizedText("conditionColumn", "RefundAutomation")}</th>
+            <th>{getLocalizedText("actionColumn", "RefundAutomation")}</th>
+            <th>{getLocalizedText("currencyColumn", "RefundAutomation")}</th>
+            <th>{getLocalizedText("paymentTypeColumn", "RefundAutomation")}</th>
+            <th>{getLocalizedText("actionsColumn", "RefundAutomation")}</th>
           </tr>
         </thead>
         <tbody>
@@ -164,17 +177,17 @@ const RefundAutomation: React.FC = () => {
                     setEditRuleId(rule.id);
                   }}
                 >
-                  {getLocalizedText("editButton")}
+                  {getLocalizedText("editButton", "RefundAutomation")}
                 </Button>
                 <Button
                   onClick={() =>
                     setRules((prev) => prev.filter((r) => r.id !== rule.id))
                   }
                 >
-                  {getLocalizedText("deleteButton")}
+                  {getLocalizedText("deleteButton", "RefundAutomation")}
                 </Button>
                 <Button onClick={() => previewRuleExecution(rule)}>
-                  {getLocalizedText("previewButton")}
+                  {getLocalizedText("previewButton", "RefundAutomation")}
                 </Button>
               </td>
             </tr>

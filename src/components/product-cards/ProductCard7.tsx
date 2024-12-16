@@ -9,6 +9,8 @@ import FlexBox from "../FlexBox";
 import Icon from "../icon/Icon";
 import Typography from "../Typography";
 import { StyledProductCard7 } from "./ProductCardStyle";
+import ViewInSpaceButton from "../buttons/ViewInSpaceButton";
+
 
 export interface ProductCard7Props {
   id: string | number;
@@ -16,6 +18,15 @@ export interface ProductCard7Props {
   qty: number;
   price: number;
   imgUrl?: string;
+  sellerPrice?: number; // Seller price
+  buyerPrice?: number; // Buyer price
+  sellerCurrency?: string; // Seller currency
+  buyerCurrency?: string; // Buyer currency
+  reviews?: { comment: string; rating: number; user: string }[]; // Localized reviews
+  tryOnAvailable?: boolean; // TryOn availability
+  isArEnabled?: boolean;
+  onChatWithSeller?: () => void; // Chat with seller handler
+  onTryNow?: () => void; // TryOn handler
 }
 
 const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
@@ -23,7 +34,16 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
   name,
   qty,
   price,
-  imgUrl = "/assets/images/products/iphone-xi.png", // Default image
+  imgUrl = "/assets/images/products/iphone-xi.png",
+  sellerPrice = 0,
+  buyerPrice = 0,
+  sellerCurrency = "USD",
+  buyerCurrency = "USD",
+  reviews = [],
+  tryOnAvailable = false,
+  isArEnabled = false,
+  onChatWithSeller,
+  onTryNow,
   ...props
 }) => {
   const handleCartAmountChange = useCallback(
@@ -36,12 +56,8 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
 
   return (
     <StyledProductCard7 {...props}>
-      <Image
-        src={imgUrl}
-        size={140}
-        display="block"
-        alt={name}
-      />
+      {/* Product Image */}
+      <Image src={imgUrl} size={140} display="block" alt={name} />
       <FlexBox
         className="product-details"
         flexDirection="column"
@@ -49,6 +65,7 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
         minWidth="0px"
         width="100%"
       >
+        {/* Product Title */}
         <Link to={`/product/${id}`}>
           <Typography
             className="title"
@@ -59,6 +76,8 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
             {name}
           </Typography>
         </Link>
+
+        {/* Remove from Cart Button */}
         <Box position="absolute" right="1rem" top="1rem">
           <IconButton
             padding="4px"
@@ -69,16 +88,21 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
           </IconButton>
         </Box>
 
+        {/* Pricing and Quantity */}
         <FlexBox justifyContent="space-between" alignItems="flex-end">
           <FlexBox flexWrap="wrap" alignItems="center">
             <Typography color="gray.600" mr="0.5rem">
-              ${price.toFixed(2)} x {qty}
+              {buyerCurrency} {buyerPrice.toFixed(2)} x {qty}
             </Typography>
             <Typography fontWeight={600} color="primary.main" mr="1rem">
-              ${(price * qty).toFixed(2)}
+              {buyerCurrency} {(buyerPrice * qty).toFixed(2)}
+            </Typography>
+            <Typography fontSize="12px" color="text.muted">
+              ({sellerCurrency} {(sellerPrice * qty).toFixed(2)})
             </Typography>
           </FlexBox>
 
+          {/* Quantity Controls */}
           <FlexBox alignItems="center">
             <Button
               variant="outlined"
@@ -106,6 +130,54 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
             </Button>
           </FlexBox>
         </FlexBox>
+
+        {/* Chat and TryOn Buttons */}
+        <FlexBox justifyContent="space-between" alignItems="center" mt="1rem">
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={onChatWithSeller}
+          >
+            Chat with Seller
+          </Button>
+          {tryOnAvailable && (
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={onTryNow}
+            >
+              Try Now
+            </Button>
+          )}
+        </FlexBox>
+        {/* View in AR */}
+        <ViewInSpaceButton productId={id} isArEnabled={isArEnabled} />
+
+        {/* Localized Reviews */}
+        {reviews.length > 0 && (
+          <Box mt="1rem">
+            <Typography fontWeight="600" fontSize="14px" mb="0.5rem">
+              Reviews:
+            </Typography>
+            {reviews.slice(0, 2).map((review, index) => (
+              <Typography
+                key={index}
+                fontSize="12px"
+                color="text.secondary"
+                mb="0.25rem"
+              >
+                {review.user}: {review.comment} ({review.rating}/5)
+              </Typography>
+            ))}
+            {reviews.length > 2 && (
+              <Typography fontSize="12px" fontWeight="600" color="primary.main">
+                +{reviews.length - 2} more reviews
+              </Typography>
+            )}
+          </Box>
+        )}
       </FlexBox>
     </StyledProductCard7>
   );

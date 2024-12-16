@@ -1,4 +1,4 @@
-import React from "react"; 
+import React from "react";
 import styled from "styled-components";
 import {
   border,
@@ -9,21 +9,31 @@ import {
   SpaceProps,
 } from "styled-system";
 
-// Define LazyImageProps with alt prop as required
 type LazyImageProps = React.ImgHTMLAttributes<HTMLImageElement> &
   BorderProps &
   SpaceProps &
-  ColorProps;
+  ColorProps & {
+    fallbackSrc?: string; // Optional fallback image source
+  };
 
-const LazyImage = styled(({ borderRadius, alt, ...props }: LazyImageProps) => {
-  // Ensure alt prop is always present by providing a default empty string if none is provided
-  return <img alt={alt || ""} {...props} />;
-})<LazyImageProps>`
+const StyledImage = styled.img<LazyImageProps>`
   display: block;
-
   ${color}
   ${space}
   ${border}
 `;
+
+const LazyImage: React.FC<LazyImageProps> = ({
+  src,
+  alt = "image",
+  fallbackSrc = "/assets/images/default-image.png", // Provide a default fallback
+  ...props
+}) => {
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = fallbackSrc; // Replace broken image with fallback
+  };
+
+  return <StyledImage src={src} alt={alt} onError={handleError} {...props} />;
+};
 
 export default LazyImage;

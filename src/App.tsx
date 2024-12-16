@@ -14,6 +14,8 @@ import ProtectedRoute from "components/ProtectedRoute/ProtectedRoute";
 import UserDashboard from "components/UserDashboard/UserDashboard";
 import WelcomeScreen from "components/Registration/WelcomeScreen";
 import VendorDashboard from "./components/Vendor/VendorDashboard";
+import { SearchProvider } from "./context/SearchContext";
+
 
 // Helper function to wrap pages with the appropriate layout
 const renderWithLayout = (PageComponent: PageWithLayout) => {
@@ -27,6 +29,7 @@ const renderWithLayout = (PageComponent: PageWithLayout) => {
 
 const App: React.FC = () => {
   return (
+    <SearchProvider>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <GlobalStyles />
@@ -55,7 +58,8 @@ const App: React.FC = () => {
           />
         </Routes>
       </ThemeProvider>
-    </Provider>
+      </Provider>
+      </SearchProvider>
   );
 };
 

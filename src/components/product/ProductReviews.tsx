@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addRating, fetchProductRating } from "@/redux/slices/productSlice";
-import { RootState } from "@/redux/store";
+import { addRating, fetchProductRating } from "../../redux/slices/products/productSlice";
+import { RootState } from "../../redux/store";
 import type { AppDispatch } from "../../redux/store";
 import ProductReviewsContainer from "./styles/ProductReviews.styles";
 
@@ -21,7 +21,7 @@ const ProductReviews: React.FC<{ productId: string }> = ({ productId }) => {
     dispatch(
       addRating({
         productId,
-        reviewData: { ...newReview, userId },
+        reviewData: { ...newReview, userId }, // No 'id' included here
       })
     );
     setNewReview({ rating: 0, comment: "" });
@@ -30,12 +30,13 @@ const ProductReviews: React.FC<{ productId: string }> = ({ productId }) => {
   return (
     <ProductReviewsContainer>
       <h3>Reviews</h3>
-      {product?.rating?.reviews.map((review: { id: string; comment: string; rating: number }) => (
-        <div key={review.id}>
-          <p>{review.comment}</p>
-          <p>Rating: {review.rating}</p>
-        </div>
-      ))}
+      {typeof product?.rating === "object" &&
+        product.rating.reviews.map((review) => (
+          <div key={review.id}>
+            <p>{review.comment}</p>
+            <p>Rating: {review.rating}</p>
+          </div>
+        ))}
       <div>
         <h4>Leave a Review</h4>
         <textarea

@@ -5,29 +5,18 @@ import FlexBox from "../FlexBox";
 import Pagination from "../pagination/Pagination";
 import ProductCard9 from "../product-cards/ProductCard9";
 import { SemiSpan } from "../Typography";
-import { fetchProducts } from "../../redux/slices/productSlice";
-import { updateFilters } from "../../redux/slices/filterSlice";
+import { fetchProducts } from "../../redux/slices/products/productSlice";
+import { updateFilters } from "../../redux/slices/support/filterSlice";
 import { RootState } from "../../redux/store";
 import type { AppDispatch } from "../../redux/store";
+import { Product } from "../../types/Product";
+import { Rating } from "@/types/rating";
+
 
 export interface ProductCard9ListProps {
   vendorId?: string;
 }
 
-interface Product {
-  id: string | number;
-  title: string;
-  price: number;
-  images: string[];
-  rating?: {
-    average: number;
-    count: number;
-  };
-  description?: string;
-  brand?: string;
-  category?: string;
-  stock?: boolean;
-}
 
 const ProductCard9List: React.FC<ProductCard9ListProps> = ({ vendorId }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -38,21 +27,12 @@ const ProductCard9List: React.FC<ProductCard9ListProps> = ({ vendorId }) => {
   const [sortOption, setSortOption] = useState<string>("popularity");
 
   useEffect(() => {
-    dispatch(fetchProducts({ vendorId: vendorId || "", page: currentPage + 1, filters, sort: sortOption }));
+    const updatedFilters = { ...filters, ...(vendorId ? { vendorId } : {}) }; // Include vendorId in filters
+    dispatch(fetchProducts({ page: currentPage + 1, filters: updatedFilters, sort: sortOption }));
   }, [currentPage, vendorId, dispatch, filters, sortOption]);
-
-  useEffect(() => {
-    if (currentPage + 1 < totalPages) {
-      dispatch(fetchProducts({ vendorId: vendorId || "", page: currentPage + 2, filters, sort: sortOption }));
-    }
-  }, [currentPage, dispatch, vendorId, totalPages, filters, sortOption]);
 
   const handlePageChange = (selectedPage: number) => {
     setCurrentPage(selectedPage);
-  };
-
-  const handleFilterChange = (key: string, value: any) => {
-    dispatch(updateFilters({ [key]: value }));
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -96,11 +76,19 @@ const ProductCard9List: React.FC<ProductCard9ListProps> = ({ vendorId }) => {
         <ProductCard9
           mb="1.25rem"
           key={item.id}
-          {...item}
-          rating={item.rating?.average}
+          id={item.id}
+          title={item.title}
+          price={item.price}
+          images={item.images}
+          rating={typeof item.rating === "object" ? item.rating.average : item.rating} // Handle both number and Rating object
+          brand={item.brand}
+          description={item.description}
+          category={item.category}
+          stock={item.stock} // Pass stock as a boolean
           onClick={() => logProductInteraction(item.id)}
         />
       ))}
+
 
       <FlexBox flexWrap="wrap" justifyContent="space-between" alignItems="center" mt="32px">
         <SemiSpan>

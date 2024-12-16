@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveShopDetails, selectShopDetails } from '../../redux/slices/registrationSlice'; // import selectShopDetails
+import { saveShopDetails, selectShopDetails } from '../../redux/slices/auth/registrationSlice'; // import selectShopDetails
 import { useNavigate } from 'react-router-dom';
 import ProgressIndicator from './ProgressIndicator';  // Import the ProgressIndicator component
 import './ShopSetupForm.css';

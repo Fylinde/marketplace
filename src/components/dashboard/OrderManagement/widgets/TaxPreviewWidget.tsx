@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Spin, Collapse, Alert } from 'antd';
 import taxService from 'services/taxService';
-import { getLocalizedText } from '../../../utils/localizationUtils';
+import { getLocalizedText, formatCurrency } from '../../../../utils/localizationUtils';
 
 const { Panel } = Collapse;
 
@@ -28,11 +28,12 @@ const TotalTax = styled.span`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
+// Props Interface
 interface TaxPreviewWidgetProps {
-  items: { category: string; price: number }[];
-  country: string;
-  region?: string;
-  currency: string;
+  items: { category: string; price: number }[]; // Array of items with category and price
+  country: string; // Country for tax calculation
+  region?: string; // Optional region for more specific tax rules
+  currency: string; // Currency for formatting tax amounts
 }
 
 const TaxPreviewWidget: React.FC<TaxPreviewWidgetProps> = ({ items, country, region, currency }) => {
@@ -43,6 +44,7 @@ const TaxPreviewWidget: React.FC<TaxPreviewWidgetProps> = ({ items, country, reg
   const [totalTax, setTotalTax] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch tax data whenever relevant dependencies change
   useEffect(() => {
     fetchTaxData();
   }, [items, country, region]);
@@ -72,7 +74,7 @@ const TaxPreviewWidget: React.FC<TaxPreviewWidgetProps> = ({ items, country, reg
       setTaxBreakdown(breakdown);
       setTotalTax(breakdown.reduce((sum, item) => sum + item.taxAmount, 0));
     } catch (err) {
-      setError(getLocalizedText('Failed to fetch tax data.'));
+      setError(getLocalizedText("Failed to fetch tax data", "refundAutomation"));
     } finally {
       setLoading(false);
     }
@@ -80,29 +82,27 @@ const TaxPreviewWidget: React.FC<TaxPreviewWidgetProps> = ({ items, country, reg
 
   return (
     <WidgetContainer>
-      <h4>{getLocalizedText('Tax Preview')}</h4>
+      <h4>{getLocalizedText("Tax Preview", "refundAutomation")}</h4>
       {loading && <Spin size="small" />}
       {error && <Alert message={error} type="error" />}
       {!loading && !error && (
         <>
           <TaxSummary>
-            <span>{getLocalizedText('Estimated Tax')}:</span>
-            <TotalTax>
-              {totalTax.toFixed(2)} {currency}
-            </TotalTax>
+            <span>{getLocalizedText("Estimated Tax", "refundAutomation")}:</span>
+            <TotalTax>{formatCurrency(totalTax, currency)}</TotalTax>
           </TaxSummary>
           <Collapse>
             {taxBreakdown.map((item, index) => (
               <Panel
-                header={`${getLocalizedText('Category')}: ${item.category}`}
+                header={`${getLocalizedText("Category", "refundAutomation")}: ${item.category}`}
                 key={index}
               >
                 <p>
-                  {getLocalizedText('Tax Rate')}: {item.taxRate}%
+                  {getLocalizedText("Tax Rate", "refundAutomation")}: {item.taxRate}%
                 </p>
                 <p>
-                  {getLocalizedText('Tax Amount')}: {item.taxAmount.toFixed(2)}{' '}
-                  {currency}
+                  {getLocalizedText("Tax Amount", "refundAutomation")}:{" "}
+                  {formatCurrency(item.taxAmount, currency)}
                 </p>
               </Panel>
             ))}

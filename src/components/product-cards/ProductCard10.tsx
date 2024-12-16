@@ -10,30 +10,52 @@ import FlexBox from "../FlexBox";
 import Icon from "../icon/Icon";
 import Modal from "../modal/Modal";
 import ProductIntro from "../products/ProductIntro";
-import { H3, SemiSpan } from "../Typography";
+import { H3, SemiSpan, Small } from "../Typography";
 import { StyledProductCard1 } from "./ProductCardStyle";
+import ViewInSpaceButton from "../buttons/ViewInSpaceButton";
+
 
 export interface ProductCard10Props {
+  id: string | number;
   className?: string;
   style?: CSSProperties;
   imgUrl?: string;
   title?: string;
   price?: number;
+  sellerPrice?: number; // Seller price
+  buyerPrice?: number; // Buyer price
+  sellerCurrency?: string; // Seller currency
+  buyerCurrency?: string; // Buyer currency
   off?: number;
-  rating?: number;
   subcategories?: Array<{
     title: string;
     url: string;
   }>;
+  rating?: number;
+  reviews?: { comment: string; rating: number; user: string }[]; // Localized reviews
+  tryOnAvailable?: boolean; // TryOn availability
+  isArEnabled?: boolean;
+  onChatWithSeller?: () => void; // Chat with seller handler
+  onTryNow?: () => void; // TryOn handler
 }
 
 const ProductCard10: React.FC<ProductCard10Props> = ({
-  imgUrl = "/assets/images/products/macbook.png", // Default image
-  title = "Product Title", // Default title
-  price = 0, // Default price
+  id,
+  imgUrl = "/assets/images/products/macbook.png",
+  title = "Product Title",
+  price = 0,
+  sellerPrice = 0,
+  buyerPrice = 0,
+  sellerCurrency = "USD",
+  buyerCurrency = "USD",
   off,
   subcategories,
-  rating = 0, // Default rating
+  rating = 0,
+  reviews = [],
+  tryOnAvailable = false,
+  isArEnabled = false,
+  onChatWithSeller,
+  onTryNow,
   ...props
 }) => {
   const [cartAmount, setCartAmount] = useState(0);
@@ -108,12 +130,13 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
               </H3>
             </Link>
 
-            <SemiSpan>300ml</SemiSpan>
-
             <FlexBox alignItems="center" mt="6px">
-              <SemiSpan pr="0.5rem" fontWeight="600" color="primary.main">
-                ${discountedPrice}
-              </SemiSpan>
+              <Small pr="0.5rem" fontWeight="600" color="primary.main">
+                {buyerCurrency} {buyerPrice.toFixed(2)}
+              </Small>
+              <Small fontSize="12px" color="text.muted">
+                ({sellerCurrency} {sellerPrice.toFixed(2)})
+              </Small>
               {off && (
                 <SemiSpan color="text.muted" fontWeight="600">
                   <del>${price.toFixed(2)}</del>
@@ -158,14 +181,55 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
             )}
           </FlexBox>
         </FlexBox>
+
+        <FlexBox justifyContent="space-between" mt="1rem">
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={onChatWithSeller}
+          >
+            Chat with Seller
+          </Button>
+          {tryOnAvailable && (
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={onTryNow}
+            >
+              Try Now
+            </Button>
+          )}
+        </FlexBox>
+        {/* View in AR */}
+        <ViewInSpaceButton productId={id} isArEnabled={isArEnabled} />
+
+        {reviews.length > 0 && (
+          <Box mt="1rem">
+            <H3 fontSize="14px" mb="0.5rem">
+              Reviews:
+            </H3>
+            {reviews.slice(0, 2).map((review, index) => (
+              <Small key={index} fontSize="12px" color="text.secondary" mb="0.25rem">
+                {review.user}: {review.comment} ({review.rating}/5)
+              </Small>
+            ))}
+            {reviews.length > 2 && (
+              <Small fontSize="12px" fontWeight="600" color="primary.main">
+                +{reviews.length - 2} more reviews
+              </Small>
+            )}
+          </Box>
+        )}
       </div>
 
       <Modal open={open} onClose={toggleDialog}>
         <Card p="1rem" position="relative">
           <ProductIntro
             product={{
-              id: title, // Assuming title acts as id
-              images: [imgUrl], // Pass imgUrl as an array
+              id: title,
+              images: [imgUrl],
               title,
               price,
               brand: undefined,

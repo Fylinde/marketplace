@@ -1,0 +1,18 @@
+{
+    "cancellationManagement": "Cancellation Management",
+    "selectOrdersToCancel": "Select Orders to Cancel",
+    "provideCancellationReason": "Provide a Cancellation Reason",
+    "reasonPlaceholder": "Enter the reason for cancellation...",
+    "cancelOrders": "Cancel Orders",
+    "ordersCancelledSuccessfully": "Orders were successfully cancelled and refunds were initiated.",
+    "bulkCancellationFailed": "Failed to cancel selected orders. Error: {{error}}",
+    "selectOrdersAndReason": "Please select orders and provide a cancellation reason.",
+    "cancellationInsights": "Cancellation Insights",
+    "auditTrail": "Audit Trail",
+    "auditTrailDescription": "This section provides a history of all cancellations performed.",
+    "loading": "Loading...",
+    "errorFetchingOrders": "An error occurred while fetching orders. Error: {{error}}",
+    "orderId": "Order ID",
+    "status": "Status"
+  }
+  

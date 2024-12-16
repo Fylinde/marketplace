@@ -1,3 +1,4 @@
+import { Address } from "./address";
 
 // Define interfaces for each part of the state
 export interface FileMetadata {
@@ -11,6 +12,16 @@ export interface FileMetadata {
     full_name: string;
     email: string;
     password: string;
+  }
+
+
+  export interface ShippingAddress extends Address { 
+    id?: string;
+    country: string;
+    state: string;
+    city: string;
+    postalCode: string;
+  
   }
   
   export interface CompanyDetails {
@@ -51,9 +62,30 @@ export interface FileMetadata {
     };
   }
   
+
+export interface BillingInformation {
+    id: string; // Unique identifier for each billing entry
+    creditCardNumber: string | null; // Nullable to handle optional fields
+    expiryMonth: string | null; // Nullable to handle missing month
+    expiryYear: string | null; // Nullable to handle missing year
+    cardHolderName: string | null; // Nullable to handle missing name
+    billingStreet: string | null; // Nullable to handle missing street
+    billingCity: string | null; // Nullable to handle missing city
+    billingState: string | null; // Nullable to handle missing state
+    billingPostalCode: string | null; // Nullable to handle missing postal code
+    billingCountry: string | null; // Nullable to handle missing country
+  }
+
+  
   
   // Updated BillingAddress without redundant credit card details
-  export interface BillingAddress {
+  export interface BillingAddress extends Address {
+    id?: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    addressLine1: string;
+    addressLine2?: string;
     street: string;
     city: string;
     state: string;
@@ -61,6 +93,8 @@ export interface FileMetadata {
     country: string;
     phone_number?: string;
   }
+  
+
   
   export interface PaymentDetails {
     cardNumber: string;            // Credit card number as a string
@@ -233,6 +267,7 @@ export interface FileMetadata {
     name: string;
     type: string; // e.g., "Credit Card", "Bank Transfer", "Crypto"
     currency: string; // e.g., "USD", "EUR", "BTC"
+    details: any; 
   }
 
 
@@ -258,4 +293,28 @@ export interface FileMetadata {
   export interface ArchiveResponse {
     success: boolean;
     archivedAt: string;
+  }
+
+
+  export interface EscrowTransaction {
+    id: string;
+    orderId: string;
+    buyerName: string;
+    sellerName: string;
+    amount: number;
+    currency: string;
+    buyerCurrency: string
+    sellerCurrency: string
+    status: "Pending" | "Released" | "Disputed";
+    releaseDate: string;
+    disputeReason?: string;
+    resolutionStatus?: "Unresolved" | "Resolved" | null;
+  }
+
+
+  export interface InventoryItem {
+    id: string;
+    name: string;
+    quantity: number;
+    location: string;
   }

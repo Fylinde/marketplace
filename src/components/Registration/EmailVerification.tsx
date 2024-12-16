@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { setAuthData } from '../../redux/slices/authSlice';
+import { setAuthData } from '../../redux/slices/auth/authSlice';
 import axios from 'axios';
 import './EmailVerification.css';  // Make sure to import the CSS file
 
@@ -40,7 +40,7 @@ const EmailVerification: React.FC = () => {
         try {
             const response = await fetch(`${apiUrl}/auth/verify?code=${verificationCode}&redirect=${autoRedirect}`);
             if (!response.ok) throw new Error('Verification failed');
-            
+
             const data = await response.json();
             const { access_token = '', refresh_token = '' } = data;
 

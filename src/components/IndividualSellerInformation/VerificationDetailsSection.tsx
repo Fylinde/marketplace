@@ -1,5 +1,5 @@
 import React from 'react';
-import { VerificationDetails } from '../../redux/slices/registrationSlice';
+import { VerificationDetails } from '../../types/sharedTypes';
 
 interface VerificationDetailsSectionProps {
   verificationDetails: VerificationDetails;

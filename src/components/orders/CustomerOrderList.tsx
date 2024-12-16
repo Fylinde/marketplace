@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import FlexBox from "../FlexBox";
 import Hidden from "../hidden/Hidden";
 import DashboardPageHeader from "../layout/DashboardPageHeader";
@@ -6,31 +7,48 @@ import Pagination from "../pagination/Pagination";
 import TableRow from "../TableRow";
 import { H5 } from "../Typography";
 import OrderRow from "./OrderRow";
+import { RootState } from "../../redux/store";
+import { fetchOrders, setFilters, setSort } from "../../redux/slices/orders/orderSlice";
+import type { AppDispatch } from "../../redux/store";
 
-export interface CustomerOrderListProps {}
 
-const CustomerOrderList: React.FC<CustomerOrderListProps> = () => {
-  const [orderList, setOrderList] = useState([]);
-  const [pageCount, setPageCount] = useState(5); // Update as needed
+const CustomerOrderList: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    orders,
+    totalPages,
+    currentPage,
+    loading,
+    filters,
+    sort,
+  } = useSelector((state: RootState) => state.orders);
 
-  // Fetch order data on component mount
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await fetch("/api/customer/orders"); // Replace with actual API endpoint
-        const data = await response.json();
-        setOrderList(data.orders);
-        setPageCount(data.pageCount); // Assume response includes page count
-      } catch (error) {
-        console.error("Failed to fetch orders", error);
-      }
-    };
-    fetchOrders();
-  }, []);
+    dispatch(fetchOrders({ page: currentPage, filters, sort }));
+  }, [dispatch, currentPage, filters, sort]);
+
+  const handlePageChange = (page: number) => {
+    dispatch(fetchOrders({ page, filters, sort }));
+  };
+
+  const handleSortChange = (sortOption: "date" | "total" | "customerName") => {
+    dispatch(setSort(sortOption));
+  };
 
   return (
     <div>
       <DashboardPageHeader title="My Orders" iconName="bag_filled" />
+      <p style={{ marginBottom: "1rem", color: "#666" }}>
+        Track your orders, manage refunds, and view order details.
+      </p>
+
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
+        <select onChange={(e) => handleSortChange(e.target.value as "date" | "total" | "customerName")}>
+          <option value="date">Sort by Date</option>
+          <option value="total">Sort by Total</option>
+          <option value="customerName">Sort by Customer Name</option>
+        </select>
+      </div>
 
       <Hidden down={769}>
         <TableRow padding="0px 18px" boxShadow="none" bg="none">
@@ -41,30 +59,41 @@ const CustomerOrderList: React.FC<CustomerOrderListProps> = () => {
             Status
           </H5>
           <H5 color="text.muted" my="0px" mx="6px" textAlign="left">
-            Date purchased
+            Date Purchased
           </H5>
           <H5 color="text.muted" my="0px" mx="6px" textAlign="left">
-            Total
+            Buyer Total
           </H5>
-          <H5
-            flex="0 0 0 !important"
-            color="text.muted"
-            px="22px"
-            my="0px"
-          ></H5>
+          <H5 color="text.muted" my="0px" mx="6px" textAlign="left">
+            Seller Total
+          </H5>
         </TableRow>
       </Hidden>
 
-      {orderList.map((order, ind) => (
-        <OrderRow orderData={order} key={ind} /> // Rename `item` to `orderData`
-      ))}
+      {loading ? (
+        <p>Loading orders...</p>
+      ) : (
+        orders.map((order, index) => (
+          <OrderRow
+            orderData={{
+              id: order.id,
+              status: order.status,
+              createdAt: order.createdAt || "N/A", // Handle missing createdAt
+              buyerCurrency: order.buyerCurrency,
+              totalBuyerPrice: order.totalBuyerPrice,
+              sellerCurrency: order.sellerCurrency,
+              totalSellerPrice: order.totalSellerPrice,
+            }}
+            key={index}
+          />
+        ))
+      )}
 
       <FlexBox justifyContent="center" mt="2.5rem">
         <Pagination
-          pageCount={pageCount}
-          onChange={(data) => {
-            console.log(data.selected);
-          }}
+          pageCount={totalPages}
+          onChange={({ selected }) => handlePageChange(selected + 1)}
+          forcePage={currentPage - 1}
         />
       </FlexBox>
     </div>

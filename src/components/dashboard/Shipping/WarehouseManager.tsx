@@ -1,15 +1,16 @@
-import React from 'react';
-import VendorDashboardLayout from 'components/layout/VendorDashboardLayout';
-import DashboardPageHeader from 'components/layout/DashboardPageHeader';
-import Warehouse from 'components/warehouse/Warehouse';
+import React from "react";
+import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import Warehouse from "../../../components/warehouse/Warehouse";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 
-const WarehouseManagement: React.FC = () => {
+const WarehouseManager: React.FC = () => {
   return (
     <VendorDashboardLayout>
-      <DashboardPageHeader title="Warehouse Management" />
+      <DashboardPageHeader title={getLocalizedText("Warehouse Management", "warehouse")} />
       <Warehouse />
     </VendorDashboardLayout>
   );
 };
 
-export default WarehouseManagement;
+export default WarehouseManager;

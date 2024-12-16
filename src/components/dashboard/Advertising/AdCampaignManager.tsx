@@ -8,6 +8,12 @@ import Pagination from "components/pagination/Pagination";
 import Chart from "components/chart/Chart";
 import { validateString, validateNumeric } from "services/validationService";
 
+
+interface AdCampaignManagerProps {
+  data: any; // Replace `any` with the correct type
+  onUpdate: (updatedData: any) => void; // Replace `any` with the correct type
+}
+
 // Define types for Ad Campaign
 interface AdCampaign {
   id: string;
@@ -21,7 +27,7 @@ interface AdCampaign {
   conversions: number;
 }
 
-const AdCampaignManagement: React.FC = () => {
+const AdCampaignManagement: React.FC<AdCampaignManagerProps> = ({ data, onUpdate }) => {
   const [campaigns, setCampaigns] = useState<AdCampaign[]>([]);
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -181,18 +187,20 @@ const AdCampaignManagement: React.FC = () => {
 
       {/* Analytics Dashboard */}
       <Box mb="30px">
-      <Chart
-        data={campaigns.map((campaign) => ({
-            name: campaign.name,
-            Impressions: campaign.impressions,
-            Clicks: campaign.clicks,
-            Conversions: campaign.conversions,
-        }))}
-        dataKeys={["Impressions", "Clicks", "Conversions"]}
-        title="Performance Overview"
-        />
-
+        {["Impressions", "Clicks", "Conversions"].map((metric) => (
+          <Chart
+            key={metric}
+            data={campaigns.map((campaign) => ({
+              name: campaign.name,
+              value: campaign[metric.toLowerCase() as keyof AdCampaign],
+            }))}
+            dataKeys={{ name: "name", value: "value" }}
+            chartType="table"
+            title={`Campaign ${metric} Overview`}
+          />
+        ))}
       </Box>
+
 
       {/* Search and Filters */}
       <Box display="flex" justifyContent="space-between" mb="20px">

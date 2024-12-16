@@ -1,0 +1,21 @@
+{
+    "bulkOrderProcessing": "Bulk Order Processing",
+    "noOrdersSelected": "No orders selected.",
+    "statusUpdated": "Order statuses updated successfully.",
+    "bulkUpdateFailed": "Bulk update failed. Error: {{error}}",
+    "loading": "Loading...",
+    "errorFetchingOrders": "An error occurred while fetching orders. Error: {{error}}",
+    "filterByStatus": "Filter by Status",
+    "sortBy": "Sort by",
+    "date": "Date",
+    "total": "Total",
+    "customerName": "Customer Name",
+    "pending": "Pending",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "select": "Select",
+    "orderId": "Order ID",
+    "status": "Status",
+    "markAsShipped": "Mark as Shipped"
+  }
+  

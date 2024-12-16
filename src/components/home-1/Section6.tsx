@@ -1,6 +1,7 @@
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "redux/store"; // Adjust based on your project structure
 import LazyImage from "components/LazyImage";
-import productDatabase from "data/product-database";
-import React, { useState } from "react";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
 import Container from "../Container";
@@ -9,59 +10,81 @@ import Grid from "../grid/Grid";
 import Hidden from "../hidden/Hidden";
 import ProductCard1 from "../product-cards/ProductCard1";
 import StyledProductCategory from "./ProductCategoryStyle";
+import { fetchBrands } from "../../redux/slices/products/brandSlice"; // Redux actions for fetching brands and products
+import { fetchProductsByBrand } from "../../redux/slices/products/productSlice";
+import { Brand } from "types/brand";
+import { Product } from "types/Product";
 
 const Section6: React.FC = () => {
-  const [selected, setSelected] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
 
-  const handleCategoryClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const brand = event.currentTarget.id; // Get id from the clicked element
-    if (selected.match(brand)) {
-      setSelected("");
-    } else {
-      setSelected(brand);
+  const {
+    products,
+    loadingProducts,
+  } = useSelector((state: RootState) => state.products);
+  const {
+    brands,
+    loadingBrands,
+    selectedBrand,
+  } = useSelector((state: RootState) => state.brands);
+
+
+  // Fetch brands and products on mount and whenever the selectedBrand changes
+  useEffect(() => {
+    if (!brands.length) {
+      dispatch(fetchBrands());
     }
+    dispatch(fetchProductsByBrand(selectedBrand || "")); // Fallback to an empty string if selectedBrand is null or undefined
+  }, [dispatch, selectedBrand, brands.length]);
+
+
+  // Handle brand/category selection
+  const handleCategoryClick = (brand: Brand) => {
+    dispatch(fetchProductsByBrand(brand.id === selectedBrand ? "" : brand.id));
   };
-  
 
   return (
     <Container mb="80px">
       <FlexBox>
+        {/* Sidebar for brands */}
         <Hidden down={768} mr="1.75rem">
           <Box shadow={6} borderRadius={10} padding="1.25rem" bg="white">
-            {brandList.map((brand: string, ind) => (
-              <StyledProductCategory
-                key={brand}
-                id={brand}
-                mb="0.75rem"
-                bg={selected.match(brand) ? "white" : "gray.100"}
-                shadow={selected.match(brand) ? 4 : undefined} // Replace null with undefined
-                onClick={handleCategoryClick}
-              >
-                <LazyImage
-                  width={20}  // Replace "20px" with number 20
-                  height={20} // Replace "20px" with number 20
-                  style={{
-                    position: "absolute",  // Make the image fill the container
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",  // Ensure it maintains aspect ratio
-                  }}
-
-                  src={`/assets/images/logos/${ind % 2 === 0 ? "v" : "u"}.png`}
-                  alt="apple"
-                />
-                <span className="product-category-title">{brand}</span>
-              </StyledProductCategory>
-            ))}
-
+            {loadingBrands ? (
+              <p>Loading Brands...</p>
+            ) : (
+              brands.map((brand: Brand, ind: number) => (
+                <StyledProductCategory
+                  key={brand.id}
+                  id={brand.id.toString()}
+                  mb="0.75rem"
+                  bg={selectedBrand === brand.id ? "white" : "gray.100"}
+                  shadow={selectedBrand === brand.id ? 4 : undefined}
+                  onClick={() => handleCategoryClick(brand)}
+                >
+                  <LazyImage
+                    width={20}
+                    height={20}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                    }}
+                    src={brand.imgUrl || "/assets/images/default-brand.png"}
+                    alt={brand.name}
+                  />
+                  <span className="product-category-title">{brand.name}</span>
+                </StyledProductCategory>
+              ))
+            )}
             <StyledProductCategory
               id="all"
               mt="4rem"
-              bg={selected.match("all") ? "white" : "gray.100"}
-              shadow={selected.match("all") ? 4 : undefined} // Replace null with undefined
-              onClick={handleCategoryClick}
+              bg={selectedBrand === "" ? "white" : "gray.100"}
+              shadow={selectedBrand === "" ? 4 : undefined}
+              onClick={() => handleCategoryClick({ id: "", name: "All Brands", imgUrl: "" } as Brand)}
             >
               <span id="all" className="product-category-title show-all">
                 View All Brands
@@ -70,21 +93,36 @@ const Section6: React.FC = () => {
           </Box>
         </Hidden>
 
+        {/* Product Grid */}
         <Box flex="1 1 0" minWidth="0px">
           <CategorySectionHeader title="Cars" seeMoreLink="#" />
-          <Grid container spacing={6}>
-            {productDatabase.slice(0, 6).map((item, ind) => (
-              <Grid item lg={4} sm={6} xs={12} key={ind}>
-                <ProductCard1 hoverEffect {...item} />
-              </Grid>
-            ))}
-          </Grid>
+          {loadingProducts ? (
+            <p>Loading Products...</p>
+          ) : (
+            <Grid container spacing={6}>
+              {products.slice(0, 6).map((item: Product) => (
+                <Grid item lg={4} sm={6} xs={12} key={item.id}>
+                  <ProductCard1
+                    hoverEffect
+                    id={item.id}
+                    imgUrl={item.imgUrl || "/assets/images/default-product.png"}
+                    title={item.title || "Untitled"}
+                    price={item.price}
+                    sellerPrice={item.sellerPrice}
+                    buyerPrice={item.buyerPrice}
+                    sellerCurrency={item.sellerCurrency}
+                    buyerCurrency={item.buyerCurrency}
+                    rating={typeof item.rating === "number" ? item.rating : undefined}
+                    productUrl={`/product/${item.id}`}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </Box>
       </FlexBox>
     </Container>
   );
 };
-
-const brandList = ["zerrari", "fesla", "btw", "boyota", "gini", "lord"];
 
 export default Section6;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../../redux/slices/authSlice';
+import { login } from '../../redux/slices/auth/authSlice';
 import { AppDispatch } from '../../redux/store';
 import './SignInForm.css';
 

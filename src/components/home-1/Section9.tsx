@@ -1,6 +1,6 @@
-import LazyImage from "components/LazyImage";
-import productDatabase from "data/product-database";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import LazyImage from "components/LazyImage";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
 import Container from "../Container";
@@ -10,26 +10,46 @@ import Hidden from "../hidden/Hidden";
 import ProductCard1 from "../product-cards/ProductCard1";
 import Typography from "../Typography";
 import StyledProductCategory from "./ProductCategoryStyle";
+import { fetchShops, fetchProductsByType } from "../../redux/slices/products/productSlice";
+import { RootState, AppDispatch } from "redux/store"; // Adjust path based on your project structure
+import { fetchBrands } from "../../redux/slices/products/brandSlice";
+import { Shop } from "types/shop";
+import { Brand } from "types/brand";
 
 const Section9: React.FC = () => {
-  const [type, setType] = useState("shops");
-  const [selected, setSelected] = useState("");
-  const [list, setList] = useState<string[]>([]); // Explicitly typed as string[]
+  const dispatch = useDispatch<AppDispatch>();
+  const { shops, products, loadingShops, loadingProducts } = useSelector(
+    (state: RootState) => state.products
+  );
+  const { brands, loadingBrands } = useSelector(
+    (state: RootState) => state.brands
+  );
 
-  const handleCategoryClick = (brand: string) => { // Typing brand as string
-    if (selected.match(brand)) {
-      setSelected("");
-    } else setSelected(brand);
+  const [type, setType] = useState<"brands" | "shops">("shops");
+  const [selected, setSelected] = useState<string>("");
+
+  // Determine the current list dynamically
+  const currentList = type === "brands" ? brands : shops;
+
+  // Handle category selection
+  const handleCategoryClick = (item: string) => {
+    setSelected(selected === item ? "" : item);
   };
 
+  // Fetch brands, shops, and products dynamically based on type and selection
   useEffect(() => {
-    if (type === "brands") setList(brandList);
-    else setList(shopList);
-  }, [type]);
+    if (type === "brands" && !brands.length) {
+      dispatch(fetchBrands());
+    } else if (type === "shops" && !shops.length) {
+      dispatch(fetchShops());
+    }
+    dispatch(fetchProductsByType({ type, filter: selected }));
+  }, [type, selected, dispatch, brands.length, shops.length]);
 
   return (
     <Container mb="70px">
       <FlexBox>
+        {/* Sidebar for brands/shops */}
         <Hidden down={768} mr="1.75rem">
           <Box shadow={6} borderRadius={10} padding="1.25rem" bg="white">
             <FlexBox mt="-0.5rem" mb="0.5rem">
@@ -64,38 +84,41 @@ const Section9: React.FC = () => {
               </Typography>
             </FlexBox>
 
-            {list.map((brand, ind) => (
-              <StyledProductCategory
-                key={brand}
-                mb="0.75rem"
-                bg={selected.match(brand) ? "white" : "gray.100"}
-                shadow={selected.match(brand) ? 4 : undefined} // Fix for shadow type
-                onClick={() => handleCategoryClick(brand)}
-              >
-                <LazyImage
-                  height={20} // Fix for LazyImage height type
-                  width={20}  // Fix for LazyImage width type
-                  src={`/assets/images/logos/${ind % 2 === 0 ? "v" : "u"}.png`}
-                  style={{
-                    position: "absolute",  // Make the image fill the container
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",  // Ensure it maintains aspect ratio
-                  }}
-
-                  alt={brand}
-                />
-                <span className="product-category-title">{brand}</span>
-              </StyledProductCategory>
-            ))}
+            {(loadingBrands || loadingShops) ? (
+              <p>Loading {type}...</p>
+            ) : (
+              currentList.map((item: Brand | Shop, ind: number) => (
+                <StyledProductCategory
+                  key={item.id} // Use unique `id`
+                  mb="0.75rem"
+                  bg={selected === item.id ? "white" : "gray.100"}
+                  shadow={selected === item.id ? 4 : undefined}
+                  onClick={() => handleCategoryClick(item.id)}
+                >
+                  <LazyImage
+                    height={20}
+                    width={20}
+                    src={`/assets/images/logos/${ind % 2 === 0 ? "v" : "u"}.png`}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                    }}
+                    alt={item.name}
+                  />
+                  <span className="product-category-title">{item.name}</span>
+                </StyledProductCategory>
+              ))
+            )}
 
             <StyledProductCategory
               mt="4rem"
-              bg={selected.match(`all-${type}`) ? "white" : "gray.100"}
-              shadow={selected.match(`all-${type}`) ? 4 : undefined}
-              onClick={() => handleCategoryClick(`all-${type}`)}
+              bg={selected === `all-${type}` ? "white" : "gray.100"}
+              shadow={selected === `all-${type}` ? 4 : undefined}
+              onClick={() => setSelected("")}
             >
               <span className="product-category-title show-all">
                 View All {type}
@@ -104,23 +127,34 @@ const Section9: React.FC = () => {
           </Box>
         </Hidden>
 
+        {/* Product Grid */}
         <Box flex="1 1 0" minWidth="0px">
           <CategorySectionHeader title="Optics / Watch" seeMoreLink="#" />
-
-          <Grid container spacing={6}>
-            {productDatabase.slice(95, 104).map((item, ind) => (
-          <Grid item lg={4} sm={6} xs={12} key={ind}>
-            <ProductCard1 hoverEffect {...item} /> {/* No need to pass price={23} */}
-          </Grid>
-        ))}
-          </Grid>
+          {loadingProducts ? (
+            <p>Loading Products...</p>
+          ) : (
+            <Grid container spacing={6}>
+              {products.map((item, ind) => (
+                <Grid item lg={4} sm={6} xs={12} key={item.id || ind}>
+                  <ProductCard1
+                    hoverEffect
+                    id={item.id}
+                    imgUrl={item.imgUrl || "/assets/images/default-product.png"}
+                    title={item.title || "No Title Available"}
+                    price={item.price ?? 0}
+                    sellerPrice={item.sellerPrice}
+                    buyerPrice={item.buyerPrice}
+                    sellerCurrency={item.sellerCurrency}
+                    buyerCurrency={item.buyerCurrency}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </Box>
       </FlexBox>
     </Container>
   );
 };
-
-const brandList = ["gray-ban", "keiss", "piccular", "mapple", "saitan"];
-const shopList = ["hexman killer", "peisst", "shatil", "steelcase"];
 
 export default Section9;

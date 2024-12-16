@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveContactDetails, selectCompanyDetails, selectAccountDetails } from '../../redux/slices/registrationSlice';
+import { saveContactDetails, selectCompanyDetails, selectAccountDetails } from '../../redux/slices/auth/registrationSlice';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import './ContactDetailsForm.css';
@@ -56,8 +56,8 @@ const ContactDetailsForm: React.FC<ContactDetailsFormProps> = ({ data, onUpdate,
   const accountDetails = useSelector(selectAccountDetails);
   const companyDetails = useSelector(selectCompanyDetails);
 
-   // Initial values, merging Redux state and new form fields
-   const initialValues: ContactDetails = {
+  // Initial values, merging Redux state and new form fields
+  const initialValues: ContactDetails = {
     ...savedContactDetails,
     firstName: accountDetails.full_name.split(' ')[0] || companyDetails.firstName || '',
     lastName: accountDetails.full_name.split(' ')[1] || companyDetails.lastName || '',
@@ -121,11 +121,11 @@ const ContactDetailsForm: React.FC<ContactDetailsFormProps> = ({ data, onUpdate,
   const handleSubmit = (values: ContactDetails) => {
     // Save form data to Redux
     dispatch(saveContactDetails(values));
-  
+
     // Move to the next step
     onNext();
   };
-  
+
 
   return (
     <Formik

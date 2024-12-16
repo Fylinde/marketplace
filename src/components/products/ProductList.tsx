@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts } from "../../redux/slices/productSlice";
+import { fetchProducts } from "../../redux/slices/products/productSlice";
 import ProductCard1List from "./ProductCard1List";
 import Pagination from "../pagination/Pagination";
 import { RootState } from "../../redux/store"; // Adjust path as needed

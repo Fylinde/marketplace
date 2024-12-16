@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShopDetails } from '../../redux/slices/registrationSlice';
+import { ShopDetails } from '../../types/sharedTypes';
 
 interface ShopDetailsSectionProps {
   shopDetails: ShopDetails;

@@ -1,6 +1,7 @@
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "redux/store"; // Adjust based on your project structure
 import LazyImage from "components/LazyImage";
-import productDatabase from "data/product-database";
-import React, { useEffect, useState } from "react";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
 import Container from "../Container";
@@ -10,28 +11,38 @@ import Hidden from "../hidden/Hidden";
 import ProductCard1 from "../product-cards/ProductCard1";
 import Typography from "../Typography";
 import StyledProductCategory from "./ProductCategoryStyle";
-import { Product } from "types/Product";
+import { fetchShops } from "../../redux/slices/products/productSlice"; // Redux actions
+import { fetchBrands } from "../../redux/slices/products/brandSlice";
+import { fetchProductsByCategory } from "../../redux/slices/products/productSlice";
+import { Brand } from "../../types/brand"; // Adjust the path based on your project
+import { Shop } from "../../types/shop";
 
 const Section7: React.FC = () => {
-  const [type, setType] = useState<"brands" | "shops">("brands");
-  const [selected, setSelected] = useState("");
-  const [list, setList] = useState<string[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    brands,
+    shops,
+    products,
+    selectedCategory,
+    categoryType,
+    loadingCategories,
+    loadingProducts,
+  } = useSelector((state: RootState) => state.products);
 
-  const handleCategoryClick = (brand: string) => {
-    if (selected.match(brand)) {
-      setSelected("");
-    } else {
-      setSelected(brand);
-    }
-  };
-
+  // Fetch categories (brands or shops) and products on component mount or when selectedCategory changes
   useEffect(() => {
-    setList(type === "brands" ? brandList : shopList);
-  }, [type]);
+    if (categoryType === "brands" && !brands.length) {
+      dispatch(fetchBrands());
+    } else if (categoryType === "shops" && !shops.length) {
+      dispatch(fetchShops());
+    }
+    dispatch(fetchProductsByCategory({ categoryType, category: selectedCategory }));
+  }, [dispatch, categoryType, selectedCategory, brands.length, shops.length]);
 
   return (
     <Container mb="70px">
       <FlexBox>
+        {/* Sidebar for Brands/Shops */}
         <Hidden down={768} mr="1.75rem">
           <Box shadow={6} borderRadius={10} padding="1.25rem" bg="white">
             <FlexBox mt="-0.5rem" mb="0.5rem">
@@ -40,8 +51,8 @@ const Section7: React.FC = () => {
                 fontSize="20px"
                 padding="0.5rem 1rem"
                 style={{ cursor: "pointer" }}
-                color={type === "brands" ? "gray.900" : "gray.600"}
-                onClick={() => setType("brands")}
+                color={categoryType === "brands" ? "gray.900" : "gray.600"}
+                onClick={() => dispatch(fetchProductsByCategory({ categoryType: "brands", category: "" }))}
               >
                 Brands
               </Typography>
@@ -58,76 +69,91 @@ const Section7: React.FC = () => {
                 fontWeight="600"
                 fontSize="20px"
                 padding="0.5rem 1rem"
-                color={type === "shops" ? "gray.900" : "gray.600"}
+                color={categoryType === "shops" ? "gray.900" : "gray.600"}
                 style={{ cursor: "pointer" }}
-                onClick={() => setType("shops")}
+                onClick={() => dispatch(fetchProductsByCategory({ categoryType: "shops", category: "" }))}
               >
                 Shops
               </Typography>
             </FlexBox>
 
-            {list.map((brand, ind) => (
-              <StyledProductCategory
-                key={brand}
-                mb="0.75rem"
-                bg={selected.match(brand) ? "white" : "gray.100"}
-                shadow={selected.match(brand) ? 4 : undefined}
-                onClick={() => handleCategoryClick(brand)}
-              >
-                <LazyImage
-                  height={20}
-                  width={20}
-                  alt={brand}
-                  src={`/assets/images/logos/${ind % 2 === 0 ? "v" : "u"}.png`}
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                  }}
-                />
-                <span className="product-category-title">{brand}</span>
-              </StyledProductCategory>
-            ))}
-
-            <StyledProductCategory
-              mt="4rem"
-              bg={selected.match(`all-${type}`) ? "white" : "gray.100"}
-              shadow={selected.match(`all-${type}`) ? 4 : undefined}
-              onClick={() => handleCategoryClick(`all-${type}`)}
-            >
-              <span className="product-category-title show-all">
-                View All {type}
-              </span>
-            </StyledProductCategory>
+            {loadingCategories ? (
+              <p>Loading {categoryType}...</p>
+            ) : (
+              <>
+                {(categoryType === "brands" ? brands : shops).map((item: Brand | Shop, ind: number) => (
+                  <StyledProductCategory
+                    key={item.id}
+                    mb="0.75rem"
+                    bg={selectedCategory === item.name ? "white" : "gray.100"}
+                    shadow={selectedCategory === item.name ? 4 : undefined}
+                    onClick={() =>
+                      dispatch(
+                        fetchProductsByCategory({
+                          categoryType,
+                          category: selectedCategory === item.name ? "" : item.name,
+                        })
+                      )
+                    }
+                  >
+                    <LazyImage
+                      height={20}
+                      width={20}
+                      alt={item.name}
+                      src={`/assets/images/logos/${ind % 2 === 0 ? "v" : "u"}.png`}
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                      }}
+                    />
+                    <span className="product-category-title">{item.name}</span>
+                  </StyledProductCategory>
+                ))}
+                <StyledProductCategory
+                  mt="4rem"
+                  bg={selectedCategory === "" ? "white" : "gray.100"}
+                  shadow={selectedCategory === "" ? 4 : undefined}
+                  onClick={() => dispatch(fetchProductsByCategory({ categoryType, category: "" }))}
+                >
+                  <span className="product-category-title show-all">View All {categoryType}</span>
+                </StyledProductCategory>
+              </>
+            )}
           </Box>
         </Hidden>
 
+        {/* Product Grid */}
         <Box flex="1 1 0" minWidth="0px">
           <CategorySectionHeader title="Mobile Phones" seeMoreLink="#" />
-
-          <Grid container spacing={6}>
-            {productDatabase.slice(81, 90).map((item: Product, ind: number) => (
-              <Grid item lg={4} sm={6} xs={12} key={item.id || ind}>
-                <ProductCard1
-                  hoverEffect
-                  id={item.id}
-                  imgUrl={item.imgUrl || "/assets/images/default-product.png"}
-                  title={item.title || "No Title Available"}
-                  price={item.price ?? 0}
-                />
-              </Grid>
-            ))}
-          </Grid>
+          {loadingProducts ? (
+            <p>Loading Products...</p>
+          ) : (
+            <Grid container spacing={6}>
+              {products.slice(0, 9).map((item) => (
+                <Grid item lg={4} sm={6} xs={12} key={item.id}>
+                  <ProductCard1
+                    hoverEffect
+                    id={item.id}
+                    imgUrl={item.imgUrl || "/assets/images/default-product.png"}
+                    title={item.title || "No Title Available"}
+                    price={item.price || 0}
+                    sellerPrice={item.sellerPrice || 0}
+                    buyerPrice={item.buyerPrice || 0}
+                    sellerCurrency={item.sellerCurrency || "USD"}
+                    buyerCurrency={item.buyerCurrency || "USD"}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </Box>
       </FlexBox>
     </Container>
   );
 };
-
-const brandList = ["mapple", "kell", "siaomi", "kasus", "sunny", "aver"];
-const shopList = ["hexman killer", "onoti", "shahil", "steelcase"];
 
 export default Section7;

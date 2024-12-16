@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { fetchOrderDetails, requestRefund } from 'redux/slices/orderSlice';
-import { updateOrderStatus } from 'redux/slices/orderSlice';
-import selectOrder from "redux/slices/orderSlice";
-import { getLocalizedText, formatCurrency } from '@/components/utils/localizationUtils';
-import { useAppDispatch, useAppSelector } from '@/redux/slices/reduxHooks';
-import Loader from '@/components/loader/Loader';
-import ErrorNotification from '@/components/errorNotification/ErrorNotification';
-import SuccessNotification from '@/components/successNotification/SuccessNotification';
-import  refundPayment  from '@/redux/slices/paymentSlice';
-import { RootState } from '@/redux/store';
-
+import React, { useState, useEffect } from "react";
+import {
+  fetchOrderDetails,
+  requestRefund,
+  updateOrderStatus,
+  selectOrderById,
+} from "../../../redux/slices/orders/orderSlice";
+import { refundPaymentThunk } from "../../../redux/slices/orders/paymentSlice";
+import { getLocalizedText, formatCurrency } from "../../../utils/localizationUtils";
+import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
+import Loader from "../../../components/loader/Loader";
+import ErrorNotification from "../../../components/errorNotification/ErrorNotification";
+import SuccessNotification from "../../../components/successNotification/SuccessNotification";
+import { RootState } from "../../../redux/store";
 
 interface ReturnAndRefundProps {
   orderId: string;
@@ -17,9 +19,8 @@ interface ReturnAndRefundProps {
 
 const ReturnAndRefund: React.FC<ReturnAndRefundProps> = ({ orderId }) => {
   const dispatch = useAppDispatch();
-  const order = useAppSelector((state) => selectOrderById(state, orderId));
+  const order = useAppSelector((state: RootState) => selectOrderById(state, orderId));
 
-  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -29,8 +30,7 @@ const ReturnAndRefund: React.FC<ReturnAndRefundProps> = ({ orderId }) => {
       try {
         if (!order) {
           setLoading(true);
-          const data = await dispatch(fetchOrderDetails(orderId)).unwrap();
-          dispatch(updateOrderStatus(data));
+          await dispatch(fetchOrderDetails(orderId)).unwrap();
         }
       } catch (err) {
         console.error("Error fetching order:", err);
@@ -39,10 +39,8 @@ const ReturnAndRefund: React.FC<ReturnAndRefundProps> = ({ orderId }) => {
         setLoading(false);
       }
     };
-  
     fetchOrder();
   }, [orderId, order, dispatch]);
-  
 
   const handleRefundRequest = async () => {
     if (!order) {
@@ -54,23 +52,31 @@ const ReturnAndRefund: React.FC<ReturnAndRefundProps> = ({ orderId }) => {
     setError(null);
 
     try {
-      const refundResponse = await dispatch(
-        refundPayment({
-          paymentId: order.paymentId,
-          currency: order.currency,
-        })
+      // Step 1: Record the refund request
+      const refundRequestResponse = await dispatch(
+        requestRefund({ orderId, reason: "Customer requested refund" })
       ).unwrap();
 
-      if (refundResponse.success) {
-        dispatch(updateOrderStatus({ orderId, status: "Refunded" }));
-        setSuccess(getLocalizedText("refundSuccessful", "refundAutomation"));
-      } else {
-        setError(
-          getLocalizedText("refundFailed", "refundAutomation", {
-            reason: refundResponse.reason || "unknown",
+      // Step 2: Trigger refund payment
+      const paymentResponse = await dispatch(
+        refundPaymentThunk({ paymentId: order.paymentId, currency: order.currency })
+      ).unwrap();
+
+      if (paymentResponse.success) {
+        // Step 3: Update order status to "Refunded"
+        await dispatch(updateOrderStatus({ orderId, status: "Refunded" })).unwrap();
+
+        setSuccess(
+          getLocalizedText("refundSuccessful", "refundAutomation", {
+            message: refundRequestResponse.message,
           })
         );
+      } else {
+        setError(
+          getLocalizedText("refundFailed", "refundAutomation", { reason: paymentResponse.message || "unknown" })
+        );
       }
+
     } catch (err) {
       setError(getLocalizedText("refundError", "refundAutomation"));
     } finally {
@@ -96,14 +102,18 @@ const ReturnAndRefund: React.FC<ReturnAndRefundProps> = ({ orderId }) => {
             {getLocalizedText(order.paymentType, "refundAutomation")}
           </p>
           <p>
-            <strong>{getLocalizedText("orderAmount", "refundAutomation")}: </strong>
-            {formatCurrency(order.amount, order.currency)}
+            <strong>{getLocalizedText("buyerPrice", "refundAutomation")}: </strong>
+            {formatCurrency(order.totalBuyerPrice || 0, order.buyerCurrency)}
+          </p>
+          <p>
+            <strong>{getLocalizedText("sellerPrice", "refundAutomation")}: </strong>
+            {formatCurrency(order.totalSellerPrice || 0, order.sellerCurrency)}
           </p>
           <p>
             <strong>{getLocalizedText("orderStatus", "refundAutomation")}: </strong>
             {getLocalizedText(order.status, "refundAutomation")}
           </p>
-          {order.status === "Completed" && (
+          {order.status === "Completed" ? (
             <button
               className="refund-button"
               onClick={handleRefundRequest}
@@ -111,10 +121,9 @@ const ReturnAndRefund: React.FC<ReturnAndRefundProps> = ({ orderId }) => {
             >
               {getLocalizedText("requestRefund", "refundAutomation")}
             </button>
-          )}
-          {order.status === "Refunded" && (
+          ) : order.status === "Refunded" ? (
             <p>{getLocalizedText("refundProcessed", "refundAutomation")}</p>
-          )}
+          ) : null}
         </div>
       ) : (
         <p>{getLocalizedText("orderNotAvailable", "refundAutomation")}</p>

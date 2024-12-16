@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveVerificationDetails, selectVerificationDetails } from '../../redux/slices/registrationSlice';
+import { saveVerificationDetails, selectVerificationDetails } from '../../redux/slices/auth/registrationSlice';
 import { useNavigate } from 'react-router-dom';
 import ProgressIndicator from './ProgressIndicator';
 import _ from 'lodash';

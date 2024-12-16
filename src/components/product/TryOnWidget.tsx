@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTryOnData } from "@/redux/slices/productSlice";
+import { fetchTryOnData } from "@/redux/slices/products/productSlice";
 import { RootState } from "@/redux/store";
-import type { AppDispatch } from "../../redux/store"; 
+import type { AppDispatch } from "../../redux/store";
 import ProductTryOnContainer from "./styles/ProductTryOn.styles";
 
 
@@ -12,7 +12,7 @@ const ProductTryOn: React.FC<{ productId: string }> = ({ productId }) => {
 
   useEffect(() => {
     dispatch(fetchTryOnData(productId));
-  }, [dispatch  , productId]);
+  }, [dispatch, productId]);
 
   const tryOn = tryOnData[productId];
 

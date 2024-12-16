@@ -1,5 +1,5 @@
 import React from "react";
-import { useAppSelector } from "../redux/reduxHooks";
+import { useAppSelector } from "@/redux/reduxHooks";
 import Box from "components/Box";
 
 const AnalyticsDashboard: React.FC = () => {

@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; 
+import { useNavigate, useLocation } from "react-router-dom";
 import Container from "../Container";
 import Box from "../Box";
 import Grid from "../grid/Grid";
 import Navbar from "../navbar/Navbar";
 import Stepper from "../stepper/Stepper";
+import LinearProgress from "../progressbar/LinearProgress";
 import AppLayout from "./AppLayout";
 
-// Define Step type (replace this with the actual structure of Step in your code)
-interface Step {
+// Base Step type for Stepper
+interface BaseStep {
   title: string;
   disabled: boolean;
+}
+
+// Extended Step type for CheckoutNavLayout
+interface Step extends BaseStep {
+  path: string; // Specific to CheckoutNavLayout
 }
 
 interface CheckoutNavLayoutProps {
@@ -19,85 +25,67 @@ interface CheckoutNavLayoutProps {
 
 const CheckoutNavLayout: React.FC<CheckoutNavLayoutProps> = ({ children }) => {
   const [selectedStep, setSelectedStep] = useState(0);
-
-  const navigate = useNavigate(); 
-  const location = useLocation(); 
+  const navigate = useNavigate();
+  const location = useLocation();
   const { pathname } = location;
 
-  // Type '_step' as 'Step'
-  const handleStepChange = (step: Step, ind: number) => {
-    switch (ind) {
-      case 0:
-        navigate("/cart");
-        break;
-      case 1:
-        navigate("/checkout");
-        break;
-      case 2:
-        navigate("/payment");
-        break;
-      case 3:
-        navigate("/orders");
-        break;
-      default:
-        break;
-    }
+  // Define the Stepper list with paths
+  const stepperList: Step[] = [
+    { title: "Cart", disabled: false, path: "/cart" },
+    { title: "Details", disabled: false, path: "/checkout" },
+    { title: "Payment", disabled: false, path: "/payment" },
+    { title: "Review", disabled: true, path: "/orders" },
+  ];
+
+  // Update selected step based on the current pathname
+  useEffect(() => {
+    const stepIndex = stepperList.findIndex((step) => step.path === pathname);
+    setSelectedStep(stepIndex >= 0 ? stepIndex : 0);
+  }, [pathname, stepperList]);
+
+  // Handle navigation when a step is clicked
+  const handleStepChange = (step: BaseStep, index: number) => {
+    const targetStep = stepperList[index];
+    if (!targetStep.disabled) navigate(targetStep.path);
   };
 
-  useEffect(() => {
-    switch (pathname) {
-      case "/cart":
-        setSelectedStep(1);
-        break;
-      case "/checkout":
-        setSelectedStep(2);
-        break;
-      case "/payment":
-        setSelectedStep(3);
-        break;
-      default:
-        break;
-    }
-  }, [pathname]);
+  // Calculate progress percentage based on selected step
+  const progressPercentage = ((selectedStep + 1) / stepperList.length) * 100;
 
   return (
     <AppLayout navbar={<Navbar />}>
       <Container my="2rem">
-        <Box mb="14px">
+        {/* Progress Indicator */}
+        <Box mb="2rem">
+          <LinearProgress
+            value={progressPercentage} // Dynamic progress percentage
+            label={`Step ${selectedStep + 1} of ${stepperList.length}`}
+            color="primary"
+            thickness={8}
+          />
+        </Box>
+
+        {/* Stepper Component */}
+        <Box mb="2rem">
           <Grid container spacing={6}>
             <Grid item lg={8} md={8} xs={12}>
               <Stepper
-                stepperList={stepperList}
+                stepperList={stepperList.map(({ title, disabled }) => ({
+                  title,
+                  disabled,
+                }))}
                 selectedStep={selectedStep}
-                onChange={handleStepChange}  
+                onChange={handleStepChange} // Handle step changes
               />
             </Grid>
           </Grid>
         </Box>
+
+        {/* Content Area */}
         {children}
       </Container>
     </AppLayout>
   );
 };
-
-// Define the Stepper list
-const stepperList: Step[] = [
-  {
-    title: "Cart",
-    disabled: false,
-  },
-  {
-    title: "Details",
-    disabled: false,
-  },
-  {
-    title: "Payment",
-    disabled: false,
-  },
-  {
-    title: "Review",
-    disabled: true,
-  },
-];
 
 export default CheckoutNavLayout;

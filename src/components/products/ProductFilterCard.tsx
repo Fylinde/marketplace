@@ -11,9 +11,11 @@ import FlexBox from "../FlexBox";
 import Rating from "../rating/Rating";
 import TextField from "../text-field/TextField";
 import { H5, H6, Paragraph, SemiSpan } from "../Typography";
-import { fetchCategories, fetchBrands, fetchColors } from "../../redux/slices/productSlice";
+import { fetchColors } from "../../redux/slices/products/productSlice";
+import { fetchBrands } from "../../redux/slices/products/brandSlice";
+import { fetchCategories } from "../../redux/slices/products/categorySlice";
 import { RootState } from "../../redux/store";
-import { updateFilters, toggleOption, resetFilters } from "../../redux/slices/filterSlice"; // Actions for filters
+import { updateFilters, toggleOption, resetFilters } from "../../redux/slices/support/filterSlice"; // Actions for filters
 import type { AppDispatch } from "../../redux/store";
 
 interface Category {
@@ -133,17 +135,18 @@ const ProductFilterCard = () => {
 
       {/* Brands */}
       <H6 mb="16px">Brands</H6>
-      {brands.map((item: Brand) => (
+      {brands.map((item: { id: string; name: string }) => (
         <CheckBox
-          key={item}
-          name={item}
-          value={item}
+          key={item.id} // Use the `id` as the unique key
+          name={item.name} // Display the name of the brand
+          value={item.id} // Pass the `id` as the value for filtering
           color="secondary"
-          label={<SemiSpan color="inherit">{item}</SemiSpan>}
+          label={<SemiSpan color="inherit">{item.name}</SemiSpan>} // Show the brand name
           my="10px"
-          onChange={() => handleFilterUpdate("brand", item)}
+          onChange={() => handleFilterUpdate("brand", item.id)} // Use the `id` for filtering
         />
       ))}
+
 
       <Divider my="24px" />
 

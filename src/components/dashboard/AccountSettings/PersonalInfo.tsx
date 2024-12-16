@@ -5,8 +5,8 @@ import CircularProgress from 'components/CircularProgress';
 import Box from 'components/Box';
 import Grid from 'components/grid/Grid';
 import Button from 'components/buttons/Button';
-import { useAppDispatch, useAppSelector } from '../../../redux/slices/reduxHooks';
-import { fetchAccountInfo, updateAccountInfo } from '../../../redux/slices/accountSlice';
+import { useAppDispatch, useAppSelector } from '../../../redux/reduxHooks';
+import { fetchAccountInfo, updateAccountInfo } from '../../../redux/slices/auth/accountSlice';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 

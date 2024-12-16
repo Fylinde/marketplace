@@ -7,16 +7,16 @@ import {
   startCall,
   endCall,
   setTypingStatus,
-} from "@/redux/slices/chatSlice";
-import { RootState, AppDispatch } from "@/redux/store";
+} from "../../redux/slices/communication/chatSlice";
+import { RootState, AppDispatch } from "../../redux/store";
 
 const SellerChat: React.FC<{ chatId: string }> = ({ chatId }) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const [message, setMessage] = useState("");
-    const [isTyping, setIsTyping] = useState(false);
-    const [isCalling, setIsCalling] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
-    const [isCameraOn, setIsCameraOn] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
+  const [message, setMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [isCalling, setIsCalling] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isCameraOn, setIsCameraOn] = useState(true);
 
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -28,10 +28,10 @@ const SellerChat: React.FC<{ chatId: string }> = ({ chatId }) => {
   useEffect(() => {
     dispatch(fetchMessages(chatId));
   }, [dispatch, chatId]);
-    
- 
- // Handle typing detection
- const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+
+  // Handle typing detection
+  const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
 
     // If not already typing, set typing status
@@ -62,7 +62,7 @@ const SellerChat: React.FC<{ chatId: string }> = ({ chatId }) => {
 
   const handleStartCall = async () => {
     try {
-      dispatch(startCall({ chatId, participants: ["buyer", "seller"] }));
+      dispatch(startCall({ participants: ["buyer", "seller"] }));
       setIsCalling(true);
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -133,14 +133,14 @@ const SellerChat: React.FC<{ chatId: string }> = ({ chatId }) => {
 
   return (
     <ChatContainer>
-       <MessageList>
+      <MessageList>
         {messages[chatId]?.map((msg: { senderId: string; content: string }, idx: number) => (
           <MessageBubble key={idx} isOwn={msg.senderId === "buyer"}>
             {msg.content}
           </MessageBubble>
         ))}
-          </MessageList>
-          {typingStatus[chatId] && <TypingIndicator>Seller is typing...</TypingIndicator>}
+      </MessageList>
+      {typingStatus[chatId] && <TypingIndicator>Seller is typing...</TypingIndicator>}
 
 
       {isCalling && (
@@ -158,20 +158,20 @@ const SellerChat: React.FC<{ chatId: string }> = ({ chatId }) => {
       <ChatInputContainer>
         <ChatInput
           value={message}
-          onChange={handleTyping} 
+          onChange={handleTyping}
           placeholder="Type a message..."
         />
         <SendButton onClick={handleSendMessage}>Send</SendButton>
-          </ChatInputContainer>
-          {!isCalling && (
-              <CallControls>
-                  {callStatus === "in-progress" ? (
-                      <EndCallButton onClick={handleEndCall}>End Call</EndCallButton>
-                  ) : (
-                      <StartCallButton onClick={handleStartCall}>Start Call</StartCallButton>
-                  )}
-              </CallControls>
+      </ChatInputContainer>
+      {!isCalling && (
+        <CallControls>
+          {callStatus === "in-progress" ? (
+            <EndCallButton onClick={handleEndCall}>End Call</EndCallButton>
+          ) : (
+            <StartCallButton onClick={handleStartCall}>Start Call</StartCallButton>
           )}
+        </CallControls>
+      )}
     </ChatContainer>
   );
 };

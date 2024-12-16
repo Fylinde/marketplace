@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, Button } from 'antd';
 import warehouseService from '../../services/warehouseService';
-import { getLocalizedText } from '../utils/localizationUtils';
+import { getLocalizedText } from '../../utils/localizationUtils';
 
 interface WarehouseFormProps {
   initialValues?: { id?: string; name: string; location: string };
@@ -32,22 +32,22 @@ const WarehouseForm: React.FC<WarehouseFormProps> = ({ initialValues, onFinish }
       onFinish={handleSubmit}
     >
       <Form.Item
-        label={getLocalizedText('Warehouse Name')}
+        label={getLocalizedText('Warehouse Name', 'returnAndRefund')}
         name="name"
-        rules={[{ required: true, message: getLocalizedText('Warehouse name is required') }]}
+        rules={[{ required: true, message: getLocalizedText('Warehouse name is required', 'returnAndRefund') }]}
       >
         <Input />
       </Form.Item>
       <Form.Item
-        label={getLocalizedText('Location')}
+        label={getLocalizedText('Location', 'returnAndRefund')}
         name="location"
-        rules={[{ required: true, message: getLocalizedText('Location is required') }]}
+        rules={[{ required: true, message: getLocalizedText('Location is required', 'returnAndRefund') }]}
       >
         <Input />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit">
-          {getLocalizedText('Save')}
+          {getLocalizedText('Save', 'returnAndRefund')}
         </Button>
       </Form.Item>
     </Form>

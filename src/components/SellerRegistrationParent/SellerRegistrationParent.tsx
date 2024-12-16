@@ -1,4 +1,4 @@
-import React, { useEffect, useState  } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
@@ -15,7 +15,7 @@ import {
   saveCompanyInformation,
   saveSellerInformation,
   saveStoreInformation,
-  saveBillingAddress, 
+  saveBillingAddress,
   setSellerType,
   saveIdentityVerification,
   saveBankAccountVerification,
@@ -29,7 +29,7 @@ import {
   updateContactPersonVerification,
   uploadDocument,
 
-} from '../../redux/slices/registrationSlice';
+} from '../../redux/slices/auth/registrationSlice';
 
 import SellerRegistrationLayout from 'components/layout/SellerRegistrationLayout';
 import CreateSellerAccount from '../Registration/CreateSellerAccount';
@@ -46,7 +46,7 @@ import StoreInformationForm from '../Registration/CompanyForms/StoreInformationF
 import BillingInformationForm from '../Registration/CompanyForms/BillingInformationForm';
 import ReviewAndSubmit from '../Registration/ReviewAndSubmit';
 import TypeSelectionForm from '../Registration/TypeSelectionForm';
-import { BusinessInformation, CompanyInformation, SellerInformation, StoreInformation } from '../../redux/slices/registrationSlice';
+import { BusinessInformation, CompanyInformation, SellerInformation, StoreInformation } from '../../types/sharedTypes';
 import SellerVerificationForm from '../Registration/CompanyForms/SellerVerificationForm';
 import IdentityVerification from '../Registration/CompanyForms/IdentityVerification';
 import BankAccountVerification from '../Registration/CompanyForms/BankAccountVerification';
@@ -56,7 +56,7 @@ import Acknowledgment from '../Registration/CompanyForms/Acknowledgment';
 import { useParams } from 'react-router-dom';
 import ContactPersonVerificationForm from '../Registration/CompanyForms/ContactPersonVerificationForm';
 import DocumentUploadManager from '../Registration/CompanyForms/DocumentUploadManager';
-import { FileMetadata as FileMetadataFromRegistration } from '../../redux/slices/registrationSlice';
+import { FileMetadata as FileMetadataFromRegistration } from '../../types/sharedTypes';
 import { FileMetadata as FileMetadataFromTypes } from '../../types/file-metadata';
 
 // Define DocumentUpload interface separately to avoid name conflicts
@@ -64,7 +64,7 @@ import { FileMetadata as FileMetadataFromTypes } from '../../types/file-metadata
 
 const SellerRegistrationParent: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>(); 
+  const dispatch = useDispatch<AppDispatch>();
 
   // Access data from Redux
   const sellerType = useSelector((state: RootState) => state.registration.sellerType);
@@ -85,10 +85,10 @@ const SellerRegistrationParent: React.FC = () => {
   const contactPersonVerificationData = useSelector((state: RootState) => state.registration.contactPersonVerification);
   const acknowledgmentData = useSelector((state: RootState) => state.registration.acknowledgment);
   const sellerVerificationInfo = useSelector((state: RootState) => state.registration.sellerVerification);
-  
 
-    // Initialize acknowledgmentData with a `consent` property
-    //const [acknowledgmentData, setAcknowledgmentData] = useState({ consent: false });
+
+  // Initialize acknowledgmentData with a `consent` property
+  //const [acknowledgmentData, setAcknowledgmentData] = useState({ consent: false });
 
   // Redirect to type selection if no type is set
   useEffect(() => {
@@ -99,10 +99,10 @@ const SellerRegistrationParent: React.FC = () => {
 
   const handleFileUpload = async (file: File, type: string) => {
     const dispatch = useDispatch<AppDispatch>();
-  
+
     try {
       const result = (await dispatch(uploadDocument(file)).unwrap()) as FileMetadataFromTypes;
-  
+
       switch (type) {
         case 'idDocument':
           dispatch(updateIdentityVerification({ idDocument: result as FileMetadataFromRegistration }));
@@ -132,7 +132,7 @@ const SellerRegistrationParent: React.FC = () => {
       console.error(`Failed to upload file for ${type}:`, error);
     }
   };
-  
+
 
   const handleAccountDetailsUpdate = (updatedData: Partial<typeof accountDetailsData>) => {
     dispatch(saveAccountDetails({ ...accountDetailsData, ...updatedData }));
@@ -199,7 +199,7 @@ const SellerRegistrationParent: React.FC = () => {
   const handleCompanyInformationUpdate = (updatedData: Partial<typeof companyInfo>) => {
     dispatch(saveCompanyInformation({ ...companyInfo, ...updatedData }));
   };
- 
+
   const handleSellerInformationUpdate = (updatedData: Partial<typeof sellerInfo>) => {
     dispatch(saveSellerInformation({ ...sellerInfo, ...updatedData }));
   };
@@ -213,8 +213,8 @@ const SellerRegistrationParent: React.FC = () => {
   const handleBillingInformationUpdate = (updatedData: Partial<typeof billingInfo>) => {
     dispatch(saveBillingAddress({ ...billingInfo, ...updatedData }));
   };
-  
-  
+
+
   // Submit final data
   const handleFormSubmit = () => {
     const combinedData = {
@@ -234,7 +234,7 @@ const SellerRegistrationParent: React.FC = () => {
       identityVerificationData,
       bankAccountVerificationData,
       businessDocumentationData,
-      contactPersonVerificationData, 
+      contactPersonVerificationData,
       acknowledgmentData
     };
     console.log('Combined Data:', combinedData);
@@ -244,35 +244,35 @@ const SellerRegistrationParent: React.FC = () => {
 
   return (
     <Routes>
-      
+
       <Route
-          path="create"
-          element={
-            <SellerRegistrationLayout currentStep="Create Account">
-              <CreateSellerAccount
-                data={accountDetailsData}
-                onUpdate={handleAccountDetailsUpdate}
-                onNext={() => navigate('/register/seller/seller-verification')}
-              />
-            </SellerRegistrationLayout>
-          }
-        />
+        path="create"
+        element={
+          <SellerRegistrationLayout currentStep="Create Account">
+            <CreateSellerAccount
+              data={accountDetailsData}
+              onUpdate={handleAccountDetailsUpdate}
+              onNext={() => navigate('/register/seller/seller-verification')}
+            />
+          </SellerRegistrationLayout>
+        }
+      />
 
 
-        <Route
-          path="seller-verification"
-          element={
-            <SellerRegistrationLayout currentStep="Seller Verification">
-              <SellerVerificationForm
-                data={sellerVerificationInfo}
-                onUpdate={handleSellerVerificationUpdate}
-                onNext={() => navigate('/register/seller/type-selection')}
-              />
-            </SellerRegistrationLayout>
-          }
-        />
+      <Route
+        path="seller-verification"
+        element={
+          <SellerRegistrationLayout currentStep="Seller Verification">
+            <SellerVerificationForm
+              data={sellerVerificationInfo}
+              onUpdate={handleSellerVerificationUpdate}
+              onNext={() => navigate('/register/seller/type-selection')}
+            />
+          </SellerRegistrationLayout>
+        }
+      />
 
-      
+
       <Route
         path="type-selection"
         element={
@@ -284,13 +284,13 @@ const SellerRegistrationParent: React.FC = () => {
 
                 // Navigate based on the selected sellerType
                 if (type === 'individual') {
-                    navigate('/register/seller/individual/contact-details');
+                  navigate('/register/seller/individual/contact-details');
                 } else if (type === 'professional') {
-                    navigate('/register/seller/professional/company-information');
+                  navigate('/register/seller/professional/company-information');
                 } else {
-                    // Handle unexpected type by navigating back to type selection
-                    console.error("Invalid seller type:", type);
-                    navigate('/register/seller/type-selection');
+                  // Handle unexpected type by navigating back to type selection
+                  console.error("Invalid seller type:", type);
+                  navigate('/register/seller/type-selection');
                 }
               }}
             />
@@ -298,248 +298,248 @@ const SellerRegistrationParent: React.FC = () => {
         }
       />
 
-            <Route
-              path="individual/contact-details"
-              element={
-                <SellerRegistrationLayout currentStep="Contact Details">
-                  <ContactDetailsForm data={contactDetailsData}
-                    onUpdate={handleContactDetailsUpdate}
-                    onNext={() => navigate('/register/seller/individual/payment-details')} />
-                </SellerRegistrationLayout>
-              }
-            />
-            <Route
-              path="individual/payment-details"
-              element={
-                <SellerRegistrationLayout currentStep="Payment Details">
-                  <PaymentDetailsForm data={paymentDetails} onUpdatePayment={handlePaymentUpdate} onUpdateBillingAddress={handleBillingInformationUpdate} onNext={() => navigate('/register/seller/individual/verification')} />
-                </SellerRegistrationLayout>
-              }
-               />
-              <Route
-              path="individual/shop-setup"
-              element={
-                <SellerRegistrationLayout currentStep="Shop Setup">
-                  <ShopSetupForm data={shopSetupData} onUpdate={handleShopSetupUpdate} onNext={() => navigate('/register/seller/individual/verification')} />
-                </SellerRegistrationLayout>
-              }
-            />
-            <Route
-              path="individual/verification"
-              element={
-                <SellerRegistrationLayout currentStep="Verification">
-                  <VerificationForm data={verificationData} onUpdate={handleVerificationUpdate} onNext={() => navigate('/register/seller/document-upload')} />
-                </SellerRegistrationLayout>
-              }
-            />
-          
-        
+      <Route
+        path="individual/contact-details"
+        element={
+          <SellerRegistrationLayout currentStep="Contact Details">
+            <ContactDetailsForm data={contactDetailsData}
+              onUpdate={handleContactDetailsUpdate}
+              onNext={() => navigate('/register/seller/individual/payment-details')} />
+          </SellerRegistrationLayout>
+        }
+      />
+      <Route
+        path="individual/payment-details"
+        element={
+          <SellerRegistrationLayout currentStep="Payment Details">
+            <PaymentDetailsForm data={paymentDetails} onUpdatePayment={handlePaymentUpdate} onUpdateBillingAddress={handleBillingInformationUpdate} onNext={() => navigate('/register/seller/individual/verification')} />
+          </SellerRegistrationLayout>
+        }
+      />
+      <Route
+        path="individual/shop-setup"
+        element={
+          <SellerRegistrationLayout currentStep="Shop Setup">
+            <ShopSetupForm data={shopSetupData} onUpdate={handleShopSetupUpdate} onNext={() => navigate('/register/seller/individual/verification')} />
+          </SellerRegistrationLayout>
+        }
+      />
+      <Route
+        path="individual/verification"
+        element={
+          <SellerRegistrationLayout currentStep="Verification">
+            <VerificationForm data={verificationData} onUpdate={handleVerificationUpdate} onNext={() => navigate('/register/seller/document-upload')} />
+          </SellerRegistrationLayout>
+        }
+      />
 
 
-        {sellerType === 'professional' && (
-          <>
 
-            <Route
-              path="professional/company-information"
-              element={
-                <SellerRegistrationLayout currentStep="Company Information">
-                  <CompanyInformationForm
-                    data={{ businessInformation: businessInfo, companyInformation: companyInfo }}
-                    onUpdate={(newData) => {
-                      if (newData.businessInformation) {
-                        handleBusinessInformationUpdate(newData.businessInformation);
-                      }
-                      if (newData.companyInformation) {
-                        handleCompanyInformationUpdate(newData.companyInformation);
-                      }
-                    }}
-                    onNext={() => navigate('/register/seller/professional/seller-information')}
-                    onSubmit={handleFormSubmit}
-                  />
-                </SellerRegistrationLayout>
-              }
-            />
-            <Route
-              path="professional/seller-information"
-              element={
-                <SellerRegistrationLayout currentStep="Seller Information">
-                  <SellerInformationForm
-                    data={{
-                      ...sellerInfo,
-                      contactPersonMiddleName: sellerInfo.contactPersonMiddleName || "", // Default to empty string if undefined
-                    }}
-                    onUpdate={handleSellerInformationUpdate}
-                    onNext={() => navigate('/register/seller/professional/contact-person')}
-                  />
-                </SellerRegistrationLayout>
-              }
-            />
-            <Route
-              path="professional/contact-person" 
-              element={
-                <SellerRegistrationLayout currentStep="Contact Person">
-                  <ContactPersonVerificationForm data={contactPersonVerificationData} onUpdate={handleContactPersonVerificationUpdate} onNext={() => navigate('/register/seller/professional/store-information')} />
-                </SellerRegistrationLayout>
-              }
-          />
-                      <Route
-              path="professional/store-information" //handleContactPersonVerificationUpdate
-              element={
-                <SellerRegistrationLayout currentStep="Store Information">
-                  <StoreInformationForm data={storeInfo} onUpdate={handleStoreInformationUpdate} onNext={() => navigate('/register/seller/professional/billing-information')} />
-                </SellerRegistrationLayout>
-              }
-            />
-            <Route
-              path="professional/billing-information"
-              element={
-                <SellerRegistrationLayout currentStep="Billing Information">
-                  <BillingInformationForm data={billingInfo} onUpdate={handleBillingInformationUpdate} onNext={() => navigate('/register/seller/professional/identity-verification')} />
-                </SellerRegistrationLayout>
-              }
-          />
-          
+
+      {sellerType === 'professional' && (
+        <>
+
           <Route
-              path="professional/identity-verification"
-              element={
-                <SellerRegistrationLayout currentStep="Identity Verification">
-                  <IdentityVerification
-                    data={identityVerificationData}
-                    onUpdate={(updatedData) => dispatch(updateIdentityVerification(updatedData))}
-                    onIDUpload={(file) => handleFileUpload(file, 'idDocument')}
-                    onSelfieUpload={(file) => handleFileUpload(file, 'selfieDocument')}
-                    onNext={() => navigate('/register/seller/professional/bank-account-verification')}
-                  />
-                </SellerRegistrationLayout>
-              }
-            />
-
-          
-      <Route
-        path="professional/bank-account-verification"
-        element={
-          <SellerRegistrationLayout currentStep="Bank Account Verification">
-            <BankAccountVerification
-              data={bankAccountVerificationData}
-              onUpdate={(updatedData) =>
-                dispatch(updateBankAccountVerification(updatedData))
-              }
-              onProofUpload={(file) => handleFileUpload(file, 'proofOfBankOwnership')}
-              onNext={() => navigate('/register/seller/professional/business-documentation')}
-            />
-          </SellerRegistrationLayout>
-        }
-      />
-
-          
-      <Route
-        path="professional/business-documentation"
-        element={
-          <SellerRegistrationLayout currentStep="Business Documentation">
-            <BusinessDocumentationForm
-              data={businessDocumentationData}
-              onUpdate={(updatedData) =>
-                dispatch(updateBusinessDocumentation(updatedData))
-              }
-              onNext={() => navigate('/register/seller/professional/acknowledgment')}
-            />
-          </SellerRegistrationLayout>
-        }
-      />
-
-    <Route
-      path="professional/acknowledgment"
-      element={
-        <SellerRegistrationLayout currentStep="Acknowledgment">
-          <Acknowledgment
-            data={acknowledgmentData}
-            onUpdate={handleAcknowledgmentUpdate}
-            onNext={() => navigate('/register/seller/professional/review')}
+            path="professional/company-information"
+            element={
+              <SellerRegistrationLayout currentStep="Company Information">
+                <CompanyInformationForm
+                  data={{ businessInformation: businessInfo, companyInformation: companyInfo }}
+                  onUpdate={(newData) => {
+                    if (newData.businessInformation) {
+                      handleBusinessInformationUpdate(newData.businessInformation);
+                    }
+                    if (newData.companyInformation) {
+                      handleCompanyInformationUpdate(newData.companyInformation);
+                    }
+                  }}
+                  onNext={() => navigate('/register/seller/professional/seller-information')}
+                  onSubmit={handleFormSubmit}
+                />
+              </SellerRegistrationLayout>
+            }
           />
-        </SellerRegistrationLayout>
-      }
-    />
+          <Route
+            path="professional/seller-information"
+            element={
+              <SellerRegistrationLayout currentStep="Seller Information">
+                <SellerInformationForm
+                  data={{
+                    ...sellerInfo,
+                    contactPersonMiddleName: sellerInfo.contactPersonMiddleName || "", // Default to empty string if undefined
+                  }}
+                  onUpdate={handleSellerInformationUpdate}
+                  onNext={() => navigate('/register/seller/professional/contact-person')}
+                />
+              </SellerRegistrationLayout>
+            }
+          />
+          <Route
+            path="professional/contact-person"
+            element={
+              <SellerRegistrationLayout currentStep="Contact Person">
+                <ContactPersonVerificationForm data={contactPersonVerificationData} onUpdate={handleContactPersonVerificationUpdate} onNext={() => navigate('/register/seller/professional/store-information')} />
+              </SellerRegistrationLayout>
+            }
+          />
+          <Route
+            path="professional/store-information" //handleContactPersonVerificationUpdate
+            element={
+              <SellerRegistrationLayout currentStep="Store Information">
+                <StoreInformationForm data={storeInfo} onUpdate={handleStoreInformationUpdate} onNext={() => navigate('/register/seller/professional/billing-information')} />
+              </SellerRegistrationLayout>
+            }
+          />
+          <Route
+            path="professional/billing-information"
+            element={
+              <SellerRegistrationLayout currentStep="Billing Information">
+                <BillingInformationForm data={billingInfo} onUpdate={handleBillingInformationUpdate} onNext={() => navigate('/register/seller/professional/identity-verification')} />
+              </SellerRegistrationLayout>
+            }
+          />
 
-          </>
-        )}
+          <Route
+            path="professional/identity-verification"
+            element={
+              <SellerRegistrationLayout currentStep="Identity Verification">
+                <IdentityVerification
+                  data={identityVerificationData}
+                  onUpdate={(updatedData) => dispatch(updateIdentityVerification(updatedData))}
+                  onIDUpload={(file) => handleFileUpload(file, 'idDocument')}
+                  onSelfieUpload={(file) => handleFileUpload(file, 'selfieDocument')}
+                  onNext={() => navigate('/register/seller/professional/bank-account-verification')}
+                />
+              </SellerRegistrationLayout>
+            }
+          />
 
 
-        {/* Combined Review and Submit Route for Both Seller Types */}
+          <Route
+            path="professional/bank-account-verification"
+            element={
+              <SellerRegistrationLayout currentStep="Bank Account Verification">
+                <BankAccountVerification
+                  data={bankAccountVerificationData}
+                  onUpdate={(updatedData) =>
+                    dispatch(updateBankAccountVerification(updatedData))
+                  }
+                  onProofUpload={(file) => handleFileUpload(file, 'proofOfBankOwnership')}
+                  onNext={() => navigate('/register/seller/professional/business-documentation')}
+                />
+              </SellerRegistrationLayout>
+            }
+          />
+
+
+          <Route
+            path="professional/business-documentation"
+            element={
+              <SellerRegistrationLayout currentStep="Business Documentation">
+                <BusinessDocumentationForm
+                  data={businessDocumentationData}
+                  onUpdate={(updatedData) =>
+                    dispatch(updateBusinessDocumentation(updatedData))
+                  }
+                  onNext={() => navigate('/register/seller/professional/acknowledgment')}
+                />
+              </SellerRegistrationLayout>
+            }
+          />
+
+          <Route
+            path="professional/acknowledgment"
+            element={
+              <SellerRegistrationLayout currentStep="Acknowledgment">
+                <Acknowledgment
+                  data={acknowledgmentData}
+                  onUpdate={handleAcknowledgmentUpdate}
+                  onNext={() => navigate('/register/seller/professional/review')}
+                />
+              </SellerRegistrationLayout>
+            }
+          />
+
+        </>
+      )}
+
+
+      {/* Combined Review and Submit Route for Both Seller Types */}
         // In SellerRegistrationParent
-<Route
-  path="review"
-  element={
-    <SellerRegistrationLayout currentStep="Review & Submit">
-      <ReviewAndSubmit
-        data={{
-          accountDetailsData,
-          contactDetailsData,
-          paymentDetails,
-          shopSetupData,
-          verificationData,
-          companyDetails,
-          businessInfo,
-          sellerInfo,
-          sellerVerificationInfo,
-          identityVerificationData: {
-            ...identityVerificationData,
-            idDocument: identityVerificationData.idDocument instanceof File
-              ? identityVerificationData.idDocument
-              : identityVerificationData.idDocument
-              ? new File([], identityVerificationData.idDocument.name || '', { type: identityVerificationData.idDocument.type })
-              : undefined,
-            selfieDocument: identityVerificationData.selfieDocument instanceof File
-              ? identityVerificationData.selfieDocument
-              : identityVerificationData.selfieDocument
-              ? new File([], identityVerificationData.selfieDocument.name || '', { type: identityVerificationData.selfieDocument.type })
-              : undefined,
-          },
-          bankAccountVerificationData: {
-            ...bankAccountVerificationData,
-            proofOfBankOwnership: bankAccountVerificationData.proofOfBankOwnership instanceof File
-              ? bankAccountVerificationData.proofOfBankOwnership
-              : bankAccountVerificationData.proofOfBankOwnership
-              ? new File([], bankAccountVerificationData.proofOfBankOwnership.name || '', { type: bankAccountVerificationData.proofOfBankOwnership.type })
-              : undefined,
-          },
-          businessDocumentationData: {
-            ...businessDocumentationData,
-            businessRegistrationDocument: businessDocumentationData.businessRegistrationDocument instanceof File
-              ? businessDocumentationData.businessRegistrationDocument
-              : businessDocumentationData.businessRegistrationDocument
-              ? new File([], businessDocumentationData.businessRegistrationDocument.name || '', { type: businessDocumentationData.businessRegistrationDocument.type })
-              : undefined,
-            taxDocument: businessDocumentationData.taxDocument instanceof File
-              ? businessDocumentationData.taxDocument
-              : businessDocumentationData.taxDocument
-              ? new File([], businessDocumentationData.taxDocument.name || '', { type: businessDocumentationData.taxDocument.type })
-              : undefined,
-          },
-          contactPersonVerificationData: {
-            ...contactPersonVerificationData,
-            authorizationLetter: contactPersonVerificationData.authorizationLetter instanceof File
-              ? contactPersonVerificationData.authorizationLetter
-              : contactPersonVerificationData.authorizationLetter
-              ? new File([], contactPersonVerificationData.authorizationLetter.name || '', { type: contactPersonVerificationData.authorizationLetter.type })
-              : undefined,
-            companyStampOrSeal: contactPersonVerificationData.companyStampOrSeal instanceof File
-              ? contactPersonVerificationData.companyStampOrSeal
-              : contactPersonVerificationData.companyStampOrSeal
-              ? new File([], contactPersonVerificationData.companyStampOrSeal.name || '', { type: contactPersonVerificationData.companyStampOrSeal.type })
-              : undefined,
-          },
-          storeInfo,
-          billingInfo,
-          sellerType,
-        }}
-        onSubmit={() => navigate('/vendor-dashboard')}
+      <Route
+        path="review"
+        element={
+          <SellerRegistrationLayout currentStep="Review & Submit">
+            <ReviewAndSubmit
+              data={{
+                accountDetailsData,
+                contactDetailsData,
+                paymentDetails,
+                shopSetupData,
+                verificationData,
+                companyDetails,
+                businessInfo,
+                sellerInfo,
+                sellerVerificationInfo,
+                identityVerificationData: {
+                  ...identityVerificationData,
+                  idDocument: identityVerificationData.idDocument instanceof File
+                    ? identityVerificationData.idDocument
+                    : identityVerificationData.idDocument
+                      ? new File([], identityVerificationData.idDocument.name || '', { type: identityVerificationData.idDocument.type })
+                      : undefined,
+                  selfieDocument: identityVerificationData.selfieDocument instanceof File
+                    ? identityVerificationData.selfieDocument
+                    : identityVerificationData.selfieDocument
+                      ? new File([], identityVerificationData.selfieDocument.name || '', { type: identityVerificationData.selfieDocument.type })
+                      : undefined,
+                },
+                bankAccountVerificationData: {
+                  ...bankAccountVerificationData,
+                  proofOfBankOwnership: bankAccountVerificationData.proofOfBankOwnership instanceof File
+                    ? bankAccountVerificationData.proofOfBankOwnership
+                    : bankAccountVerificationData.proofOfBankOwnership
+                      ? new File([], bankAccountVerificationData.proofOfBankOwnership.name || '', { type: bankAccountVerificationData.proofOfBankOwnership.type })
+                      : undefined,
+                },
+                businessDocumentationData: {
+                  ...businessDocumentationData,
+                  businessRegistrationDocument: businessDocumentationData.businessRegistrationDocument instanceof File
+                    ? businessDocumentationData.businessRegistrationDocument
+                    : businessDocumentationData.businessRegistrationDocument
+                      ? new File([], businessDocumentationData.businessRegistrationDocument.name || '', { type: businessDocumentationData.businessRegistrationDocument.type })
+                      : undefined,
+                  taxDocument: businessDocumentationData.taxDocument instanceof File
+                    ? businessDocumentationData.taxDocument
+                    : businessDocumentationData.taxDocument
+                      ? new File([], businessDocumentationData.taxDocument.name || '', { type: businessDocumentationData.taxDocument.type })
+                      : undefined,
+                },
+                contactPersonVerificationData: {
+                  ...contactPersonVerificationData,
+                  authorizationLetter: contactPersonVerificationData.authorizationLetter instanceof File
+                    ? contactPersonVerificationData.authorizationLetter
+                    : contactPersonVerificationData.authorizationLetter
+                      ? new File([], contactPersonVerificationData.authorizationLetter.name || '', { type: contactPersonVerificationData.authorizationLetter.type })
+                      : undefined,
+                  companyStampOrSeal: contactPersonVerificationData.companyStampOrSeal instanceof File
+                    ? contactPersonVerificationData.companyStampOrSeal
+                    : contactPersonVerificationData.companyStampOrSeal
+                      ? new File([], contactPersonVerificationData.companyStampOrSeal.name || '', { type: contactPersonVerificationData.companyStampOrSeal.type })
+                      : undefined,
+                },
+                storeInfo,
+                billingInfo,
+                sellerType,
+              }}
+              onSubmit={() => navigate('/vendor-dashboard')}
+            />
+          </SellerRegistrationLayout>
+        }
       />
-    </SellerRegistrationLayout>
-  }
-/>
 
-      </Routes>
-   
+    </Routes>
+
   );
 };
 

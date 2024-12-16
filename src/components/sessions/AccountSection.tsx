@@ -3,7 +3,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux/store";
-import { logout } from "../../redux/slices/authSlice";
+import { logout } from "../../redux/slices/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import StyledAccountSection from "./StyledAccountSection";
 

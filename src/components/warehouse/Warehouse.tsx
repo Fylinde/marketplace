@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useAppDispatch, useAppSelector } from 'redux/slices/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
 import {
   fetchWarehouses,
   fetchRecommendations,
   fetchSharedInventory,
-} from 'redux/slices/warehouseSlice';
+} from '@/redux/slices/logistics/warehouseSlice';
 import warehouseService from '../../services/warehouseService';
 import { Table, Button, Spin, Modal, Alert } from 'antd';
-import { getLocalizedText } from '../utils/localizationUtils';
+import { getLocalizedText } from '../../utils/localizationUtils';
 import WarehouseForm from './WarehouseForm';
 
 const WarehouseContainer = styled.div`
@@ -69,17 +69,17 @@ const Warehouse: React.FC = () => {
 
   const columns = [
     {
-      title: getLocalizedText('Warehouse Name'),
+      title: getLocalizedText('Warehouse Name', 'returnAndRefund'),
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: getLocalizedText('Location'),
+      title: getLocalizedText('Location', 'returnAndRefund'),
       dataIndex: 'location',
       key: 'location',
     },
     {
-      title: getLocalizedText('Actions'),
+      title: getLocalizedText('Actions', 'returnAndRefund'),
       key: 'actions',
       render: (_: any, record: any) => (
         <div>
@@ -89,10 +89,10 @@ const Warehouse: React.FC = () => {
               setModalVisible(true);
             }}
           >
-            {getLocalizedText('Edit')}
+            {getLocalizedText('Edit', 'returnAndRefund')}
           </Button>
           <Button danger onClick={() => handleDelete(record.id)}>
-            {getLocalizedText('Delete')}
+            {getLocalizedText('Delete', 'returnAndRefund')}
           </Button>
         </div>
       ),
@@ -102,7 +102,7 @@ const Warehouse: React.FC = () => {
   return (
     <WarehouseContainer>
       <Header>
-        <h1>{getLocalizedText('Manage Warehouses')}</h1>
+        <h1>{getLocalizedText('Manage Warehouses', 'returnAndRefund')}</h1>
         <Button
           type="primary"
           onClick={() => {
@@ -110,7 +110,7 @@ const Warehouse: React.FC = () => {
             setModalVisible(true);
           }}
         >
-          {getLocalizedText('Add Warehouse')}
+          {getLocalizedText('Add Warehouse', 'returnAndRefund')}
         </Button>
       </Header>
       {loading && <Spin size="large" />}
@@ -122,7 +122,7 @@ const Warehouse: React.FC = () => {
       />
       <Modal
         visible={modalVisible}
-        title={editingWarehouse ? getLocalizedText('Edit Warehouse') : getLocalizedText('Add Warehouse')}
+        title={editingWarehouse ? getLocalizedText('Edit Warehouse', 'returnAndRefund') : getLocalizedText('Add Warehouse', 'returnAndRefund')}
         onCancel={() => setModalVisible(false)}
         footer={null}
       >
@@ -136,7 +136,7 @@ const Warehouse: React.FC = () => {
       </Modal>
 
       <RecommendationsSection>
-        <h2>{getLocalizedText('AI Recommendations')}</h2>
+        <h2>{getLocalizedText('AI Recommendations', 'returnAndRefund')}</h2>
         <StyledTable
           dataSource={recommendations.map((rec) => ({
             key: rec.productId,
@@ -146,17 +146,17 @@ const Warehouse: React.FC = () => {
           }))}
           columns={[
             {
-              title: getLocalizedText('Product ID'),
+              title: getLocalizedText('Product ID', 'returnAndRefund'),
               dataIndex: 'productId',
               key: 'productId',
             },
             {
-              title: getLocalizedText('Warehouse ID'),
+              title: getLocalizedText('Warehouse ID', 'returnAndRefund'),
               dataIndex: 'warehouseId',
               key: 'warehouseId',
             },
             {
-              title: getLocalizedText('Suggested Stock'),
+              title: getLocalizedText('Suggested Stock', 'returnAndRefund'),
               dataIndex: 'suggestedStock',
               key: 'suggestedStock',
             },
@@ -166,13 +166,13 @@ const Warehouse: React.FC = () => {
       </RecommendationsSection>
 
       <SharedInventorySection>
-        <h2>{getLocalizedText('Shared Inventory')}</h2>
+        <h2>{getLocalizedText('Shared Inventory', 'returnAndRefund')}</h2>
         <StyledTable
           dataSource={sharedInventory.map((item) => ({ key: item.id, ...item }))}
           columns={[
-            { title: getLocalizedText('Seller Name'), dataIndex: 'sellerName', key: 'sellerName' },
-            { title: getLocalizedText('Product Name'), dataIndex: 'productName', key: 'productName' },
-            { title: getLocalizedText('Quantity'), dataIndex: 'quantity', key: 'quantity' },
+            { title: getLocalizedText('Seller Name', 'returnAndRefund'), dataIndex: 'sellerName', key: 'sellerName' },
+            { title: getLocalizedText('Product Name', 'returnAndRefund'), dataIndex: 'productName', key: 'productName' },
+            { title: getLocalizedText('Quantity', 'returnAndRefund'), dataIndex: 'quantity', key: 'quantity' },
           ]}
           pagination={{ pageSize: 5 }}
         />

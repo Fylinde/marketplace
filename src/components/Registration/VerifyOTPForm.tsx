@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { setAuthData } from '../../redux/slices/authSlice';
+import { setAuthData } from '../../redux/slices/auth/authSlice';
 import axios from 'axios';
 import './VerifyOTPForm.css';
 
@@ -18,51 +18,51 @@ const VerifyOTPForm: React.FC = () => {
     setError(null);  // Reset error
 
     try {
-        // Retrieve the contact from localStorage
-        const contact = localStorage.getItem('contact');
-        console.log("Retrieved contact from localStorage:", contact);
+      // Retrieve the contact from localStorage
+      const contact = localStorage.getItem('contact');
+      console.log("Retrieved contact from localStorage:", contact);
 
-        // Validate that contact and otpCode are both defined
-        if (!contact) {
-            console.error("Error: Contact information is missing.");
-            setError("Contact information is missing.");
-            return;
-        }
-        if (!otpCode) {
-            console.error("Error: OTP code is missing.");
-            setError("OTP code is missing.");
-            return;
-        }
+      // Validate that contact and otpCode are both defined
+      if (!contact) {
+        console.error("Error: Contact information is missing.");
+        setError("Contact information is missing.");
+        return;
+      }
+      if (!otpCode) {
+        console.error("Error: OTP code is missing.");
+        setError("OTP code is missing.");
+        return;
+      }
 
-        const formData = new URLSearchParams();
-        formData.append("contact", contact);
-        formData.append("otp", otpCode);
+      const formData = new URLSearchParams();
+      formData.append("contact", contact);
+      formData.append("otp", otpCode);
 
-        // Send OTP verification request
-        const response = await axios.post(
-          `${apiUrl}/auth/verify-otp`,
-          formData,
-          { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      // Send OTP verification request
+      const response = await axios.post(
+        `${apiUrl}/auth/verify-otp`,
+        formData,
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
 
-        // Check for a successful response
-        if (response.status === 200) {
-            console.log("OTP verified successfully:", response.data);
+      // Check for a successful response
+      if (response.status === 200) {
+        console.log("OTP verified successfully:", response.data);
 
-            const { access_token, refresh_token } = response.data;
-            localStorage.setItem('access_token', access_token);
-            localStorage.setItem('refresh_token', refresh_token);
+        const { access_token, refresh_token } = response.data;
+        localStorage.setItem('access_token', access_token);
+        localStorage.setItem('refresh_token', refresh_token);
 
-            dispatch(setAuthData({ access_token, refresh_token, user: null }));
-            await fetchUserData(access_token);
-        } else {
-            throw new Error('OTP verification failed.');
-        }
+        dispatch(setAuthData({ access_token, refresh_token, user: null }));
+        await fetchUserData(access_token);
+      } else {
+        throw new Error('OTP verification failed.');
+      }
     } catch (error) {
-        console.error("Error during OTP verification:", error);
-        setError("Invalid OTP or missing contact information. Please try again.");
+      console.error("Error during OTP verification:", error);
+      setError("Invalid OTP or missing contact information. Please try again.");
     }
-};
+  };
 
 
   const fetchUserData = async (token: string) => {

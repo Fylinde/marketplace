@@ -24,6 +24,11 @@ export interface CarouselProps {
   hasMasterSpinner?: boolean;
   infinite?: boolean;
   autoPlay?: boolean;
+  pauseOnHover?: boolean;
+  keyboardNavigation?: boolean;
+  swipeNavigation?: boolean;
+  transitionEffect?: "slide" | "fade"; // New transition effects
+  animationSpeed?: number; // Speed in ms
   step?: number;
   interval?: number;
   showDots?: boolean;
@@ -39,7 +44,7 @@ export interface CarouselProps {
   rightButtonClass?: string;
   leftButtonStyle?: CSSProperties;
   rightButtonStyle?: CSSProperties;
-  children?: React.ReactNode; // <-- Add children here
+  children?: React.ReactNode;
 }
 
 const Carousel: React.FC<CarouselProps> = ({
@@ -53,6 +58,11 @@ const Carousel: React.FC<CarouselProps> = ({
   hasMasterSpinner,
   infinite,
   autoPlay,
+  pauseOnHover,
+  keyboardNavigation,
+  swipeNavigation,
+  transitionEffect = "slide",
+  animationSpeed = 500,
   step,
   interval,
   showDots,
@@ -69,6 +79,25 @@ const Carousel: React.FC<CarouselProps> = ({
   leftButtonStyle,
   rightButtonStyle,
 }) => {
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (keyboardNavigation) {
+      if (event.key === "ArrowLeft") {
+        (ButtonBack as any)?.props?.onClick();
+      } else if (event.key === "ArrowRight") {
+        (ButtonNext as any)?.props?.onClick();
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    if (keyboardNavigation) {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [keyboardNavigation]);
+
   return (
     <StyledCarousel
       naturalSlideWidth={naturalSlideWidth}
@@ -79,16 +108,20 @@ const Carousel: React.FC<CarouselProps> = ({
       hasMasterSpinner={hasMasterSpinner}
       infinite={infinite}
       isPlaying={autoPlay}
-      step={step}
       interval={interval}
+      transitionEffect={transitionEffect}
+      animationSpeed={animationSpeed}
       dotColor={dotColor}
       dotGroupMarginTop={dotGroupMarginTop}
       spacing={spacing}
       showDots={showDots}
       currentSlide={currentSlide}
+      onMouseEnter={pauseOnHover ? () => (autoPlay = false) : undefined}
+      onMouseLeave={pauseOnHover ? () => (autoPlay = true) : undefined}
+      swipeable={swipeNavigation}
       showArrowOnHover={showArrowOnHover}
     >
-      <Slider className="custom-slider">
+      <Slider className={`custom-slider ${transitionEffect}`}>
         {React.Children.map(children, (child, ind) => (
           <Slide index={ind}>{child}</Slide>
         ))}
@@ -165,24 +198,6 @@ const renderDots = ({
         }
       />
     );
-
-    if (total - i - 1 < step && total - i - 1 !== 0) {
-      dots.push(
-        <div
-          key={i + total}
-          className={clsx({
-            dot: true,
-            "dot-active": currentSlide === totalSlides - visibleSlides,
-          })}
-          onClick={() =>
-            carouselStore.setStoreState({
-              currentSlide: totalSlides - visibleSlides,
-              autoPlay: false,
-            })
-          }
-        />
-      );
-    }
   }
   return dots;
 };
@@ -196,10 +211,15 @@ Carousel.defaultProps = {
   hasMasterSpinner: false,
   infinite: false,
   autoPlay: false,
+  pauseOnHover: true,
+  keyboardNavigation: true,
+  swipeNavigation: true,
   step: 1,
   interval: 2000,
   showDots: false,
   showArrow: true,
+  transitionEffect: "slide",
+  animationSpeed: 500,
   dotGroupMarginTop: "2rem",
   spacing: "1.5rem",
   arrowButtonColor: "secondary",

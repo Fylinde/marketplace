@@ -4,7 +4,8 @@ import {
   StyledSelect,
   StyledInput,
 } from './IdentityVerificationContainer.styled';
-import { IdentityVerification as IdentityVerificationType } from '../../../redux/slices/registrationSlice';
+import { IdentityVerification as IdentityVerificationType } from '../../../types/sharedTypes';
+
 
 interface IdentityVerificationProps {
   data: IdentityVerificationType;

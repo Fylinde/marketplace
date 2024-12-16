@@ -7,7 +7,7 @@ import {
   fetchSuggestedResponses,
   escalateConversation,
   fetchChatbotPerformance,
-} from 'redux/slices/chatbotSlice ';
+} from '@/redux/slices/communication/chatbotSlice ';
 
 import { RootState, AppDispatch } from 'redux/store';
 import styled from 'styled-components';
@@ -106,7 +106,7 @@ const PerformanceContainer = styled.div`
 const Chatbot: React.FC<ChatbotProps> = ({ sessionId, language }) => {
   const dispatch: AppDispatch = useDispatch();
   const { t } = useTranslation();
-  const {suggestedResponses, loading, error, performance } = useSelector(
+  const { suggestedResponses, loading, error, performance } = useSelector(
     (state: RootState) => state.chatbot
   );
 
@@ -114,7 +114,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ sessionId, language }) => {
     { sender: 'user', message: 'Hello', timestamp: '2024-01-01T12:00:00Z' },
     { sender: 'bot', message: 'Hi, how can I help you?', timestamp: '2024-01-01T12:01:00Z' },
   ];
-  
+
   const [input, setInput] = useState('');
 
   useEffect(() => {

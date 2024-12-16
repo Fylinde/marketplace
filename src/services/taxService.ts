@@ -38,6 +38,12 @@ const taxService = {
     const { data } = await axios.get(`${API_BASE_URL}/tax/supported-countries`);
     return data;
   },
+
+  async calculateBulkTax(items: { price: number; country: string; region?: string; category?: string }[]) {
+    const { data } = await axios.post(`${API_BASE_URL}/tax/bulk-calculate`, { items });
+    return data; // Returns an array of tax amounts per item
+  }
+  
 };
 
 export default taxService;

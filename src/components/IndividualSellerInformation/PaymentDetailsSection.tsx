@@ -1,5 +1,5 @@
 import React from 'react';
-import { PaymentDetails } from '../../redux/slices/registrationSlice';
+import { PaymentDetails } from '../../types/sharedTypes';
 
 interface PaymentDetailsSectionProps {
   paymentDetails: PaymentDetails;

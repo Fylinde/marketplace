@@ -55,20 +55,26 @@ export class WebSocketService {
         this.subscribers[event].push(callback);
         console.log(`[WebSocket] Subscribed to event: ${event}`);
     }
-   
-    
+
     // Unsubscribe from an event
     unsubscribe(event: string, callback?: (data: any) => void) {
         if (this.subscribers[event]) {
-          if (callback) {
-            this.subscribers[event] = this.subscribers[event].filter((cb) => cb !== callback);
-          } else {
-            delete this.subscribers[event];
-          }
-          console.log(`[WebSocket] Unsubscribed from event: ${event}`);
+            if (callback) {
+                this.subscribers[event] = this.subscribers[event].filter((cb) => cb !== callback);
+            } else {
+                delete this.subscribers[event];
+            }
+            console.log(`[WebSocket] Unsubscribed from event: ${event}`);
         }
-      }
-      
+    }
+
+    // Simplified onMessage interface
+    onMessage(callback: (data: string) => void) {
+        // Generic listener for all incoming messages
+        this.subscribe("message", (data) => {
+            callback(data);
+        });
+    }
 
     // Send a message through the WebSocket
     sendMessage(message: string) {

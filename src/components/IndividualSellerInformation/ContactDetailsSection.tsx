@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContactDetails } from '../../redux/slices/registrationSlice';
+import { ContactDetails } from '../../types/sharedTypes';
 
 interface ContactDetailsSectionProps {
   contactDetails: ContactDetails;

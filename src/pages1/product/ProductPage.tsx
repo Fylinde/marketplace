@@ -6,7 +6,7 @@ import {
   fetchLocalizedPrices,
   fetchTryOnData,
   fetchRelatedProducts,
-} from "@/redux/slices/productSlice";
+} from "@/redux/slices/products/productSlice";
 import ProductReviews from "@/components/product/ProductReviews";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import ProductTryOn from "@/components/product/TryOnWidget";
@@ -78,9 +78,9 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
           </AddToCart>
           <StockInfo stock={currentProduct.stock ?? 0}>
             {currentProduct.stock !== undefined && currentProduct.stock > 0
-                ? `In Stock (${currentProduct.stock} available)`
-                : "Out of Stock"}
-            </StockInfo>
+              ? `In Stock (${currentProduct.stock} available)`
+              : "Out of Stock"}
+          </StockInfo>
           {currentProduct.tryOnAvailable && <ProductTryOn productId={productId} />}
         </DetailsContainer>
       </ProductSection>
@@ -92,7 +92,7 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
       <ChatSection>
         <Chatbot sessionId={productId} language={language} />
         <SellerChat chatId={productId} />
-     </ChatSection>
+      </ChatSection>
 
       <RelatedSection>
         <h2>Related Products</h2>
@@ -195,10 +195,10 @@ const AddToCart = styled.div`
 
 // Styled components remain the same except for StockInfo
 interface StockInfoProps {
-    stock: number;
-  }
-  
-  const StockInfo = styled.div<StockInfoProps>`
+  stock: number;
+}
+
+const StockInfo = styled.div<StockInfoProps>`
     font-size: 1rem;
     color: ${(props) => (props.stock > 0 ? "#4caf50" : "#ff5252")};
   `;

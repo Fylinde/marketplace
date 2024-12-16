@@ -6,7 +6,7 @@ import Box from "../Box";
 import Grid from "../grid/Grid";
 import ProductCard1 from "../product-cards/ProductCard1";
 import { H3 } from "../Typography";
-import { fetchRelatedProducts } from "../../redux/slices/productSlice"; // Redux action for related products
+import { fetchRelatedProducts } from "../../redux/slices/products/productSlice"; // Redux action for related products
 import { RootState } from "../../redux/store"; // Adjust path as needed
 import type { AppDispatch } from "../../redux/store";
 import Modal from "../modal/Modal";
@@ -105,17 +105,27 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productId }) => {
       </Box>
 
       <Grid container spacing={8}>
-        {relatedProducts.map((item: Product) => (
+        {relatedProducts.map((item) => (
           <Grid item lg={3} md={4} sm={6} xs={12} key={item.id}>
             <ProductCard1
-              {...item}
-              rating={item.rating?.average}
-              hoverEffect
-              onClick={() => setQuickViewProduct(item)}
+              id={item.id}
+              title={item.title || "Untitled Product"}
+              price={item.price || 0}
+              images={item.images || []}
+              rating={typeof item.rating === "object" && "average" in item.rating ? item.rating.average : 0} // Check type of rating
+              brand={item.brand || "Unknown Brand"}
+              category={item.category || "Uncategorized"}
+              stock={item.stock ? true : false} // Ensure stock is a boolean
+              hoverEffect={true} // Explicitly set hoverEffect to true
+              sellerPrice={item.sellerPrice || item.price || 0} // Default to price
+              buyerPrice={item.buyerPrice || item.price || 0} // Default to price
+              sellerCurrency={item.sellerCurrency || "USD"} // Default to USD
+              buyerCurrency={item.buyerCurrency || "USD"} // Default to USD
             />
           </Grid>
         ))}
       </Grid>
+
 
       <div ref={ref}></div>
 

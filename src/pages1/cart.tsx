@@ -1,6 +1,6 @@
 
 import { useAppContext } from "contexts/app/AppContext";
-import { CartItem } from "reducers/cartReducer";
+import { CartItem } from "@/redux/reducers/cartReducer";
 import { Link } from "react-router-dom";
 import React, { Fragment } from "react";
 import Box from "../components/Box";

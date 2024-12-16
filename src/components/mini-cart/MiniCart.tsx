@@ -1,189 +1,246 @@
-import Avatar from "components/avatar/Avatar";
-import FlexBox from "components/FlexBox";
-import LazyImage from "components/LazyImage";
-import { useAppContext } from "contexts/app/AppContext";
-import { CartItem } from "reducers/cartReducer";
+import React, { Fragment, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import React, { Fragment, useCallback } from "react";
-import Button from "../buttons/Button";
-import Divider from "../Divider";
-import Icon from "../icon/Icon";
-import Typography, { H5, Paragraph, Tiny } from "../Typography";
+import { CartItem } from "../../types/cartItem";
+import FlexBox from "../../components/FlexBox";
+import LinearProgress from "../progressbar/LinearProgress";
+import Button from "../../components/buttons/Button";
+import Divider from "../../components/Divider";
+import Icon from "../../components/icon/Icon";
+import Typography, { Paragraph } from "../../components/Typography";
 import { StyledMiniCart } from "./MiniCartStyle";
+import { useAppSelector, useAppDispatch } from "../../redux/reduxHooks";
+import {
+  removeItemFromCart,
+  fetchRecommendations,
+  changeCartAmount,
+  lockExchangeRate,
+} from "../../redux/slices/orders/cartSlice";
+import { fetchShippingMethods, setSelectedMethod } from "../../redux/slices/logistics/shippingSlice";
+import { fetchCurrentExchangeRates } from "../../redux/slices/utils/exchangeRateSlice";
+import shippingCalculator from "../../utils/shippingCalculator";
+import priceCalculation from "../../utils/priceCalculations";
+import { getLocalizedText, formatCurrency } from "../../utils/localizationUtils";
 
 type MiniCartProps = {
-  toggleSidenav?: () => void;
+  toggleSidenav?: () => void; // Used to close the cart sidebar
+  currentStep: number;
 };
 
-const MiniCart: React.FC<MiniCartProps> = ({ toggleSidenav }) => {
-  const { state, dispatch } = useAppContext();
-  const { cartList } = state.cart;
+const steps = ["Cart", "Shipping", "Payment", "Confirmation"];
 
-  const handleCartAmountChange = useCallback(
-    (amount: number, product: CartItem) => () => {
-      dispatch({
-        type: "CHANGE_CART_AMOUNT",
-        payload: {
-          ...product,
-          qty: amount,
-        },
-      });
-    },
-    [dispatch]
+const MiniCart: React.FC<MiniCartProps> = ({ toggleSidenav, currentStep }) => {
+  const dispatch = useAppDispatch();
+
+  // Redux State
+  const { cartList, currency, lockedExchangeRate, recommendations } = useAppSelector(
+    (state) => state.cart
+  );
+  const { methods: shippingMethods, selectedMethod } = useAppSelector((state) => state.shipping);
+  const { currentRates, loading: rateLoading, error: rateError } = useAppSelector(
+    (state) => state.exchangeRate
   );
 
-  const getTotalPrice = (): number => {
-    return (
-      cartList.reduce(
-        (accumulator: number, item: CartItem) =>
-          accumulator + item.price * item.qty,
-        0
-      ) || 0
-    );
+  // Local State
+  const [shippingCost, setShippingCost] = useState<number>(0);
+  const [totalWithShipping, setTotalWithShipping] = useState<number>(0);
+
+  // Fetch Recommendations, Shipping Methods, and Exchange Rates on Load
+  useEffect(() => {
+    dispatch(fetchRecommendations());
+    dispatch(fetchShippingMethods({ country: "USA", currency: "USD" }));
+    if (!currentRates) {
+      dispatch(fetchCurrentExchangeRates());
+    }
+  }, [dispatch, currentRates]);
+
+  // Lock Exchange Rates During Checkout
+  const handleCheckout = () => {
+    if (!lockedExchangeRate && currentRates) {
+      dispatch(lockExchangeRate(currentRates.rates)); // Lock rates for cart
+    }
+    if (toggleSidenav) toggleSidenav();
   };
+
+  // Calculate totals using priceCalculation utility
+// Calculate totals using priceCalculation utility
+const {
+  totalBuyerPrice,
+  totalSellerPrice,
+  totalTax,
+  totalDiscount,
+  totalWithShipping: calculatedTotal,
+} = priceCalculation.calculate({
+  items: cartList.map((item) => ({
+    sellerPrice: item.sellerPrice,
+    quantity: item.quantity,
+    discount: item.discount,
+    taxRate: item.taxRate,
+    // Change lockedExchangeRate from null to undefined if null
+    lockedExchangeRate: lockedExchangeRate ? lockedExchangeRate[currency] : undefined,
+  })),
+  shippingCost,
+});
+
+
+  useEffect(() => {
+    setTotalWithShipping(calculatedTotal);
+  }, [calculatedTotal]);
+
+  // Simulate progress towards free shipping
+  const freeShippingThreshold = 50;
+  const freeShippingProgress = Math.min((totalBuyerPrice / freeShippingThreshold) * 100, 100);
+  const remainingForFreeShipping = Math.max(freeShippingThreshold - totalBuyerPrice, 0);
+
+  // Handle Shipping Selection
+  const handleShippingSelection = async (methodId: string) => {
+    try {
+      const result = await shippingCalculator.calculateShipping({
+        methodId,
+        address: { country: "USA", state: "CA", city: "San Francisco", postalCode: "94103" },
+        cartTotal: totalBuyerPrice,
+      });
+      setShippingCost(result.shippingCost);
+      dispatch(setSelectedMethod(methodId));
+    } catch (error) {
+      console.error("Error calculating shipping:", error);
+    }
+  };
+
+  // Handle Cart Actions
+  const handleRemoveItem = (id: string) => dispatch(removeItemFromCart(id));
+  const handleChangeQuantity = (id: string, quantity: number) =>
+    dispatch(changeCartAmount({ id, amount: quantity }));
 
   return (
     <StyledMiniCart>
+      {/* Steps Indicator */}
+      <div className="progress-indicator">
+        <Typography fontWeight={600} fontSize="14px">
+          {steps.map((step, index) => (
+            <Fragment key={index}>
+              <span style={{ color: index <= currentStep ? "blue" : "gray" }}>
+                {getLocalizedText(step.toLowerCase(), "shipping")}
+              </span>
+              {index < steps.length - 1 && <Icon mx="0.5rem">arrow_forward</Icon>}
+            </Fragment>
+          ))}
+        </Typography>
+      </div>
+      <Divider />
+
+      {/* Loading and Error States for Exchange Rates */}
+      {rateLoading && <Typography>Loading exchange rates...</Typography>}
+      {rateError && <Typography color="error">Error loading exchange rates: {rateError}</Typography>}
+
+      {/* Free Shipping Progress */}
+      <LinearProgress
+        value={freeShippingProgress}
+        label={
+          remainingForFreeShipping > 0
+            ? getLocalizedText("freeShippingLabel", "shipping", {
+                amount: formatCurrency(remainingForFreeShipping, currency),
+              })
+            : getLocalizedText("freeShippingAchieved", "shipping")
+        }
+        color="primary"
+        thickness={8}
+      />
+
+      {/* Cart Items */}
       <div className="cart-list">
-        <FlexBox alignItems="center" m="0px 20px" height="74px">
-          <Icon size="1.75rem">bag</Icon>
-          <Typography fontWeight={600} fontSize="16px" ml="0.5rem">
-            {cartList.length} item
-          </Typography>
-        </FlexBox>
-
-        <Divider />
-
-        {!!!cartList.length && (
-          <FlexBox
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            height="calc(100% - 80px)"
-          >
-            <LazyImage
-              src="/assets/images/logos/shopping-bag.svg"
-              style={{ width: "100%", height: "auto", borderRadius: "4px" }}
-              alt="Shopping bag" // Add alt text for accessibility
-            />
-            <Paragraph
-              mt="1rem"
-              color="text.muted"
-              textAlign="center"
-              maxWidth="200px"
-            >
-              Your shopping bag is empty. Start shopping
-            </Paragraph>
+        {cartList.length === 0 ? (
+          <FlexBox alignItems="center" justifyContent="center" height="100%">
+            <Paragraph>{getLocalizedText("emptyCart", "shipping")}</Paragraph>
           </FlexBox>
-        )}
-        {cartList.map((item: CartItem) => (
-          <Fragment key={item.id}>
-            <div className="cart-item">
-              <FlexBox alignItems="center" flexDirection="column">
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  padding="5px"
-                  size="none"
-                  borderColor="primary.light"
-                  borderRadius="300px"
-                  onClick={handleCartAmountChange(item.qty + 1, item)}
-                >
-                  <Icon variant="small">plus</Icon>
-                </Button>
-                <Typography fontWeight={600} fontSize="15px" my="3px">
-                  {item.qty}
-                </Typography>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  padding="5px"
-                  size="none"
-                  borderColor="primary.light"
-                  borderRadius="300px"
-                  onClick={handleCartAmountChange(item.qty - 1, item)}
-                  disabled={item.qty === 1}
-                >
-                  <Icon variant="small">minus</Icon>
-                </Button>
+        ) : (
+          cartList.map((item: CartItem) => (
+            <div key={item.id} className="cart-item">
+              <FlexBox alignItems="center" justifyContent="space-between">
+                <Typography fontWeight={600}>{item.name}</Typography>
+                <div>
+                  <Button size="small" onClick={() => handleChangeQuantity(item.id, item.quantity - 1)}>
+                    -
+                  </Button>
+                  <span style={{ margin: "0 10px" }}>{item.quantity}</span>
+                  <Button size="small" onClick={() => handleChangeQuantity(item.id, item.quantity + 1)}>
+                    +
+                  </Button>
+                </div>
+                <Typography>{formatCurrency(item.buyerPrice * item.quantity, currency)}</Typography>
               </FlexBox>
-
-              {/* Removed unnecessary <a> tag */}
-              <Link to={`/product/${item.id}`}>
-                <Avatar
-                  src={item.imgUrl || "/assets/images/products/iphone-x.png"}
-                  mx="1rem"
-                  alt={item.name}
-                  size={76}
-                />
-              </Link>
-
-              <div className="product-details">
-                {/* Removed unnecessary <a> tag */}
-                <Link to={`/product/${item.id}`}>
-                  <H5 className="title" fontSize="14px">
-                    {item.name}
-                  </H5>
-                </Link>
-                <Tiny color="text.muted">
-                  ${item.price.toFixed(2)} x {item.qty}
-                </Tiny>
-                <Typography
-                  fontWeight={600}
-                  fontSize="14px"
-                  color="primary.main"
-                  mt="4px"
-                >
-                  ${(item.qty * item.price).toFixed(2)}
-                </Typography>
-              </div>
-
-              <Icon
-                className="clear-icon"
-                size="1rem"
-                ml="1.25rem"
-                onClick={handleCartAmountChange(0, item)}
-              >
-                close
-              </Icon>
+              <Button variant="text" color="error" onClick={() => handleRemoveItem(item.id)}>
+                {getLocalizedText("remove", "shipping")}
+              </Button>
+              <Divider />
             </div>
-            <Divider />
-          </Fragment>
-        ))}
+          ))
+        )}
       </div>
 
-      {!!cartList.length && (
-        <Fragment>
+      {/* Shipping Methods */}
+      <Typography fontWeight={600} mt="1rem">
+        {getLocalizedText("selectShipping", "shipping")}
+      </Typography>
+      {shippingMethods.map((method) => (
+        <FlexBox
+          key={method.id}
+          onClick={() => handleShippingSelection(method.id)}
+          style={{
+            cursor: "pointer",
+            padding: "10px",
+            border: `2px solid ${selectedMethod === method.id ? "blue" : "lightgray"}`,
+            marginBottom: "0.5rem",
+          }}
+        >
+          <Typography>{`${method.name} - ${formatCurrency(method.rate, currency)} (${
+            method.estimatedDelivery
+          })`}</Typography>
+        </FlexBox>
+      ))}
+
+      {/* Price Summary */}
+      <div>
+        <Typography>Subtotal: {formatCurrency(totalBuyerPrice, currency)}</Typography>
+        <Typography>Seller Revenue: {formatCurrency(totalSellerPrice, "USD")}</Typography>
+        <Typography>Discount: -{formatCurrency(totalDiscount, currency)}</Typography>
+        <Typography>Taxes: {formatCurrency(totalTax, currency)}</Typography>
+        <Typography>Shipping: {formatCurrency(shippingCost, currency)}</Typography>
+        <Divider />
+        <Typography fontWeight={600}>Total: {formatCurrency(totalWithShipping, currency)}</Typography>
+      </div>
+
+      {/* Checkout Actions */}
+      {cartList.length > 0 && (
+        <>
           <Link to="/checkout">
-            <Button
-              variant="contained"
-              color="primary"
-              m="1rem 1rem 0.75rem"
-              onClick={toggleSidenav}
-            >
-              <Typography fontWeight={600}>
-                Checkout Now (${getTotalPrice().toFixed(2)})
-              </Typography>
+            <Button variant="contained" color="primary" onClick={handleCheckout}>
+              {getLocalizedText("checkoutNow", "shipping")}
             </Button>
           </Link>
           <Link to="/cart">
-            <Button
-              color="primary"
-              variant="outlined"
-              m="0px 1rem 0.75rem"
-              onClick={toggleSidenav}
-            >
-              <Typography fontWeight={600}>View Cart</Typography>
-            </Button>
+            <Button variant="outlined">{getLocalizedText("viewCart", "shipping")}</Button>
           </Link>
-        </Fragment>
+        </>
+      )}
+
+      {/* Recommendations */}
+      {recommendations.length > 0 && (
+        <>
+          <Divider />
+          <Typography fontWeight={600} mt="1rem">
+            {getLocalizedText("recommendedForYou", "shipping")}
+          </Typography>
+          {recommendations.map((item) => (
+            <div key={item.id}>
+              <Typography>
+                {item.name} - {formatCurrency(item.buyerPrice, currency)}
+              </Typography>
+            </div>
+          ))}
+        </>
       )}
     </StyledMiniCart>
   );
-};
-
-MiniCart.defaultProps = {
-  toggleSidenav: () => {},
 };
 
 export default MiniCart;

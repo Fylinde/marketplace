@@ -1,0 +1,18 @@
+{
+    "transactionHistory": "Transaction History",
+    "transactionDetails": "Transaction Details",
+    "transactionId": "Transaction ID",
+    "amount": "Amount",
+    "timestamp": "Timestamp",
+    "escrowStatus": "Escrow Status",
+    "items": "Items",
+    "itemName": "Item Name",
+    "itemPrice": "Item Price",
+    "quantity": "Quantity",
+    "requestRefund": "Request Refund",
+    "refundRequested": "Refund has been requested.",
+    "loading": "Loading...",
+    "error": "An error occurred.",
+    "transactionNotFound": "Transaction not found."
+  }
+  

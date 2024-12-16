@@ -4,13 +4,17 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { setAuthData, logout } from '../../redux/slices/authSlice';
+import { setAuthData, logout } from '../../redux/slices/auth/authSlice';
 import './UserDashboard.css';
+import RecommendedItems from '../search/RecommendedItems';
+import PreferenceManager from '../PreferenceManager';
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+
+  const userId = useSelector((state: RootState) => state.auth.user?.id);
 
   // Access tokens and user from Redux store
   const { access_token, user, status } = useSelector((state: RootState) => state.auth);
@@ -24,11 +28,11 @@ const UserDashboard: React.FC = () => {
     if (access_token_param && refresh_token_param) {
       const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
       dispatch(setAuthData({ access_token: access_token_param, refresh_token: refresh_token_param, user: storedUser }));
-      
+
       // Store tokens in localStorage
       localStorage.setItem('access_token', access_token_param);
       localStorage.setItem('refresh_token', refresh_token_param);
-      
+
       // Remove query parameters from URL after processing
       window.history.replaceState({}, document.title, "/user-dashboard");
     } else {
@@ -71,6 +75,7 @@ const UserDashboard: React.FC = () => {
   return (
     <div className="user-dashboard">
       <h1>Welcome, {user?.full_name ? `Hello, ${user.full_name}` : 'Hello, Guest'}</h1>
+      {/* <PreferenceManager userId={userId} /> */}
       <div className="dashboard-sections">
         <div className="dashboard-section">
           <div className="dashboard-card">
@@ -122,6 +127,8 @@ const UserDashboard: React.FC = () => {
       <div className="extra-sections">
         {/* Placeholder for other sections */}
       </div>
+      {/*<RecommendedItems context="personalized" userId={user.id} /> */}
+
       <button onClick={handleLogout} className="logout-button">
         Logout
       </button>

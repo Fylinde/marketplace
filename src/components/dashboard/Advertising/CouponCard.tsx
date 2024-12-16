@@ -1,13 +1,16 @@
 import React from "react";
 import "./CouponCard.css";
 
+
+interface Coupon {
+  id: string;
+  title: string;
+  discount: string;
+  expiryDate: string;
+}
+
 interface CouponCardProps {
-  coupon: {
-    id: string;
-    title: string;
-    discount: string;
-    expiryDate: string;
-  };
+  coupon: Coupon; // Updated to use `coupon` instead of `data`
   onDelete: () => void;
 }
 

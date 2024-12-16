@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { useAppDispatch, useAppSelector } from 'redux/slices/reduxHooks';
-import { fetchShippingMethods, setSelectedMethod } from 'redux/slices/shippingSlice';
-import shippingService from 'services/shippingService';
-import { getLocalizedText } from '../../utils/localizationUtils';
-import DashboardPageHeader from 'components/layout/DashboardPageHeader';
-import VendorDashboardLayout from 'components/layout/VendorDashboardLayout';
-import DataInput from 'components/dataInput/DataInput';
-import Button from '@/components/buttons/Button';
-import { Spin, Alert, Table, Modal } from 'antd';
-import { ColumnsType } from 'antd/lib/table';
-
-
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
+import { fetchShippingMethods } from "@/redux/slices/logistics/shippingSlice";
+import shippingService from "services/shippingService";
+import { getLocalizedText, formatCurrency } from "@/utils/localizationUtils";
+import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
+import DataInput from "components/dataInput/DataInput";
+import Button from "@/components/buttons/Button";
+import { Spin, Alert, Table, Modal } from "antd";
+import { ColumnsType } from "antd/lib/table";
+import { ShippingData } from "@/redux/slices/logistics/shippingSlice";
 
 
 const ShippingManagementContainer = styled.div`
@@ -50,26 +49,38 @@ const StyledTable = styled(Table)`
   }
 `;
 
-const ShippingManagement: React.FC = () => {
+interface ShippingManagementProps {
+  shippingData: ShippingData[];
+  loading: boolean;
+  error: string | null;
+}
+
+const ShippingManagement: React.FC<ShippingManagementProps> = ({
+  shippingData,
+  loading,
+  error,
+}) => {
   const dispatch = useAppDispatch();
-  const { methods, selectedMethod, loading, error } = useAppSelector((state) => state.shipping);
   const [modalVisible, setModalVisible] = useState(false);
   const [newShippingMethod, setNewShippingMethod] = useState({
-    name: '',
+    name: "",
     rate: 0,
-    currency: '',
-    estimatedDelivery: '',
+    currency: "USD",
+    estimatedDelivery: "",
   });
 
+  // Fetch data only if `shippingData` is not passed as a prop
   useEffect(() => {
-    dispatch(fetchShippingMethods({ country: 'US', currency: 'USD' })); // Example params
-  }, [dispatch]);
+    if (!shippingData) {
+      dispatch(fetchShippingMethods({ country: "US", currency: "USD" })); // Pass arguments
+    }
+  }, [dispatch, shippingData]);
 
   const handleAddShippingMethod = async () => {
     try {
       await shippingService.addShippingMethod(newShippingMethod);
       setModalVisible(false);
-      dispatch(fetchShippingMethods({ country: 'US', currency: 'USD' })); // Refresh methods
+      dispatch(fetchShippingMethods({ country: "US", currency: "USD" })); // Refresh
     } catch (err) {
       console.error(err);
     }
@@ -78,7 +89,7 @@ const ShippingManagement: React.FC = () => {
   const handleDeleteShippingMethod = async (methodId: string) => {
     try {
       await shippingService.deleteShippingMethod(methodId);
-      dispatch(fetchShippingMethods({ country: 'US', currency: 'USD' })); // Refresh methods
+      dispatch(fetchShippingMethods({ country: "US", currency: "USD" })); // Refresh
     } catch (err) {
       console.error(err);
     }
@@ -86,30 +97,28 @@ const ShippingManagement: React.FC = () => {
 
   const columns: ColumnsType<any> = [
     {
-      title: getLocalizedText('Shipping Method'),
-      dataIndex: 'name',
-      key: 'name',
+      title: getLocalizedText("Shipping Method", "shipping"),
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: getLocalizedText('Rate'),
-      dataIndex: 'rate',
-      key: 'rate',
-      render: (rate, record) => `${rate} ${record.currency}`,
+      title: getLocalizedText("Rate", "shipping"),
+      dataIndex: "rate",
+      key: "rate",
+      render: (rate, record) => formatCurrency(rate, record.currency),
     },
     {
-      title: getLocalizedText('Estimated Delivery'),
-      dataIndex: 'estimatedDelivery',
-      key: 'estimatedDelivery',
+      title: getLocalizedText("Estimated Delivery", "shipping"),
+      dataIndex: "estimatedDelivery",
+      key: "estimatedDelivery",
     },
     {
-      title: getLocalizedText('Actions'),
-      key: 'actions',
+      title: getLocalizedText("Actions", "shipping"),
+      key: "actions",
       render: (_, record) => (
-        <span>
-          <Button onClick={() => handleDeleteShippingMethod(record.id)}>
-            {getLocalizedText('Delete')}
-          </Button>
-        </span>
+        <Button danger onClick={() => handleDeleteShippingMethod(record.id)}>
+          {getLocalizedText("Delete", "shipping")}
+        </Button>
       ),
     },
   ];
@@ -117,50 +126,67 @@ const ShippingManagement: React.FC = () => {
   return (
     <VendorDashboardLayout>
       <ShippingManagementContainer>
-        <DashboardPageHeader title={getLocalizedText('Shipping Management')} />
+        <DashboardPageHeader title={getLocalizedText("Shipping Management", "shipping")} />
         <HeaderContainer>
-          <h3>{getLocalizedText('Manage Shipping Methods')}</h3>
+          <h3>{getLocalizedText("Manage Shipping Methods", "shipping")}</h3>
           <StyledButton onClick={() => setModalVisible(true)}>
-            {getLocalizedText('Add New Shipping Method')}
+            {getLocalizedText("Add New Shipping Method", "shipping")}
           </StyledButton>
         </HeaderContainer>
-        {loading && <Spin size="large" />}
-        {error && <Alert message={error} type="error" />}
-        <StyledTable
-          dataSource={methods.map((method) => ({
-            key: method.id,
-            ...method,
-          }))}
-          columns={columns}
-          pagination={{ pageSize: 10 }}
-        />
+        {loading ? (
+          <Spin size="large" />
+        ) : error ? (
+          <Alert message={error} type="error" />
+        ) : (
+          <StyledTable
+            dataSource={
+              shippingData?.length
+                ? shippingData.map((data) => ({ key: data.id, ...data }))
+                : [] // Fallback to an empty array if shippingData is unavailable
+            }
+            columns={columns}
+            pagination={{ pageSize: 10 }}
+          />
+        )}
         <Modal
-          title={getLocalizedText('Add Shipping Method')}
+          title={getLocalizedText("Add Shipping Method", "shipping")}
           visible={modalVisible}
           onCancel={() => setModalVisible(false)}
           onOk={handleAddShippingMethod}
         >
           <DataInput
-            label={getLocalizedText('Shipping Name')}
+            label={getLocalizedText("Shipping Name", "shipping")}
             value={newShippingMethod.name}
-            onChange={(e) => setNewShippingMethod({ ...newShippingMethod, name: e.target.value })}
+            onChange={(e) =>
+              setNewShippingMethod({ ...newShippingMethod, name: e.target.value })
+            }
           />
           <DataInput
-            label={getLocalizedText('Rate')}
+            label={getLocalizedText("Rate", "shipping")}
             type="number"
             value={newShippingMethod.rate}
-            onChange={(e) => setNewShippingMethod({ ...newShippingMethod, rate: parseFloat(e.target.value) })}
+            onChange={(e) =>
+              setNewShippingMethod({
+                ...newShippingMethod,
+                rate: parseFloat(e.target.value),
+              })
+            }
           />
           <DataInput
-            label={getLocalizedText('Currency')}
+            label={getLocalizedText("Currency", "shipping")}
             value={newShippingMethod.currency}
-            onChange={(e) => setNewShippingMethod({ ...newShippingMethod, currency: e.target.value })}
+            onChange={(e) =>
+              setNewShippingMethod({ ...newShippingMethod, currency: e.target.value })
+            }
           />
           <DataInput
-            label={getLocalizedText('Estimated Delivery')}
+            label={getLocalizedText("Estimated Delivery", "shipping")}
             value={newShippingMethod.estimatedDelivery}
             onChange={(e) =>
-              setNewShippingMethod({ ...newShippingMethod, estimatedDelivery: e.target.value })
+              setNewShippingMethod({
+                ...newShippingMethod,
+                estimatedDelivery: e.target.value,
+              })
             }
           />
         </Modal>

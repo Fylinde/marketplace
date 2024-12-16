@@ -4,7 +4,7 @@ import {
   fetchProductDetails,
   fetchPersonalizedRecommendations,
   fetchCommunityQuestions,
-} from "../../redux/slices/productCardSlice";
+} from "../../redux/slices/products/productCardSlice";
 import { RootState } from "../../redux/store";
 import { WebSocketService } from "services/websocketService";
 import Countdown from "react-countdown";
@@ -13,11 +13,14 @@ import Button from "../buttons/Button";
 import Icon from "../icon/Icon";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import styled from "styled-components";
-import type { AppDispatch } from "../../redux/store"; // Ensure this matches your store setup
-import { Product } from "@/types/Product";
+import { Link } from "react-router-dom";
+import type { AppDispatch } from "../../redux/store";
+import { Product } from "../../types/Product";
 
+// WebSocket Service Initialization
 const webSocketService = new WebSocketService("wss://your-websocket-url");
 
+// Styled Components
 const ProductCardContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -28,6 +31,12 @@ const ProductCardContainer = styled.div`
   margin: 16px;
   max-width: 400px;
   width: 100%;
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
 
   @media (max-width: 768px) {
     max-width: 100%;
@@ -76,8 +85,8 @@ const Details = styled.div`
 
   .price-section {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
 
     h4 {
       font-size: 20px;
@@ -88,18 +97,26 @@ const Details = styled.div`
       font-size: 14px;
       color: #999;
     }
+
+    .seller-price {
+      font-size: 14px;
+      color: #555;
+      margin-top: 4px;
+    }
+  }
+
+  .additional-info {
+    margin-top: 8px;
+
+    p {
+      font-size: 14px;
+      color: #555;
+    }
   }
 `;
 
 const StockInfo = styled.div<{ outOfStock: boolean }>`
   color: ${(props) => (props.outOfStock ? "#ff5252" : "#4caf50")};
-`;
-
-
-const TryOn = styled.div`
-  margin-top: 8px;
-  font-size: 14px;
-  color: #3f51b5;
 `;
 
 const CartActions = styled.div`
@@ -181,90 +198,105 @@ const TrendingStats = styled.div`
   }
 `;
 
-// Define props for the EnhancedProductCard component
+// Props Interface
 interface EnhancedProductCardProps {
-    productId: string;
-    buyerRegion: string;
-    buyerCurrency: string;
-  }
+  productId: string; // Standardized to string
+  buyerRegion: string;
+  buyerCurrency: string;
+  sellerPrice: number;
+  sellerCurrency: string;
+  localizedPrices?: Record<string, { buyerPrice: number; sellerPrice: number; sellerCurrency: string }>;
+  stock?: number;
+  recommendations?: any[];
+  communityQuestions?: Record<string, any[]>;
+  trendingStats?: Record<string, { views: number; purchases: number }>;
+  tryOnAvailable?: boolean;
+  onAddToCart?: (productId: string) => void;
+  onOpenChatWithSeller?: (productId: string) => void;
+}
 
-// Component implementation
+// EnhancedProductCard Component
 const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
-    productId,
-    buyerRegion,
-    buyerCurrency,
-  }) => {
-    const dispatch = useDispatch<AppDispatch>();
-    // State for live data from WebSocket
-    const [liveData, setLiveData] = useState<{
-        buyerPrice?: number;
-        sellerPrice?: number;
-        saleEndsIn?: number;
-      }>({});
+  productId,
+  buyerRegion,
+  buyerCurrency,
+  sellerPrice,
+  sellerCurrency,
+  localizedPrices = {},
+  stock = 0,
+  recommendations = [],
+  communityQuestions = {},
+  trendingStats = {},
+  tryOnAvailable = false,
+  onAddToCart = () => { },
+  onOpenChatWithSeller = () => { },
+}) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const [liveData, setLiveData] = useState<{
+    buyerPrice?: number;
+    sellerPrice?: number;
+    saleEndsIn?: number;
+  }>({});
 
   const {
     products,
-    recommendations,
-    communityQuestions,
-    trendingStats,
-    localizedPrices,
     loading,
     error,
-    stock,
-    tryOnAvailable,
   } = useSelector((state: RootState) => state.productCard);
 
   const product = products.find((p) => p.id === productId);
- 
-    
-  if (!product) {
-    return <div>Product not found</div>;
-  }
-    
+
   useEffect(() => {
-    // Fetch required data
-    dispatch(fetchProductDetails(productId));
+    dispatch(
+      fetchProductDetails({
+        productId,
+        buyerCurrency,
+      })
+    );
     dispatch(fetchPersonalizedRecommendations({ buyerId: "user123", region: buyerRegion }));
     dispatch(fetchCommunityQuestions(productId));
 
-    // Subscribe to WebSocket for live updates
-    webSocketService.subscribe(`/products/${productId}`, (data) => {
-      setLiveData(data);
-    });
+    webSocketService.subscribe(`/products/${productId}`, (data) => setLiveData(data));
 
     return () => {
       webSocketService.unsubscribe(`/products/${productId}`);
     };
   }, [dispatch, productId, buyerRegion]);
 
+  if (!product) return <div>Product not found</div>;
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">{error}</div>;
 
-  // TypeScript now knows `product` is a `Product` type.
-  const { name, imgUrl, price, discount, rating } = product;
+  const { name, imgUrl, price, discount, rating, brand, category } = product;
   const discountedPrice = price - (price * discount) / 100;
 
   return (
     <ProductCardContainer>
       <ImageContainer>
-        <LazyLoadImage src={imgUrl} alt={name} effect="blur" />
+        <Link to={`/product/${productId}`}>
+          <LazyLoadImage src={imgUrl} alt={name} effect="blur" />
+        </Link>
         {discount > 0 && <div className="sale-chip">{discount}% Off</div>}
       </ImageContainer>
 
       <Details>
         <h3>{name}</h3>
+        {brand && <p className="additional-info">Brand: {brand}</p>}
+        {category && <p className="additional-info">Category: {category}</p>}
         <Rating value={Number(rating) || 0} outof={5} readonly />
         <div className="price-section">
           <h4>
-            {liveData.buyerPrice || localizedPrices[productId]?.buyerPrice} {buyerCurrency}
+            {liveData.buyerPrice || localizedPrices[productId]?.buyerPrice || sellerPrice} {buyerCurrency}
           </h4>
           {discount > 0 && (
             <del>
-              {liveData.sellerPrice || localizedPrices[productId]?.sellerPrice} {buyerCurrency}
+              {liveData.sellerPrice || localizedPrices[productId]?.sellerPrice || sellerPrice} {sellerCurrency}
             </del>
           )}
+          <p className="seller-price">
+            Seller Price: {sellerPrice} {sellerCurrency}
+          </p>
         </div>
-
         {liveData.saleEndsIn && (
           <Countdown
             date={Date.now() + liveData.saleEndsIn * 1000}
@@ -280,16 +312,18 @@ const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
           {stock > 0 ? `Stock: ${stock}` : "Out of Stock"}
         </StockInfo>
 
-        {tryOnAvailable && <TryOn>Try-On Available</TryOn>}
+        {tryOnAvailable && <p className="additional-info">Try-On Available</p>}
 
         <CartActions>
-          <Button variant="outlined" color="primary">
+          <Button variant="outlined" color="primary" onClick={() => onAddToCart(productId)}>
             Add to Cart
           </Button>
           <Icon className="wishlist-icon" variant="small">
             heart
           </Icon>
-
+          <Button variant="text" color="secondary" onClick={() => onOpenChatWithSeller(productId)}>
+            Chat with Seller
+          </Button>
         </CartActions>
       </Details>
 
@@ -300,7 +334,9 @@ const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
             <div key={index} className="recommendation-item">
               <LazyLoadImage src={rec.imgUrl} alt={rec.name} />
               <p>{rec.name}</p>
-              <p>{rec.price} {buyerCurrency}</p>
+              <p>
+                {rec.price} {buyerCurrency}
+              </p>
             </div>
           ))}
         </div>
@@ -310,8 +346,12 @@ const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
         <h4>Questions & Answers</h4>
         {communityQuestions[productId]?.map((q, index) => (
           <div key={index} className="question">
-            <p><strong>Q:</strong> {q.question}</p>
-            <p><strong>A:</strong> {q.answer || "No answer yet"}</p>
+            <p>
+              <strong>Q:</strong> {q.question}
+            </p>
+            <p>
+              <strong>A:</strong> {q.answer || "No answer yet"}
+            </p>
           </div>
         ))}
       </CommunityQuestions>
@@ -320,8 +360,21 @@ const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
         <p>Views: {trendingStats[productId]?.views || 0}</p>
         <p>Purchases: {trendingStats[productId]?.purchases || 0}</p>
       </TrendingStats>
+
+      <footer className="footer">
+        <p>
+          Prices shown in <strong>{buyerCurrency}</strong> and converted from seller's price in{" "}
+          <strong>{localizedPrices[productId]?.sellerCurrency || sellerCurrency || "unknown currency"}</strong>.
+        </p>
+      </footer>
     </ProductCardContainer>
   );
 };
 
 export default EnhancedProductCard;
+
+// Open chat function
+const openChatWithSeller = (productId: string) => {
+  // Placeholder: Implement logic to open chat window with seller
+  console.log(`Opening chat with seller for product ID: ${productId}`);
+};

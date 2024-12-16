@@ -1,15 +1,17 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProductDetails, fetchRelatedProducts } from "@/redux/slices/productSlice";
+import { fetchProductDetails, fetchRelatedProducts } from "@/redux/slices/products/productSlice";
 import { RootState } from "@/redux/store";
 import ProductReviews from "./ProductReviews";
 import RelatedProducts from "./RelatedProducts";
 import ProductTryOn from "./TryOnWidget";
-import type { AppDispatch } from "../../redux/store"; 
+import type { AppDispatch } from "../../redux/store";
 import ProductDetailContainer from "./styles/ProductDetail.styles";
+import RecommendedItems from "../search/RecommendedItems";
+
 
 const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
-    const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
   const { currentProduct, loading, error } = useSelector((state: RootState) => state.products);
 
   useEffect(() => {
@@ -31,6 +33,8 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
       <ProductReviews productId={productId} />
       <RelatedProducts productId={productId} />
       <ProductTryOn productId={productId} />
+      <RecommendedItems context="product" productId={productId} />
+
     </ProductDetailContainer>
   );
 };

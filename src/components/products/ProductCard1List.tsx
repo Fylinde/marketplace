@@ -6,8 +6,7 @@ import Grid from "../grid/Grid";
 import Pagination from "../pagination/Pagination";
 import ProductCard1 from "../product-cards/ProductCard1";
 import { SemiSpan } from "../Typography";
-import { fetchProducts } from "../../redux/slices/productSlice";
-import { updateFilters } from "../../redux/slices/filterSlice"; // Assuming global filters are implemented
+import { fetchProducts } from "../../redux/slices/products/productSlice";
 import { RootState } from "../../redux/store";
 import type { AppDispatch } from "../../redux/store";
 import { Product } from "../../types/Product";
@@ -24,7 +23,7 @@ const ProductCard1List: React.FC<ProductCard1ListProps> = ({ vendorId }) => {
   const productsPerPage = 9;
 
   useEffect(() => {
-    dispatch(fetchProducts({ vendorId: vendorId || "", page: currentPage + 1 }));
+    dispatch(fetchProducts({ page: currentPage + 1, filters: { ...(vendorId ? { vendorId } : {}) } }));
   }, [currentPage, vendorId, dispatch]);
 
   const handlePageChange = (selectedPage: number) => {
@@ -58,11 +57,15 @@ const ProductCard1List: React.FC<ProductCard1ListProps> = ({ vendorId }) => {
               id={product.id}
               title={product.title}
               price={product.price}
-              imgUrl={product.images?.[0] || "/assets/default-product.jpg"} // Default fallback
+              imgUrl={product.images?.[0] || "/assets/default-product.jpg"} // Fallback image
               category={product.category}
               images={product.images}
               brand={product.brand}
-              stock={product.stock}
+              stock={product.stock > 0} // Convert stock number to boolean
+              sellerPrice={product.price} // Adjust this logic as needed
+              buyerPrice={product.price} // Adjust this logic as needed
+              sellerCurrency="USD" // Adjust this based on product data
+              buyerCurrency="USD" // Adjust this based on product data
             />
           </Grid>
         ))}

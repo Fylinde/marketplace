@@ -61,6 +61,17 @@ const shippingService = {
     const { data } = await axios.delete(`${API_BASE_URL}/shipping/regions/${regionId}`);
     return data;
   },
+
+  async fetchShippingData(params: { country: string; currency: string }) {
+    const response = await axios.get(`${API_BASE_URL}/shipping/data`, { params });
+    return response.data;
+  },
+
+  async updateShippingSettings(settings: { id: string; updates: Record<string, any> }) {
+    const response = await axios.put(`${API_BASE_URL}/shipping/settings/${settings.id}`, settings.updates);
+    return response.data;
+  },
+  
 };
 
 export default shippingService;

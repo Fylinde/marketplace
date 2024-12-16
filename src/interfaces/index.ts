@@ -13,4 +13,5 @@ export type shadowOptions =
   | "large"
   | "badge"
   | "border"
+  | 'medium'
   | "none";
