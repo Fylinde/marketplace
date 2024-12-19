@@ -1,125 +1,175 @@
-
-import { useAppContext } from "contexts/app/AppContext";
-import { CartItem } from "@/redux/reducers/cartReducer";
+import React, { Fragment, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import React, { Fragment } from "react";
-import Box from "../components/Box";
-import Button from "../components/buttons/Button";
-import { Card1 } from "../components/Card1";
-import Divider from "../components/Divider";
+import { useAppSelector, useAppDispatch } from "../redux/reduxHooks";
 import FlexBox from "../components/FlexBox";
 import Grid from "../components/grid/Grid";
-import CheckoutNavLayout from "../components/layout/CheckoutNavLayout";
-import ProductCard7 from "../components/product-cards/ProductCard7";
+import Typography from "../components/Typography";
+import Divider from "../components/Divider";
+import Button from "../components/buttons/Button";
 import Select from "../components/Select";
 import TextField from "../components/text-field/TextField";
 import TextArea from "../components/textarea/TextArea";
-import Typography from "../components/Typography";
-import countryList from "../data/countryList";
+import LinearProgress from "../components/progressbar/LinearProgress";
+import { Card1 } from "../components/Card1";
+import ProductCard7 from "../components/product-cards/ProductCard7";
+import { changeCartAmount, removeItem, applyDiscount } from "../redux/slices/orders/cartSlice";
+import { formatCurrency, getLocalizedText } from "../utils/localizationUtils";
+
 
 const Cart = () => {
-  const { state } = useAppContext();
-  const cartList: CartItem[] = state.cart.cartList;
+  const dispatch = useAppDispatch();
 
-  const getTotalPrice = () => {
-    return (
-      cartList.reduce(
-        (accumulator, item) => accumulator + item.price * item.qty,
-        0
-      ) || 0
-    );
+  // Redux State
+  const {
+    cartList,
+    totalBuyerPrice,
+    discount,
+    freeShippingThreshold,
+    currency,
+  } = useAppSelector((state) => state.cart);
+
+  const [paymentMethod, setPaymentMethod] = useState<string>("fiat"); // Default to fiat
+  const [paymentFees, setPaymentFees] = useState<number>(0); // Fee for selected method
+  const [shippingCost, setShippingCost] = useState<number>(0);
+  const [totalCostWithShipping, setTotalCostWithShipping] = useState<number>(0);
+  const [voucher, setVoucher] = useState<string>("");
+
+  // Calculate Free Shipping Progress
+  const freeShippingProgress = Math.min((totalBuyerPrice / freeShippingThreshold!) * 100, 100);
+  const remainingForFreeShipping = Math.max(freeShippingThreshold! - totalBuyerPrice, 0);
+
+  // Calculate Payment Fees
+  const calculatePaymentFees = (method: string) => {
+    switch (method) {
+      case "crypto":
+        return totalBuyerPrice * 0.02; // Example: 2% fee for crypto
+      case "escrow":
+        return totalBuyerPrice * 0.03; // Example: 3% escrow fee
+      default:
+        return 0; // No additional fee for fiat
+    }
+  };
+
+  // Handle Payment Method Change
+  const handlePaymentMethodChange = (method: string) => {
+    setPaymentMethod(method);
+    const fees = calculatePaymentFees(method);
+    setPaymentFees(fees);
+    setTotalCostWithShipping(totalBuyerPrice + fees + shippingCost - discount);
+  };
+
+
+
+  // Handle Voucher Application
+  const applyVoucher = () => {
+    const discountValue = voucher === "SAVE10" ? 10 : 0; // Example validation logic
+    dispatch(applyDiscount({ discount: discountValue }));
   };
 
   return (
     <Fragment>
       <Grid container spacing={6}>
+        {/* Cart Items Section */}
         <Grid item lg={8} md={8} xs={12}>
-          {cartList.map((item) => (
-            <ProductCard7 key={item.id} mb="1.5rem" {...item} />
-          ))}
+          {cartList.length > 0 ? (
+            cartList.map((item) => (
+              <ProductCard7
+                key={item.id}
+                mb="1.5rem"
+                {...item}
+                removeItem={() => dispatch(removeItem(item.id))}
+                updateQuantity={(quantity: number) =>
+                  dispatch(changeCartAmount({ id: item.id, amount: quantity }))
+                }
+              />
+            ))
+          ) : (
+            <Typography>{getLocalizedText("cartEmpty", "shipping")}</Typography>
+          )}
         </Grid>
+
+        {/* Cart Summary Section */}
         <Grid item lg={4} md={4} xs={12}>
           <Card1>
-            <FlexBox
-              justifyContent="space-between"
-              alignItems="center"
-              mb="1rem"
-            >
-              <Typography color="gray.600">Total:</Typography>
-              <FlexBox alignItems="flex-end">
-                <Typography fontSize="18px" fontWeight="600" lineHeight="1">
-                  ${getTotalPrice().toFixed(2)}
-                </Typography>
-                <Typography fontWeight="600" fontSize="14px" lineHeight="1">
-                  00
-                </Typography>
-              </FlexBox>
-            </FlexBox>
+            {/* Free Shipping Progress */}
+            {freeShippingThreshold && (
+              <div className="free-shipping">
+                <LinearProgress
+                  value={freeShippingProgress}
+                  label={
+                    remainingForFreeShipping > 0
+                      ? getLocalizedText("freeShippingProgress", "shipping", {
+                          amount: formatCurrency(remainingForFreeShipping, currency),
+                        })
+                      : getLocalizedText("freeShippingAchieved", "shipping")
+                  }
+                  color="primary"
+                  thickness={8}
+                />
+              </div>
+            )}
 
             <Divider mb="1rem" />
 
-            <FlexBox alignItems="center" mb="1rem">
-              <Typography fontWeight="600" mr="10px">
-                Additional Comments
-              </Typography>
-              <Box p="3px 10px" bg="primary.light" borderRadius="3px">
-                <Typography fontSize="12px" color="primary.main">
-                  Note
-                </Typography>
-              </Box>
-            </FlexBox>
-
-            <TextArea rows={6} fullwidth mb="1rem" />
-
-            <Divider mb="1rem" />
-
-            <TextField placeholder="Voucher" fullwidth />
-
-            <Button
-              variant="outlined"
-              color="primary"
-              mt="1rem"
-              mb="30px"
-              fullwidth
-            >
-              Apply Voucher
-            </Button>
-
-            <Divider mb="1.5rem" />
-
+            {/* Payment Method Selector */}
             <Typography fontWeight="600" mb="1rem">
-              Shipping Estimates
+              {getLocalizedText("selectPaymentMethod", "shipping")}
             </Typography>
-
             <Select
+              value={{ label: paymentMethod, value: paymentMethod }}
+              options={[
+                { label: getLocalizedText("fiat", "shipping"), value: "fiat" },
+                { label: getLocalizedText("crypto", "shipping"), value: "crypto" },
+                { label: getLocalizedText("escrow", "shipping"), value: "escrow" },
+              ]}
+              onChange={(option) =>
+                handlePaymentMethodChange((option as { value: string }).value)
+              }
               mb="1rem"
-              label="Country"
-              placeholder="Select Country"
-              options={countryList}
-              onChange={(e) => {
-                console.log(e);
-              }}
             />
 
-            <Select
-              label="State"
-              placeholder="Select State"
-              options={stateList}
-              onChange={(e) => {
-                console.log(e);
-              }}
+            {/* Price Breakdown */}
+            <Typography fontWeight="600" mb="1rem">
+              {getLocalizedText("priceSummary", "shipping")}
+            </Typography>
+            <FlexBox justifyContent="space-between" mb="1rem">
+              <Typography>{getLocalizedText("subtotal", "shipping")}:</Typography>
+              <Typography>{formatCurrency(totalBuyerPrice, currency)}</Typography>
+            </FlexBox>
+            <FlexBox justifyContent="space-between" mb="1rem">
+              <Typography>{getLocalizedText("paymentFees", "shipping")}:</Typography>
+              <Typography>{formatCurrency(paymentFees, currency)}</Typography>
+            </FlexBox>
+            <FlexBox justifyContent="space-between" mb="1rem">
+              <Typography>{getLocalizedText("shipping", "shipping")}:</Typography>
+              <Typography>{formatCurrency(shippingCost, currency)}</Typography>
+            </FlexBox>
+            <Divider mb="1rem" />
+            <FlexBox justifyContent="space-between" mb="1rem">
+              <Typography fontWeight="600">{getLocalizedText("total", "shipping")}:</Typography>
+              <Typography fontWeight="600">
+                {formatCurrency(totalCostWithShipping || totalBuyerPrice, currency)}
+              </Typography>
+            </FlexBox>
+
+            {/* Voucher Application */}
+            <TextField
+              placeholder={getLocalizedText("voucherPlaceholder", "shipping")}
+              value={voucher}
+              onChange={(e) => setVoucher(e.target.value)}
+              fullwidth
+              mb="1rem"
             />
-
-            <Box mt="1rem">
-              <TextField label="Zip Code" placeholder="3100" fullwidth />
-            </Box>
-
-            <Button variant="outlined" color="primary" my="1rem" fullwidth>
-              Calculate Shipping
+            <Button variant="outlined" color="primary" onClick={applyVoucher} fullwidth>
+              {getLocalizedText("applyVoucher", "shipping")}
             </Button>
+
+            <Divider my="1.5rem" />
+
+            {/* Actions */}
             <Link to="/checkout">
               <Button variant="contained" color="primary" fullwidth>
-                Checkout Now
+                {getLocalizedText("checkoutNow", "shipping")}
               </Button>
             </Link>
           </Card1>
@@ -128,18 +178,5 @@ const Cart = () => {
     </Fragment>
   );
 };
-
-const stateList = [
-  {
-    value: "New York",
-    label: "New York",
-  },
-  {
-    value: "Chicago",
-    label: "Chicago",
-  },
-];
-
-Cart.layout = CheckoutNavLayout;
 
 export default Cart;

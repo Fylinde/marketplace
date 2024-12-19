@@ -23,6 +23,7 @@ export interface UserProfile {
 
 export interface UserState {
   profile: UserProfile | null;
+  context: string;
   wishlist: WishlistItem[];
   browsingHistory: string[]; // Array of product IDs
   cart: { productId: string; quantity: number }[]; // Array of cart items
@@ -34,6 +35,7 @@ export interface UserState {
 
 const initialState: UserState = {
   profile: null,
+  context: '',
   wishlist: [],
   browsingHistory: [],
   cart: [],

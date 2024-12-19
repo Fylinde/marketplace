@@ -15,8 +15,7 @@ import ViewInSpaceButton from "../buttons/ViewInSpaceButton";
 export interface ProductCard7Props {
   id: string | number;
   name: string;
-  qty: number;
-  price: number;
+  quantity: number;
   imgUrl?: string;
   sellerPrice?: number; // Seller price
   buyerPrice?: number; // Buyer price
@@ -27,13 +26,15 @@ export interface ProductCard7Props {
   isArEnabled?: boolean;
   onChatWithSeller?: () => void; // Chat with seller handler
   onTryNow?: () => void; // TryOn handler
+  removeItem?: () => void; // Optional prop for removing an item
+  updateQuantity?: (quantity: number) => void; // Optional prop for updating quantity
+  [key: string]: any; // Allow extensibility
 }
 
 const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
   id,
   name,
-  qty,
-  price,
+  quantity,
   imgUrl = "/assets/images/products/iphone-xi.png",
   sellerPrice = 0,
   buyerPrice = 0,
@@ -44,6 +45,8 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
   isArEnabled = false,
   onChatWithSeller,
   onTryNow,
+  removeItem,
+  updateQuantity,
   ...props
 }) => {
   const handleCartAmountChange = useCallback(
@@ -92,13 +95,13 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
         <FlexBox justifyContent="space-between" alignItems="flex-end">
           <FlexBox flexWrap="wrap" alignItems="center">
             <Typography color="gray.600" mr="0.5rem">
-              {buyerCurrency} {buyerPrice.toFixed(2)} x {qty}
+              {buyerCurrency} {buyerPrice.toFixed(2)} x {quantity}
             </Typography>
             <Typography fontWeight={600} color="primary.main" mr="1rem">
-              {buyerCurrency} {(buyerPrice * qty).toFixed(2)}
+              {buyerCurrency} {(buyerPrice * quantity).toFixed(2)}
             </Typography>
             <Typography fontSize="12px" color="text.muted">
-              ({sellerCurrency} {(sellerPrice * qty).toFixed(2)})
+              ({sellerCurrency} {(sellerPrice * quantity).toFixed(2)})
             </Typography>
           </FlexBox>
 
@@ -110,13 +113,13 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
               padding="5px"
               size="small"
               borderColor="primary.light"
-              onClick={() => handleCartAmountChange(qty - 1)}
-              disabled={qty === 1}
+              onClick={() => handleCartAmountChange(quantity - 1)}
+              disabled={quantity === 1}
             >
               <Icon variant="small">minus</Icon>
             </Button>
             <Typography mx="0.5rem" fontWeight="600" fontSize="15px">
-              {qty}
+              {quantity}
             </Typography>
             <Button
               variant="outlined"
@@ -124,7 +127,7 @@ const ProductCard7: React.FC<ProductCard7Props & SpaceProps> = ({
               padding="5px"
               size="small"
               borderColor="primary.light"
-              onClick={() => handleCartAmountChange(qty + 1)}
+              onClick={() => handleCartAmountChange(quantity + 1)}
             >
               <Icon variant="small">plus</Icon>
             </Button>

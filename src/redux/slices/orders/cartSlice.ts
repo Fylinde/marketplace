@@ -398,5 +398,5 @@ const cartSlice = createSlice({
 
 
 
-export const { changeCartAmount, applyDiscount, lockExchangeRate  } = cartSlice.actions;
+export const { changeCartAmount, removeItem, applyDiscount, lockExchangeRate  } = cartSlice.actions;
 export default cartSlice.reducer;

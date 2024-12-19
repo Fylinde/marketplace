@@ -27,7 +27,7 @@ const Section6: React.FC = () => {
     loadingBrands,
     selectedBrand,
   } = useSelector((state: RootState) => state.brands);
-
+  const { currentRates } = useSelector((state: RootState) => state.exchangeRate); // Extract exchange rates
 
   // Fetch brands and products on mount and whenever the selectedBrand changes
   useEffect(() => {
@@ -36,7 +36,6 @@ const Section6: React.FC = () => {
     }
     dispatch(fetchProductsByBrand(selectedBrand || "")); // Fallback to an empty string if selectedBrand is null or undefined
   }, [dispatch, selectedBrand, brands.length]);
-
 
   // Handle brand/category selection
   const handleCategoryClick = (brand: Brand) => {
@@ -99,25 +98,26 @@ const Section6: React.FC = () => {
           {loadingProducts ? (
             <p>Loading Products...</p>
           ) : (
-            <Grid container spacing={6}>
-              {products.slice(0, 6).map((item: Product) => (
-                <Grid item lg={4} sm={6} xs={12} key={item.id}>
-                  <ProductCard1
-                    hoverEffect
-                    id={item.id}
-                    imgUrl={item.imgUrl || "/assets/images/default-product.png"}
-                    title={item.title || "Untitled"}
-                    price={item.price}
-                    sellerPrice={item.sellerPrice}
-                    buyerPrice={item.buyerPrice}
-                    sellerCurrency={item.sellerCurrency}
-                    buyerCurrency={item.buyerCurrency}
-                    rating={typeof item.rating === "number" ? item.rating : undefined}
-                    productUrl={`/product/${item.id}`}
-                  />
-                </Grid>
-              ))}
-            </Grid>
+          <Grid container spacing={6}>
+            {products.slice(0, 6).map((item: Product) => (
+              <Grid item lg={4} sm={6} xs={12} key={item.id}>
+                <ProductCard1
+                  hoverEffect
+                  id={item.id}
+                  imgUrl={item.imgUrl || "/assets/images/default-product.png"}
+                  title={item.title || "Untitled"}
+                  sellerPrice={item.sellerPrice}
+                  buyerPrice={item.buyerPrice}
+                  sellerCurrency={item.sellerCurrency}
+                  buyerCurrency={item.buyerCurrency}
+                  exchangeRates={currentRates} // Pass currentRates instead of exchangeRates
+                  rating={typeof item.rating === "number" ? item.rating : undefined}
+                  productUrl={`/product/${item.id}`}
+                />
+              </Grid>
+            ))}
+          </Grid>
+
           )}
         </Box>
       </FlexBox>

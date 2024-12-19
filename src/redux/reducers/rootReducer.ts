@@ -37,6 +37,7 @@ import chatbotReducer from "../slices/communication/chatbotSlice ";
 import commentReducer from "../slices/communication/commentSlice";
 import notificationReducer from "../slices/communication/notificationSlice";
 import messageReducer from "../slices/communication/messageSlice"
+import chatReducer from "../slices/communication/chatSlice"
 
 
 import shippingReducer from "../slices/logistics/shippingSlice";
@@ -120,7 +121,8 @@ const rootReducer = combineReducers({
   comments: commentReducer,
   notifications: notificationReducer,
   message: messageReducer,
-
+  chat: chatReducer,
+  
 
   // Logistics
   shipping: shippingReducer,

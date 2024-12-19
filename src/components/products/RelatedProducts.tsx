@@ -6,26 +6,12 @@ import Box from "../Box";
 import Grid from "../grid/Grid";
 import ProductCard1 from "../product-cards/ProductCard1";
 import { H3 } from "../Typography";
-import { fetchRelatedProducts } from "../../redux/slices/products/productSlice"; // Redux action for related products
-import { RootState } from "../../redux/store"; // Adjust path as needed
+import { fetchRelatedProducts } from "../../redux/slices/products/productSlice";
+import { RootState } from "../../redux/store";
 import type { AppDispatch } from "../../redux/store";
 import Modal from "../modal/Modal";
 import ProductIntro from "../products/ProductIntro";
-
-interface Product {
-  id: string | number;
-  title: string;
-  images: string[];
-  price: number;
-  rating?: {
-    average: number;
-    count: number;
-  };
-  description?: string;
-  brand?: string;
-  category?: string;
-  stock?: boolean;
-}
+import { Product } from "../../types/Product";
 
 export interface RelatedProductsProps {
   productId: string;
@@ -34,6 +20,7 @@ export interface RelatedProductsProps {
 const RelatedProducts: React.FC<RelatedProductsProps> = ({ productId }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { relatedProducts, loading, error } = useSelector((state: RootState) => state.products);
+  const { currentRates } = useSelector((state: RootState) => state.exchangeRate); // Fetch exchange rates
   const [filters, setFilters] = useState({ brand: "", category: "", maxPrice: Infinity });
   const [page, setPage] = useState(1);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
@@ -110,28 +97,38 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productId }) => {
             <ProductCard1
               id={item.id}
               title={item.title || "Untitled Product"}
-              price={item.price || 0}
               images={item.images || []}
-              rating={typeof item.rating === "object" && "average" in item.rating ? item.rating.average : 0} // Check type of rating
+              rating={
+                typeof item.rating === "object" && "average" in item.rating
+                  ? item.rating.average
+                  : 0
+              }
               brand={item.brand || "Unknown Brand"}
               category={item.category || "Uncategorized"}
-              stock={item.stock ? true : false} // Ensure stock is a boolean
-              hoverEffect={true} // Explicitly set hoverEffect to true
-              sellerPrice={item.sellerPrice || item.price || 0} // Default to price
-              buyerPrice={item.buyerPrice || item.price || 0} // Default to price
-              sellerCurrency={item.sellerCurrency || "USD"} // Default to USD
-              buyerCurrency={item.buyerCurrency || "USD"} // Default to USD
+              stock={item.stock ? true : false}
+              hoverEffect={true}
+              sellerPrice={item.sellerPrice || item.price || 0}
+              buyerPrice={item.buyerPrice || item.price || 0}
+              sellerCurrency={item.sellerCurrency || "USD"}
+              buyerCurrency={item.buyerCurrency || "USD"}
+              exchangeRates={currentRates || { baseCurrency: "USD", rates: {} }} // Pass exchange rates
             />
           </Grid>
         ))}
       </Grid>
 
-
       <div ref={ref}></div>
 
       {quickViewProduct && (
         <Modal open={!!quickViewProduct} onClose={() => setQuickViewProduct(null)}>
-          <ProductIntro product={quickViewProduct} />
+          <ProductIntro
+            product={{
+              ...quickViewProduct,
+              images: quickViewProduct.images || [],
+              title: quickViewProduct.title || "Untitled Product",
+              description: quickViewProduct.description || "",
+            }}
+          />
         </Modal>
       )}
     </Box>

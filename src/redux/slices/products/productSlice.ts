@@ -304,12 +304,12 @@ export const fetchTags = createAsyncThunk(
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async (
-    args: { page?: number; vendorId?: string; filters?: Record<string, any>; sort?: string } = {}, // Add vendorId
+    args: { page?: number; sellerId?: string; filters?: Record<string, any>; sort?: string } = {}, // Add vendorId
     thunkAPI
   ) => {
-    const { page = 1, vendorId, filters = {}, sort = "popularity" } = args; // Include vendorId
+    const { page = 1, sellerId, filters = {}, sort = "popularity" } = args; // Include vendorId
     try {
-      const response = await getProducts(vendorId, page, filters, sort); // Pass vendorId to the API call
+      const response = await getProducts(sellerId, page, filters, sort); // Pass vendorId to the API call
       return { products: response.products, totalPages: response.totalPages };
     } catch (error: any) {
       return thunkAPI.rejectWithValue(extractErrorMessage(error));
@@ -478,33 +478,32 @@ export const fetchShops = createAsyncThunk<Shop[], void, { rejectValue: string }
 
 // Helper function to validate and transform API response into the expected Product structure
 const transformProductResponse = (data: any): Product => {
-  if (
-    !data ||
-    typeof data.id !== "string" ||
-    typeof data.name !== "string" ||
-    typeof data.price !== "number" ||
-    typeof data.stock !== "number" ||
-    typeof data.createdAt !== "string" // Ensure createdAt exists and is a string
-  ) {
+  if (!data || typeof data.id !== "string" || typeof data.name !== "string") {
     throw new Error("Invalid product data structure from API");
   }
 
   return {
     id: data.id,
     name: data.name,
-    price: data.price,
-    currency: data.currency || "USD", // Default currency if not provided
-    stock: data.stock,
-    imgUrl: data.imgUrl || "/assets/images/default-product.png", // Default image if not provided
-    description: data.description || "", // Default empty description
-    category: data.category || "Uncategorized", // Default category
-    rating: data.rating || 0, // Default rating
-    vendorId: data.vendorId || "", // Default vendorId
-    vendorName: data.vendorName || "Unknown Vendor", // Default vendor name
-    createdAt: data.createdAt || new Date().toISOString(), // Default to current timestamp
-    // Add more fields as needed from Product type
+    sellerPrice: data.sellerPrice || 0,
+    sellerCurrency: data.sellerCurrency || "USD",
+    totalSellerPrice: data.totalSellerPrice || 0,
+    buyerPrice: data.buyerPrice || 0,
+    buyerCurrency: data.buyerCurrency || "USD",
+    totalBuyerPrice: data.totalBuyerPrice || 0,
+    createdAt: data.createdAt || new Date().toISOString(),
+    stock: data.stock || 0,
+    imgUrl: data.imgUrl || "/assets/images/default-product.png",
+    description: data.description || "",
+    status: data.status || "Unavailable",
+    rating: data.rating || 0,
+    category: data.category || "Uncategorized",
+    sellerId: data.sellerId || "unknown",
+    sellerName: data.sellerName || "Unknown Seller",
+    ...data, // Include any additional fields dynamically
   };
 };
+
 
 // Fetch product details by ID
 export const fetchProductDetails = createAsyncThunk<Product, string>(
@@ -512,20 +511,7 @@ export const fetchProductDetails = createAsyncThunk<Product, string>(
   async (productId, thunkAPI) => {
     try {
       const response = await axios.get(`/api/products/${productId}`);
-      return {
-        id: response.data.id,
-        name: response.data.name,
-        price: response.data.price,
-        currency: response.data.currency || "USD",
-        stock: response.data.stock,
-        imgUrl: response.data.imgUrl || "/assets/images/default-product.png",
-        description: response.data.description || "",
-        category: response.data.category || "Uncategorized",
-        rating: response.data.rating || 0,
-        vendorId: response.data.vendorId || "",
-        vendorName: response.data.vendorName || "Unknown Vendor",
-        createdAt: response.data.createdAt || new Date().toISOString(),
-      } as Product;
+      return transformProductResponse(response.data); // Use updated transformation
     } catch (error) {
       return thunkAPI.rejectWithValue(
         (error as AxiosError).response?.data?.message || "Failed to fetch product details"
@@ -632,6 +618,13 @@ const productSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(updateProduct.fulfilled, (state, action) => {
+      const index = state.products.findIndex((p) => p.id === action.payload.id);
+      if (index !== -1) {
+        state.products[index] = { ...state.products[index], ...action.payload };
+      }
+    });
+    
     builder
       // B2C Products
       .addCase(fetchB2CProducts.fulfilled, (state, action) => {
@@ -949,6 +942,14 @@ const productSlice = createSlice({
 });
 
 // Selectors
+export const selectProductById = (state: RootState, id: string) =>
+  state.products.products.find((product) => product.id === id);
+
+export const selectBuyerPrice = (state: RootState, id: string) => {
+  const product = state.products.products.find((product) => product.id === id);
+  return product?.buyerPrice || 0;
+};
+
 export const selectProducts = (state: RootState) => state.products.products;
 export const selectProductError = (state: RootState) => state.products.error;
 export const selectSelectedCategory = (state: RootState) =>

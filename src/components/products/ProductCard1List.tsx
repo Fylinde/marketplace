@@ -12,19 +12,20 @@ import type { AppDispatch } from "../../redux/store";
 import { Product } from "../../types/Product";
 
 export interface ProductCard1ListProps {
-  vendorId?: string;
+  sellerId?: string;
   products?: Product[];
 }
 
-const ProductCard1List: React.FC<ProductCard1ListProps> = ({ vendorId }) => {
+const ProductCard1List: React.FC<ProductCard1ListProps> = ({ sellerId }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { products, loading, totalPages, error } = useSelector((state: RootState) => state.products);
+  const { currentRates } = useSelector((state: RootState) => state.exchangeRate); // Fetch exchange rates
   const [currentPage, setCurrentPage] = useState(0);
   const productsPerPage = 9;
 
   useEffect(() => {
-    dispatch(fetchProducts({ page: currentPage + 1, filters: { ...(vendorId ? { vendorId } : {}) } }));
-  }, [currentPage, vendorId, dispatch]);
+    dispatch(fetchProducts({ page: currentPage + 1, filters: { ...(sellerId ? { sellerId } : {}) } }));
+  }, [currentPage, sellerId, dispatch]);
 
   const handlePageChange = (selectedPage: number) => {
     setCurrentPage(selectedPage);
@@ -56,7 +57,6 @@ const ProductCard1List: React.FC<ProductCard1ListProps> = ({ vendorId }) => {
             <ProductCard1
               id={product.id}
               title={product.title}
-              price={product.price}
               imgUrl={product.images?.[0] || "/assets/default-product.jpg"} // Fallback image
               category={product.category}
               images={product.images}
@@ -66,6 +66,7 @@ const ProductCard1List: React.FC<ProductCard1ListProps> = ({ vendorId }) => {
               buyerPrice={product.price} // Adjust this logic as needed
               sellerCurrency="USD" // Adjust this based on product data
               buyerCurrency="USD" // Adjust this based on product data
+              exchangeRates={currentRates || { baseCurrency: "USD", rates: {} }} // Provide exchange rates with a fallback
             />
           </Grid>
         ))}

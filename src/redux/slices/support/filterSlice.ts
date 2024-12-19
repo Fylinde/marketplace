@@ -1,16 +1,22 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface FiltersState {
+export interface FiltersState {
   category: string | null;
   minPrice: number | null;
   maxPrice: number | null;
   brand: string | null;
   color: string | null;
   rating: number | null;
+  sellerId?: string;
+  priceRange?: [number, number];
+  sort?: string; // Add the sort property here
   otherOptions: { [key: string]: boolean }; // Handles options like "On Sale", "In Stock"
 }
 
 const initialState: FiltersState = {
+  sellerId: undefined,
+  priceRange: [0, 1000],
+  sort: "popularity", // Default value
   category: null,
   minPrice: null,
   maxPrice: null,

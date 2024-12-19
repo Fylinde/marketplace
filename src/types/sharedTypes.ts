@@ -258,6 +258,7 @@ export interface BillingInformation {
     id: string;
     name: string;
     email: string;
+    context: string;
     // Add other fields based on your API response
   }
   

@@ -14,7 +14,7 @@ const ProductList: React.FC = () => {
 
   useEffect(() => {
     // Dispatch action to fetch products for the current page
-    dispatch(fetchProducts({ page: currentPage, vendorId: "" }));
+    dispatch(fetchProducts({ page: currentPage, sellerId: "" }));
   }, [dispatch, currentPage]);
 
   const handlePageChange = (selectedPage: number) => {

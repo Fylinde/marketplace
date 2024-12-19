@@ -29,6 +29,10 @@ const Section7: React.FC = () => {
     loadingProducts,
   } = useSelector((state: RootState) => state.products);
 
+  const { currentRates } = useSelector(
+    (state: RootState) => state.exchangeRate // Extract exchange rates
+  );
+
   // Fetch categories (brands or shops) and products on component mount or when selectedCategory changes
   useEffect(() => {
     if (categoryType === "brands" && !brands.length) {
@@ -132,23 +136,29 @@ const Section7: React.FC = () => {
           {loadingProducts ? (
             <p>Loading Products...</p>
           ) : (
-            <Grid container spacing={6}>
-              {products.slice(0, 9).map((item) => (
-                <Grid item lg={4} sm={6} xs={12} key={item.id}>
-                  <ProductCard1
-                    hoverEffect
-                    id={item.id}
-                    imgUrl={item.imgUrl || "/assets/images/default-product.png"}
-                    title={item.title || "No Title Available"}
-                    price={item.price || 0}
-                    sellerPrice={item.sellerPrice || 0}
-                    buyerPrice={item.buyerPrice || 0}
-                    sellerCurrency={item.sellerCurrency || "USD"}
-                    buyerCurrency={item.buyerCurrency || "USD"}
-                  />
-                </Grid>
-              ))}
-            </Grid>
+          <Grid container spacing={6}>
+            {products.slice(0, 9).map((item) => (
+              <Grid item lg={4} sm={6} xs={12} key={item.id}>
+                <ProductCard1
+                  hoverEffect
+                  id={item.id}
+                  imgUrl={item.imgUrl || "/assets/images/default-product.png"}
+                  title={item.title || "No Title Available"}
+                  sellerPrice={item.sellerPrice || 0}
+                  buyerPrice={item.buyerPrice || 0}
+                  sellerCurrency={item.sellerCurrency || "USD"}
+                  buyerCurrency={item.buyerCurrency || "USD"}
+                  exchangeRates={
+                    currentRates || {
+                      baseCurrency: "USD",
+                      rates: {},
+                    }
+                  } // Provide default ExchangeRate object if currentRates is null
+                />
+              </Grid>
+            ))}
+          </Grid>
+
           )}
         </Box>
       </FlexBox>

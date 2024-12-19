@@ -11,10 +11,11 @@ import ProductCard1 from "../product-cards/ProductCard1";
 import Typography from "../Typography";
 import StyledProductCategory from "./ProductCategoryStyle";
 import { fetchShops, fetchProductsByType } from "../../redux/slices/products/productSlice";
-import { RootState, AppDispatch } from "redux/store"; // Adjust path based on your project structure
+import { RootState, AppDispatch } from "redux/store";
 import { fetchBrands } from "../../redux/slices/products/brandSlice";
 import { Shop } from "types/shop";
 import { Brand } from "types/brand";
+import { convertCurrency } from "../../utils/currencyConversion";
 
 const Section9: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,19 +25,19 @@ const Section9: React.FC = () => {
   const { brands, loadingBrands } = useSelector(
     (state: RootState) => state.brands
   );
+  const { currentRates } = useSelector(
+    (state: RootState) => state.exchangeRate
+  );
 
   const [type, setType] = useState<"brands" | "shops">("shops");
   const [selected, setSelected] = useState<string>("");
 
-  // Determine the current list dynamically
   const currentList = type === "brands" ? brands : shops;
 
-  // Handle category selection
   const handleCategoryClick = (item: string) => {
     setSelected(selected === item ? "" : item);
   };
 
-  // Fetch brands, shops, and products dynamically based on type and selection
   useEffect(() => {
     if (type === "brands" && !brands.length) {
       dispatch(fetchBrands());
@@ -84,12 +85,12 @@ const Section9: React.FC = () => {
               </Typography>
             </FlexBox>
 
-            {(loadingBrands || loadingShops) ? (
+            {loadingBrands || loadingShops ? (
               <p>Loading {type}...</p>
             ) : (
               currentList.map((item: Brand | Shop, ind: number) => (
                 <StyledProductCategory
-                  key={item.id} // Use unique `id`
+                  key={item.id}
                   mb="0.75rem"
                   bg={selected === item.id ? "white" : "gray.100"}
                   shadow={selected === item.id ? 4 : undefined}
@@ -133,23 +134,37 @@ const Section9: React.FC = () => {
           {loadingProducts ? (
             <p>Loading Products...</p>
           ) : (
-            <Grid container spacing={6}>
-              {products.map((item, ind) => (
+          <Grid container spacing={6}>
+            {products.map((item, ind) => {
+              const convertedBuyerPrice = currentRates
+                ? convertCurrency(
+                    item.sellerPrice,
+                    item.sellerCurrency,
+                    item.buyerCurrency,
+                    currentRates // Pass the complete currentRates object
+                  )
+                : item.sellerPrice; // Fallback to seller price if rates are unavailable
+
+              return (
                 <Grid item lg={4} sm={6} xs={12} key={item.id || ind}>
                   <ProductCard1
                     hoverEffect
                     id={item.id}
                     imgUrl={item.imgUrl || "/assets/images/default-product.png"}
                     title={item.title || "No Title Available"}
-                    price={item.price ?? 0}
                     sellerPrice={item.sellerPrice}
-                    buyerPrice={item.buyerPrice}
+                    buyerPrice={convertedBuyerPrice}
                     sellerCurrency={item.sellerCurrency}
                     buyerCurrency={item.buyerCurrency}
+                    exchangeRates={
+                      currentRates || { baseCurrency: "USD", rates: {} } // Provide full fallback ExchangeRate
+                    }
                   />
                 </Grid>
-              ))}
-            </Grid>
+              );
+            })}
+          </Grid>
+
           )}
         </Box>
       </FlexBox>

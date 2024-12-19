@@ -14,6 +14,8 @@ import Section12 from "components/home-1/Section12";
 import Section13 from "components/home-1/Section13";
 import AppLayout from "components/layout/AppLayout"; // Ensure correct path
 import { PageWithLayout } from "types/pageLayouts";
+import FloatingWidget from "components/exchange/FloatingWidget"; // Import the widget
+
 
 const IndexPage: PageWithLayout = () => {
   return (
@@ -31,6 +33,7 @@ const IndexPage: PageWithLayout = () => {
       <Section11 />
       <Section12 />
       <Section13 />
+      <FloatingWidget />
     </main>
   );
 };

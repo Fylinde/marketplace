@@ -1,8 +1,11 @@
 // src/redux/slices/recommendationSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import RecommendationService from "../../../services/RecommendationService";
+import { Recommendation } from "@/types/Recommendation";
+
 
 interface RecommendationState {
+  recommendations: Recommendation[];
   personalized: any[];
   productBased: any[];
   searchBased: any[];
@@ -15,6 +18,7 @@ interface RecommendationState {
 
 
 const initialState: RecommendationState = {
+  recommendations: [],
   personalized: [],
   productBased: [],
   searchBased: [],

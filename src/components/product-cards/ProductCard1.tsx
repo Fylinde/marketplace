@@ -1,8 +1,10 @@
 import React from "react";
 import { StyledProductCard1 } from "./ProductCardStyle";
-import Rating from "../rating/Rating"; // Retain the original component name
+import Rating from "../rating/Rating";
 import { Link } from "react-router-dom";
 import ViewInSpaceButton from "../buttons/ViewInSpaceButton";
+import { ExchangeRate } from "../../types/ExchangeRate";
+import { convertCurrency } from "../../utils/currencyConversion";
 
 export interface RatingData {
   average: number;
@@ -12,12 +14,12 @@ export interface RatingData {
 
 export interface ProductCard1Props {
   id: string | number;
+  name?: string;
   title?: string;
-  price: number; // Required
   sellerPrice: number;
-  buyerPrice: number;
   sellerCurrency: string;
   buyerCurrency: string;
+  buyerPrice?: number; // Optional prop
   images?: string[];
   imgUrl?: string;
   productUrl?: string;
@@ -31,18 +33,20 @@ export interface ProductCard1Props {
   off?: number; // Optional
   discount?: number; // Add discount
   reviews?: { comment: string; rating: number; user: string }[]; // Localized reviews
-  onChatWithSeller?: (productId: string | number) => void; // Chat with seller handler
-  onTryNow?: (productId: string | number) => void; // Visual TryOn handler
+  exchangeRates: ExchangeRate | null;
+  onChatWithSeller?: (productId: string | number) => void;
+  onTryNow?: (productId: string | number) => void;
   onClick?: () => void;
 }
+
 
 const ProductCard1: React.FC<ProductCard1Props> = ({
   id,
   title,
   sellerPrice,
-  buyerPrice,
   sellerCurrency,
   buyerCurrency,
+  buyerPrice: buyerPriceProp,
   images,
   imgUrl,
   category,
@@ -54,11 +58,17 @@ const ProductCard1: React.FC<ProductCard1Props> = ({
   isArEnabled = false,
   reviews = [],
   discount,
+  exchangeRates,
   onChatWithSeller,
   onTryNow,
   onClick,
 }) => {
   const primaryImage = images?.[0] || imgUrl || "/assets/images/default-product.png";
+
+  // Calculate buyerPrice using currency conversion utility if the prop is not provided
+  const calculatedBuyerPrice = buyerPriceProp
+    ? buyerPriceProp
+    : convertCurrency(sellerPrice, sellerCurrency, buyerCurrency, exchangeRates);
 
   return (
     <StyledProductCard1 hoverEffect={hoverEffect} onClick={onClick}>
@@ -81,7 +91,7 @@ const ProductCard1: React.FC<ProductCard1Props> = ({
         )}
 
         {/* Rating */}
-        {(typeof rating === "object" && rating !== null && "average" in rating) ? (
+        {typeof rating === "object" && rating !== null && "average" in rating ? (
           <Rating value={(rating as RatingData).average} outof={5} color="warn" readonly />
         ) : typeof rating === "number" ? (
           <Rating value={rating} outof={5} color="warn" readonly />
@@ -92,7 +102,7 @@ const ProductCard1: React.FC<ProductCard1Props> = ({
           Seller Price: {sellerCurrency} {sellerPrice.toFixed(2)}
         </p>
         <p>
-          Buyer Price: {buyerCurrency} {buyerPrice.toFixed(2)}
+          Buyer Price: {buyerCurrency} {calculatedBuyerPrice.toFixed(2)}
         </p>
 
         {/* Discount */}

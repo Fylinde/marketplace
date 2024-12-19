@@ -10,15 +10,12 @@ import { updateFilters } from "../../redux/slices/support/filterSlice";
 import { RootState } from "../../redux/store";
 import type { AppDispatch } from "../../redux/store";
 import { Product } from "../../types/Product";
-import { Rating } from "@/types/rating";
-
 
 export interface ProductCard9ListProps {
-  vendorId?: string;
+  sellerId?: string;
 }
 
-
-const ProductCard9List: React.FC<ProductCard9ListProps> = ({ vendorId }) => {
+const ProductCard9List: React.FC<ProductCard9ListProps> = ({ sellerId }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { products, loading, totalPages, error } = useSelector((state: RootState) => state.products);
   const filters = useSelector((state: RootState) => state.filters);
@@ -27,16 +24,21 @@ const ProductCard9List: React.FC<ProductCard9ListProps> = ({ vendorId }) => {
   const [sortOption, setSortOption] = useState<string>("popularity");
 
   useEffect(() => {
-    const updatedFilters = { ...filters, ...(vendorId ? { vendorId } : {}) }; // Include vendorId in filters
+    const updatedFilters = { ...filters, ...(sellerId ? { sellerId } : {}) };
+    dispatch(updateFilters(updatedFilters)); // Dispatch updated filters to Redux
     dispatch(fetchProducts({ page: currentPage + 1, filters: updatedFilters, sort: sortOption }));
-  }, [currentPage, vendorId, dispatch, filters, sortOption]);
+  }, [currentPage, sellerId, dispatch, filters, sortOption]);
 
   const handlePageChange = (selectedPage: number) => {
     setCurrentPage(selectedPage);
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSortOption(e.target.value);
+    const newSortOption = e.target.value;
+    setSortOption(newSortOption);
+
+    // Dispatch updated filters to the Redux store
+    dispatch(updateFilters({ sort: newSortOption }));
   };
 
   const logProductInteraction = (productId: string | number) => {
@@ -78,17 +80,19 @@ const ProductCard9List: React.FC<ProductCard9ListProps> = ({ vendorId }) => {
           key={item.id}
           id={item.id}
           title={item.title}
-          price={item.price}
+          sellerPrice={item.sellerPrice}
+          buyerPrice={item.buyerPrice}
+          sellerCurrency={item.sellerCurrency || "USD"}
+          buyerCurrency={item.buyerCurrency || "USD"}
           images={item.images}
-          rating={typeof item.rating === "object" ? item.rating.average : item.rating} // Handle both number and Rating object
+          rating={typeof item.rating === "object" ? item.rating.average : item.rating}
           brand={item.brand}
           description={item.description}
           category={item.category}
-          stock={item.stock} // Pass stock as a boolean
+          stock={item.stock}
           onClick={() => logProductInteraction(item.id)}
         />
       ))}
-
 
       <FlexBox flexWrap="wrap" justifyContent="space-between" alignItems="center" mt="32px">
         <SemiSpan>

@@ -25,6 +25,7 @@ const WishList: PageWithLayout = () => {
   const { items: wishlist, recommendations, loading, error } = useSelector(
     (state: RootState) => state.wishlist
   );
+  const { currentRates } = useSelector((state: RootState) => state.exchangeRate); // Fetch exchange rates
 
   const [currentPage, setCurrentPage] = useState<number>(0);
   const itemsPerPage = 9;
@@ -99,16 +100,16 @@ const WishList: PageWithLayout = () => {
             <ProductCard1
               id={item.id}
               title={item.title}
-              price={item.price}
               imgUrl={item.images?.[0] || "/assets/default-product.jpg"}
               category={item.category}
               images={item.images}
               brand={item.brand}
               stock={item.stock > 0} // Convert stock to boolean
-              sellerPrice={item.price} // Assuming sellerPrice is equal to item.price
-              buyerPrice={item.price} // Assuming buyerPrice is equal to item.price
-              sellerCurrency="USD" // Default currency
-              buyerCurrency="USD" // Default currency
+              sellerPrice={item.sellerPrice || 0}
+              buyerPrice={item.buyerPrice || 0}
+              sellerCurrency={item.sellerCurrency || "USD"}
+              buyerCurrency={item.buyerCurrency || "USD"}
+              exchangeRates={currentRates || { baseCurrency: "USD", rates: {} }} // Provide exchange rates
             />
 
             <FlexBox justifyContent="space-between" mt="0.5rem">
@@ -125,7 +126,6 @@ const WishList: PageWithLayout = () => {
               </Button>
             </FlexBox>
           </Grid>
-
         ))}
       </Grid>
 
@@ -146,7 +146,6 @@ const WishList: PageWithLayout = () => {
                 <ProductCard1
                   id={product.id}
                   title={product.title}
-                  price={product.price}
                   imgUrl={product.images?.[0] || "/assets/default-product.jpg"}
                   category={product.category}
                   images={product.images}
@@ -156,10 +155,9 @@ const WishList: PageWithLayout = () => {
                   buyerPrice={product.price}
                   sellerCurrency="USD"
                   buyerCurrency="USD"
+                  exchangeRates={currentRates || { baseCurrency: "USD", rates: {} }} // Provide exchange rates
                 />
               </Grid>
-
-
             ))}
           </Grid>
         </div>
@@ -169,6 +167,5 @@ const WishList: PageWithLayout = () => {
 };
 
 WishList.layout = ({ children }) => <DashboardLayout>{children}</DashboardLayout>;
-
 
 export default WishList;

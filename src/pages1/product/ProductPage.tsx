@@ -7,6 +7,9 @@ import {
   fetchTryOnData,
   fetchRelatedProducts,
 } from "@/redux/slices/products/productSlice";
+import { fetchCurrentExchangeRates } from "@/redux/slices/utils/exchangeRateSlice";
+import ExchangeRateCard from "@/components/exchange/ExchangeRateCard";
+import CurrencyConverter from "@/components/exchange/CurrencyConverter";
 import ProductReviews from "@/components/product/ProductReviews";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import ProductTryOn from "@/components/product/TryOnWidget";
@@ -28,6 +31,9 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
     (state: RootState) => state.products
   );
 
+  // Fetch rates and baseCurrency from exchangeRate slice
+  const { rates, baseCurrency } = useSelector((state: RootState) => state.exchangeRate);
+
   useEffect(() => {
     const fetchData = async () => {
       await Promise.all([
@@ -35,6 +41,7 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
         dispatch(fetchLocalizedPrices({ productId, buyerCurrency })),
         dispatch(fetchTryOnData(productId)),
         dispatch(fetchRelatedProducts({ productId })),
+        dispatch(fetchCurrentExchangeRates()), // Fetch exchange rates
       ]);
     };
     fetchData();
@@ -55,6 +62,7 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
       />
       <ProductSchema product={currentProduct} />
 
+      {/* Product Section */}
       <ProductSection>
         <ImageContainer>
           <LazyLoadImage src={currentProduct.imgUrl} alt={currentProduct.name} effect="blur" />
@@ -70,6 +78,7 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
               <span>{buyerPrice.toFixed(2)} {buyerCurrency}</span>
             </p>
           </LocalizedPrice>
+          <CurrencyConverter rates={rates} baseCurrency={baseCurrency} /> {/* Pass rates and baseCurrency */}
           <p>{currentProduct.description}</p>
           <AddToCart>
             <button>Add to Cart</button>
@@ -85,15 +94,23 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
         </DetailsContainer>
       </ProductSection>
 
+      {/* Exchange Rate Widget */}
+      <ExchangeRateWidget>
+        <ExchangeRateCard rates={rates} baseCurrency={baseCurrency} /> {/* Pass props */}
+      </ExchangeRateWidget>
+
+      {/* Reviews Section */}
       <ReviewsSection>
         <ProductReviews productId={productId} />
       </ReviewsSection>
 
+      {/* Chat Section */}
       <ChatSection>
         <Chatbot sessionId={productId} language={language} />
         <SellerChat chatId={productId} />
       </ChatSection>
 
+      {/* Related Products Section */}
       <RelatedSection>
         <h2>Related Products</h2>
         <RelatedProducts productId={productId} />
@@ -104,7 +121,7 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
 
 export default ProductPage;
 
-// styles
+// Styled Components
 
 const PageContainer = styled.div`
   display: flex;
@@ -193,15 +210,14 @@ const AddToCart = styled.div`
   }
 `;
 
-// Styled components remain the same except for StockInfo
-interface StockInfoProps {
-  stock: number;
-}
+const StockInfo = styled.div<{ stock: number }>`
+  font-size: 1rem;
+  color: ${(props) => (props.stock > 0 ? "#4caf50" : "#ff5252")};
+`;
 
-const StockInfo = styled.div<StockInfoProps>`
-    font-size: 1rem;
-    color: ${(props) => (props.stock > 0 ? "#4caf50" : "#ff5252")};
-  `;
+const ExchangeRateWidget = styled.div`
+  margin-top: 20px;
+`;
 
 const ReviewsSection = styled.div`
   background-color: #fff;

@@ -26,9 +26,8 @@ import Sticky from "components/sticky/Sticky";
 import { H1, H5, SemiSpan } from "components/Typography";
 import type { AppDispatch } from "../redux/store";
 import { Review } from "@/types/review";
-import { PageWithLayout } from "@/types/pageLayouts"; // Or adjust based on your setup
-
-
+import { PageWithLayout } from "@/types/pageLayouts";
+import { RootState } from "../redux/store";
 
 
 const SalePage1: PageWithLayout = () => {
@@ -41,6 +40,7 @@ const SalePage1: PageWithLayout = () => {
   const flashDeals = useSelector(selectFlashDeals);
   const recommendations = useSelector(selectPersonalizedRecommendations);
   const currentSegment = useSelector(selectCurrentSegment);
+  const currentRates = useSelector((state: RootState) => state.exchangeRate?.currentRates);
 
   const productPerPage = 28;
 
@@ -146,6 +146,7 @@ const SalePage1: PageWithLayout = () => {
                     : deal.product.rating?.average
                 }
                 reviews={normalizeReviews(deal.product.reviews)}
+                exchangeRates={currentRates || { baseCurrency: "USD", rates: {} }} // Provide a fallback for exchange rates
               />
             </Grid>
           ))}
@@ -170,6 +171,7 @@ const SalePage1: PageWithLayout = () => {
                     : item.rating?.average
                 }
                 reviews={normalizeReviews(item.reviews || [])}
+                exchangeRates={currentRates || { baseCurrency: "USD", rates: {} }} // Provide a fallback for exchange rates
               />
             </Grid>
           ))}
@@ -192,6 +194,7 @@ const SalePage1: PageWithLayout = () => {
                   : product.rating?.average
               }
               reviews={normalizeReviews(product.reviews || [])}
+              exchangeRates={currentRates || { baseCurrency: "USD", rates: {} }} // Provide a fallback for exchange rates
             />
           </Grid>
         ))}

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 // Import sections
 import AccountSettings from "../../components/dashboard/AccountSettings/index";
@@ -11,6 +13,11 @@ import Security from "../../components/dashboard/Security/index";
 import Shipping from "../../components/dashboard/Shipping/index";
 import Support from "../../components/dashboard/Support/index";
 
+// Import Exchange Components
+import ExchangeRateCard from "../../components/exchange/ExchangeRateCard";
+import CurrencyConverter from "../../components/exchange/CurrencyConverter";
+import RateDashboard from "../../components/exchange/RateDashboard"; // Optional
+
 // Optional: Dashboard Layout components
 import DashboardHeader from "../../components/dashboard/DashboardLayout/DashboardHeader";
 import DashboardSidebar from "../../components/dashboard/DashboardLayout/DashboardSidebar";
@@ -18,6 +25,9 @@ import DashboardFooter from "../../components/dashboard/DashboardLayout/Dashboar
 
 const SellerDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<any>(null);
+
+  // Fetch rates and baseCurrency from Redux state
+  const { rates, baseCurrency } = useSelector((state: RootState) => state.exchangeRate);
 
   useEffect(() => {
     // Fetch initial data
@@ -41,6 +51,12 @@ const SellerDashboard: React.FC = () => {
       <div className="dashboard-content">
         <h1>Welcome to Vendor Dashboard</h1>
 
+        {/* Exchange Rate Card */}
+        <section>
+          <h2>Current Exchange Rates</h2>
+          <ExchangeRateCard rates={rates} baseCurrency={baseCurrency} />
+        </section>
+
         {/* Account Settings Section */}
         <section>
           <h2>Account Settings</h2>
@@ -62,12 +78,14 @@ const SellerDashboard: React.FC = () => {
         {/* Payment Section */}
         <section>
           <h2>Payment</h2>
+          <CurrencyConverter rates={rates} baseCurrency={baseCurrency} />
           <Payment />
         </section>
 
         {/* Performance Metrics Section */}
         <section>
           <h2>Performance Metrics</h2>
+          <RateDashboard /> {/* Optional: Add rate trends chart here */}
           <PerformanceMetrics />
         </section>
 

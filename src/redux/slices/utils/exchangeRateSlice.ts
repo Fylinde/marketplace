@@ -1,27 +1,41 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import exchangeRateService from "services/exchangeRateService";
 
-interface ExchangeRate {
+// Types
+export interface ExchangeRate {
   baseCurrency: string;
   rates: Record<string, number>;
   updatedAt: string; // Timestamp of the last update
 }
 
-interface HistoricalRate {
+export interface HistoricalRate {
   date: string;
   rates: Record<string, number>;
 }
 
+export interface ConversionResult {
+  from: string;
+  to: string;
+  amount: number;
+  result: number;
+}
+
 interface ExchangeRateState {
+  rates: Record<string, number>; // A dictionary of exchange rates
+  baseCurrency: string;
   currentRates: ExchangeRate | null;
   historicalRates: HistoricalRate[];
+  conversionResult: ConversionResult | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: ExchangeRateState = {
+  rates: {}, // Default to an empty object
+  baseCurrency: "USD",
   currentRates: null,
   historicalRates: [],
+  conversionResult: null,
   loading: false,
   error: null,
 };
@@ -43,11 +57,27 @@ export const fetchCurrentExchangeRates = createAsyncThunk(
 // Fetch historical exchange rates
 export const fetchHistoricalExchangeRates = createAsyncThunk(
   "exchangeRate/fetchHistoricalExchangeRates",
-  async (date: string, thunkAPI) => {
+  async ({ startDate, endDate }: { startDate: string; endDate: string }, thunkAPI) => {
     try {
-      return await exchangeRateService.getHistoricalExchangeRates(date);
+      return await exchangeRateService.getHistoricalExchangeRates({ startDate, endDate });
     } catch (error) {
       return thunkAPI.rejectWithValue("Failed to fetch historical exchange rates.");
+    }
+  }
+);
+
+
+// Convert currency
+export const convertCurrency = createAsyncThunk(
+  "exchangeRate/convertCurrency",
+  async (
+    payload: { amount: number; from: string; to: string },
+    thunkAPI
+  ) => {
+    try {
+      return await exchangeRateService.convertCurrency(payload);
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Currency conversion failed.");
     }
   }
 );
@@ -56,26 +86,68 @@ export const fetchHistoricalExchangeRates = createAsyncThunk(
 const exchangeRateSlice = createSlice({
   name: "exchangeRate",
   initialState,
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+    clearConversionResult: (state) => {
+      state.conversionResult = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      // Fetch Current Rates
-      .addCase(fetchCurrentExchangeRates.pending, (state) => {
+    .addCase(fetchCurrentExchangeRates.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(fetchCurrentExchangeRates.fulfilled, (state, action) => {
+      state.rates = action.payload.rates;
+      state.baseCurrency = action.payload.baseCurrency;
+      state.loading = false;
+    })
+    .addCase(fetchCurrentExchangeRates.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message || "Failed to fetch exchange rates";
+    })
+
+      builder
+      // Handle pending state for historical rates
+      .addCase(fetchHistoricalExchangeRates.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchCurrentExchangeRates.fulfilled, (state, action) => {
-        state.currentRates = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchCurrentExchangeRates.rejected, (state, action) => {
+      // Handle fulfilled state for historical rates
+      .addCase(
+        fetchHistoricalExchangeRates.fulfilled,
+        (state, action: PayloadAction<HistoricalRate[]>) => {
+          state.historicalRates = [...state.historicalRates, ...action.payload];
+          state.loading = false;
+        }
+      )
+      // Handle rejected state for historical rates
+      .addCase(fetchHistoricalExchangeRates.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
-      // Fetch Historical Rates
-      .addCase(fetchHistoricalExchangeRates.fulfilled, (state, action) => {
-        state.historicalRates.push(action.payload);
+
+      // Convert Currency
+      .addCase(convertCurrency.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(convertCurrency.fulfilled, (state, action: PayloadAction<ConversionResult>) => {
+        state.conversionResult = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(convertCurrency.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
+// Actions
+export const { clearError, clearConversionResult } = exchangeRateSlice.actions;
+
+// Reducer
 export default exchangeRateSlice.reducer;

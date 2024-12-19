@@ -1,48 +1,55 @@
 import styled from "styled-components";
-import { getTheme } from "../../utils/utils";
 
 export const StyledMiniCart = styled.div`
+  width: 300px;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  height: 100vh;
 
-  .cart-list {
-    flex: 1 1 0;
-    overflow: auto;
+  .free-shipping {
+    margin-bottom: 1rem;
   }
 
-  .cart-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
+  .cart-items {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+  }
 
-    .add-cart {
-      text-align: center;
-    }
+  .cart-summary {
+    margin-top: 1rem;
+  }
+`;
 
-    .product-image {
-      border-radius: 5px;
-      margin-left: 1rem;
-      margin-right: 1rem;
-      width: 64px;
-      height: 64px;
-    }
+export const StyledCartItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
 
-    .product-details {
-      flex: 1 1 0;
-      min-width: 0px;
+  img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 1rem;
+    border-radius: 4px;
+  }
 
-      .title {
-        margin: 0px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1;
+  .item-details {
+    flex: 1;
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+
+      .quantity {
+        margin: 0 0.5rem;
       }
     }
-    .clear-icon {
-      color: ${getTheme("colors.gray.600")};
-      cursor: pointer;
-    }
+  }
+
+  svg {
+    cursor: pointer;
   }
 `;

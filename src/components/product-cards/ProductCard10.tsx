@@ -14,14 +14,12 @@ import { H3, SemiSpan, Small } from "../Typography";
 import { StyledProductCard1 } from "./ProductCardStyle";
 import ViewInSpaceButton from "../buttons/ViewInSpaceButton";
 
-
 export interface ProductCard10Props {
   id: string | number;
   className?: string;
   style?: CSSProperties;
   imgUrl?: string;
   title?: string;
-  price?: number;
   sellerPrice?: number; // Seller price
   buyerPrice?: number; // Buyer price
   sellerCurrency?: string; // Seller currency
@@ -43,7 +41,6 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
   id,
   imgUrl = "/assets/images/products/macbook.png",
   title = "Product Title",
-  price = 0,
   sellerPrice = 0,
   buyerPrice = 0,
   sellerCurrency = "USD",
@@ -58,22 +55,33 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
   onTryNow,
   ...props
 }) => {
-  const [cartAmount, setCartAmount] = useState(0);
+  const [quantity, setQuantity] = useState(0);
+  const [totalSellerPrice, setTotalSellerPrice] = useState(0); // Tracks total in seller's currency
+  const [totalBuyerPrice, setTotalBuyerPrice] = useState(0); // Tracks total in buyer's currency
   const [open, setOpen] = useState(false);
 
   const toggleDialog = useCallback(() => setOpen((prev) => !prev), []);
 
-  const handleCartAmountChange = useCallback(
-    (amount: number) => {
-      if (amount >= 0) setCartAmount(amount);
+  const handleCartQuantityChange = useCallback(
+    (newQuantity: number) => {
+      if (newQuantity >= 0) {
+        setQuantity(newQuantity);
+        setTotalSellerPrice(parseFloat((newQuantity * sellerPrice).toFixed(2)));
+        setTotalBuyerPrice(parseFloat((newQuantity * buyerPrice).toFixed(2)));
+      }
     },
-    []
+    [sellerPrice, buyerPrice]
   );
 
-  const discountedPrice =
-    off && price
-      ? (price - (price * off) / 100).toFixed(2)
-      : price.toFixed(2);
+  const discountedSellerPrice =
+    off && sellerPrice
+      ? (sellerPrice - (sellerPrice * off) / 100).toFixed(2)
+      : sellerPrice.toFixed(2);
+
+  const discountedBuyerPrice =
+    off && buyerPrice
+      ? (buyerPrice - (buyerPrice * off) / 100).toFixed(2)
+      : buyerPrice.toFixed(2);
 
   return (
     <StyledProductCard1 {...props}>
@@ -132,23 +140,18 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
 
             <FlexBox alignItems="center" mt="6px">
               <Small pr="0.5rem" fontWeight="600" color="primary.main">
-                {buyerCurrency} {buyerPrice.toFixed(2)}
+                {buyerCurrency} {discountedBuyerPrice}
               </Small>
               <Small fontSize="12px" color="text.muted">
-                ({sellerCurrency} {sellerPrice.toFixed(2)})
+                ({sellerCurrency} {discountedSellerPrice})
               </Small>
-              {off && (
-                <SemiSpan color="text.muted" fontWeight="600">
-                  <del>${price.toFixed(2)}</del>
-                </SemiSpan>
-              )}
             </FlexBox>
           </Box>
 
           <FlexBox
             flexDirection="column-reverse"
             alignItems="center"
-            justifyContent={cartAmount ? "space-between" : "flex-start"}
+            justifyContent={quantity ? "space-between" : "flex-start"}
             width="30px"
           >
             <Button
@@ -157,15 +160,15 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
               padding="5px"
               size="small"
               borderColor="primary.light"
-              onClick={() => handleCartAmountChange(cartAmount + 1)}
+              onClick={() => handleCartQuantityChange(quantity + 1)}
             >
               <Icon variant="small">plus</Icon>
             </Button>
 
-            {cartAmount > 0 && (
+            {quantity > 0 && (
               <Fragment>
                 <SemiSpan color="text.primary" fontWeight="600">
-                  {cartAmount}
+                  {quantity}
                 </SemiSpan>
                 <Button
                   variant="outlined"
@@ -173,13 +176,18 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
                   padding="5px"
                   size="small"
                   borderColor="primary.light"
-                  onClick={() => handleCartAmountChange(cartAmount - 1)}
+                  onClick={() => handleCartQuantityChange(quantity - 1)}
                 >
                   <Icon variant="small">minus</Icon>
                 </Button>
               </Fragment>
             )}
           </FlexBox>
+        </FlexBox>
+
+        <FlexBox justifyContent="space-between" mt="1rem">
+          <H3>Total (Buyer): {buyerCurrency} {totalBuyerPrice.toFixed(2)}</H3>
+          <Small>Total (Seller): {sellerCurrency} {totalSellerPrice.toFixed(2)}</Small>
         </FlexBox>
 
         <FlexBox justifyContent="space-between" mt="1rem">
@@ -228,12 +236,15 @@ const ProductCard10: React.FC<ProductCard10Props> = ({
         <Card p="1rem" position="relative">
           <ProductIntro
             product={{
-              id: title,
+              id,
               images: [imgUrl],
               title,
-              price,
+              sellerPrice,
+              buyerPrice,
+              buyerCurrency,
+              sellerCurrency,
               brand: undefined,
-              stock: undefined,
+              stock: 0, // Default stock value
             }}
           />
           <Box position="absolute" top="0.75rem" right="0.75rem" cursor="pointer">

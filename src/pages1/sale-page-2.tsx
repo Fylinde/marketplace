@@ -14,10 +14,12 @@ import Grid from "components/grid/Grid";
 import SaleLayout2 from "components/layout/SaleLayout2";
 import Pagination from "components/pagination/Pagination";
 import ProductCard1 from "components/product-cards/ProductCard1";
-import Box from "components/Box"; // Add missing Box import
+import Box from "components/Box";
 import { H1, H5, SemiSpan } from "components/Typography";
 import type { AppDispatch } from "../redux/store";
 import { Review } from "@/types/review";
+import { RootState } from "../redux/store";
+import { Product } from "../types/Product"; // Import the Product type
 
 const saleCategoryList: { icon: string; title: string; segment: "B2C" | "B2B" | "C2C" }[] = [
   { icon: "t-shirt", title: "Men", segment: "B2C" },
@@ -33,10 +35,11 @@ const SalePage2 = () => {
   const productPerPage = 28;
 
   // Redux state selectors
-  const products = useSelector(selectProducts);
+  const products: Product[] = useSelector(selectProducts); // Ensure products is typed as an array of Product
   const b2cAnalytics = useSelector(selectSegmentAnalytics("B2C"));
   const b2bAnalytics = useSelector(selectSegmentAnalytics("B2B"));
   const c2cAnalytics = useSelector(selectSegmentAnalytics("C2C"));
+  const { currentRates } = useSelector((state: RootState) => state.exchangeRate); // Fetch exchange rates
 
   useEffect(() => {
     dispatch(fetchSalesProducts());
@@ -74,14 +77,15 @@ const SalePage2 = () => {
       <Grid container spacing={6}>
         {products
           .slice(page * productPerPage, (page + 1) * productPerPage)
-          .map((product, ind) => (
+          .map((product: Product, ind: number) => (
             <Grid item lg={3} md={4} sm={6} xs={12} key={ind}>
               <ProductCard1
-                {...product}
-                sellerPrice={product.price}
-                buyerPrice={product.price}
-                sellerCurrency="USD"
-                buyerCurrency="USD"
+                id={product.id}
+                name={product.name}
+                sellerPrice={product.sellerPrice}
+                buyerPrice={product.buyerPrice}
+                sellerCurrency={product.sellerCurrency}
+                buyerCurrency={product.buyerCurrency}
                 stock={product.stock > 0}
                 rating={
                   typeof product.rating === "number"
@@ -89,6 +93,7 @@ const SalePage2 = () => {
                     : product.rating?.average
                 }
                 reviews={normalizeReviews(product.reviews || [])}
+                exchangeRates={currentRates || { baseCurrency: "USD", rates: {} }} // Provide exchange rates
               />
             </Grid>
           ))}

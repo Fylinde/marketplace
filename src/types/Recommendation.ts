@@ -1,4 +1,12 @@
 export interface Recommendation {
+    id: string | number;
+    images: string[];
+    buyerPrice: number;
+    buyerCurrency: string;
+    sellerPrice: number;
+    sellerCurrency: string;
+    stock: number;
+    brand?: string;
     productId: string;
     name?: string; // Optional property
     currentPrice?: number;

@@ -17,4 +17,5 @@ export interface CartItem {
     isTryOnEnabled?: boolean; // Visual TryOn feature
     escrow?: boolean; // Escrow-enabled item
     taxRate?: number; // Add this if needed
+    imgUrl?: string;
   }

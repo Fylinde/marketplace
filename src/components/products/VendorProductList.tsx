@@ -11,58 +11,33 @@ import Typography, { H5 } from "../Typography";
 import { fetchProducts } from "../../redux/slices/products/productSlice"; // Adjust import path as needed
 import { RootState } from "../../redux/store";
 import type { AppDispatch } from "../../redux/store";
+import { Product } from "../../types/Product";
 
-// Define Product interface
-interface Product {
-  id: string | number;
-  status?: string;
-  createdAt: string;
-  price: number;
-}
 
 // Props for VendorProductList
 export interface VendorProductListProps {
-  vendorId: string;
+  sellerId: string;
 }
 
-const VendorProductList: React.FC<VendorProductListProps> = ({ vendorId }) => {
+const VendorProductList: React.FC<VendorProductListProps> = ({ sellerId }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { products, loading, error, totalPages } = useSelector((state: RootState) => state.products);
   const buttonSize: "small" = "small";
 
   // Fetch products for the specific vendor
   useEffect(() => {
-    dispatch(fetchProducts({ vendorId, page: 1 }));
-  }, [dispatch, vendorId]);
+    dispatch(fetchProducts({ sellerId, page: 1 }));
+  }, [dispatch, sellerId]);
 
   // Handle pagination changes
   const handlePageChange = (data: { selected: number }) => {
-    dispatch(fetchProducts({ vendorId, page: data.selected + 1 }));
+    dispatch(fetchProducts({ sellerId, page: data.selected + 1 }));
   };
 
-  if (loading) {
-    return (
-      <FlexBox justifyContent="center" alignItems="center" height="100vh">
-        <Typography>Loading products...</Typography>
-      </FlexBox>
-    );
-  }
+  if (loading) return <Typography>Loading...</Typography>;
+  if (error) return <Typography color="error.main">{error}</Typography>;
+  if (!products.length) return <Typography>No products found.</Typography>;
 
-  if (error) {
-    return (
-      <FlexBox justifyContent="center" alignItems="center" height="100vh">
-        <Typography color="error.main">Error: {error}</Typography>
-      </FlexBox>
-    );
-  }
-
-  if (!products.length) {
-    return (
-      <FlexBox justifyContent="center" alignItems="center" height="100vh">
-        <Typography>No products found for this vendor.</Typography>
-      </FlexBox>
-    );
-  }
 
   return (
     <Fragment>
@@ -93,28 +68,10 @@ const VendorProductList: React.FC<VendorProductListProps> = ({ vendorId }) => {
           style={{ textDecoration: "none", color: "inherit" }}
         >
           <TableRow my="1rem" padding="6px 18px">
-            <H5 m="6px" textAlign="left">
-              {item.id}
-            </H5>
-            <Typography m="6px" textAlign="left" color="text.muted">
-              {item.status || "Available"}
-            </Typography>
-            <Typography m="6px" textAlign="left" color="text.muted">
-              {new Date(item.createdAt).toLocaleDateString()}
-            </Typography>
-            <Typography m="6px" textAlign="left" color="text.muted">
-              ${item.price.toFixed(2)}
-            </Typography>
-
-            <Hidden flex="0 0 0 !important" down={769}>
-              <Typography textAlign="center" color="text.muted">
-                <IconButton size={buttonSize}>
-                  <Icon variant="small" defaultcolor="currentColor">
-                    arrow-right
-                  </Icon>
-                </IconButton>
-              </Typography>
-            </Hidden>
+            <H5>{item.id}</H5>
+            <Typography>{item.status || "Available"}</Typography>
+            <Typography>{new Date(item.createdAt).toLocaleDateString()}</Typography>
+            <Typography>${item.buyerPrice?.toFixed(2) || item.sellerPrice?.toFixed(2) || 0}</Typography>
           </TableRow>
         </Link>
       ))}
