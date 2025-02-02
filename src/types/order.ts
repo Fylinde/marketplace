@@ -1,11 +1,12 @@
 import { Product } from "./Product";
+import { ExchangeRate } from "./ExchangeRate";
 import { BillingAddress, ShippingAddress } from "./sharedTypes";
+
 type Priority = "Normal" | "VIP" | "High" | string;
 
 export interface Order {
   id: string;
   date: string;
-  products: Product[];
   customerNote?: string;
   customerName: string;
   priority: Priority;
@@ -21,9 +22,10 @@ export interface Order {
   paymentType: string;
   totalSellerPrice: number;
   totalBuyerPrice: number;
+  price?: number;
   buyerPrice: number;
   sellerPrice: number;
-  currency: string;
+  currency?: string;
   buyerCurrency: string;
   sellerCurrency: string;
   status: "Pending" | "Processing" | "Delivered" | "Cancelled" | "Completed" | "Refunded";
@@ -32,8 +34,15 @@ export interface Order {
   shippingAddress?: ShippingAddress[];
   billingAddress: BillingAddress[];
   estimatedDeliveryDate?: string;
+  exchangeRates: ExchangeRate[];
+  userId: string;
+  products: OrderProduct[]; // Use OrderProduct[] to reference product IDs and quantities
 }
 
+export interface OrderProduct {
+  productId: string;
+  quantity: number;
+}
 
 export interface DeliveryOption {
   id: string;
@@ -43,16 +52,14 @@ export interface DeliveryOption {
   time?: string; // Optional delivery time
 }
 
-
-
 export interface OrderItem {
-productId: string;
-productName: string;
-name?: string; // Fallback for name
-quantity: number;
-price: number; // Fallback for buyerPrice or sellerPrice
-buyerPrice?: number; // Add this
-sellerPrice?: number; // Add this
-discount?: number; // Optional discount percentage
-taxRate?: number; // Optional tax rate percentage
+  productId: string;
+  productName?: string;
+  name?: string; // Fallback for name
+  quantity: number;
+  price?: number;
+  buyerPrice?: number; // Add this
+  sellerPrice?: number; // Add this
+  discount?: number; // Optional discount percentage
+  taxRate?: number; // Optional tax rate percentage
 }

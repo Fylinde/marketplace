@@ -1,50 +1,47 @@
 import styled from "styled-components";
-import { getTheme } from "utils/utils";
 
 export const StyledCarouselCard1 = styled.div`
-  text-align: left;
-  margin-left: 280px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem 3rem;
-  background-color: ${getTheme("colors.background.paper")};
+  padding: 1.5rem 2rem;
+  background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-
-  .title {
-    font-size: 3rem;
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    line-height: 1.2;
-    color: ${getTheme("colors.text.primary")};
-    transition: font-size 0.3s ease, color 0.3s ease;
-  }
+  max-width: 75%; /* Restrict to 75% of the page width */
+  margin-left: 25%; /* Start at 75% of the page width */
 
   .text-content {
-    max-width: 50%;
+    width: 45%; /* Allocate 45% of the content for text */
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 1rem;
+    text-align: left;
+
+    .title {
+      font-size: 2.5rem; /* Reduced size */
+      margin: 0 0 1rem 0;
+      line-height: 1.2;
+      color: ${(props) => props.theme.colors.text.primary || "#333"};
+    }
 
     .button-link {
-      padding: 1rem 1.5rem;
-      font-size: 1.25rem;
+      margin-top: 0.75rem;
+      padding: 0.75rem 1.25rem; /* Reduced padding */
+      font-size: 1rem; /* Reduced font size */
       border-radius: 8px;
       transition: all 0.3s ease;
 
       &:hover {
         transform: translateY(-3px);
-        background-color: ${getTheme("colors.primary.dark")};
+        background-color: ${(props) => props.theme.colors.primary.dark || "#0056b3"};
       }
     }
   }
 
   .image-holder {
-    position: relative;
-    max-width: 45%;
+    width: 50%; /* Allocate 50% of the content for the image */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -56,70 +53,50 @@ export const StyledCarouselCard1 = styled.div`
       transition: transform 0.3s ease;
 
       &:hover {
-        transform: scale(1.05); /* Zoom effect */
+        transform: scale(1.05); /* Zoom effect on hover */
       }
-    }
-  }
-
-  &:hover {
-    box-shadow: 0px 6px 25px rgba(0, 0, 0, 0.15); /* Subtle hover shadow */
-  }
-
-  /* Responsive Styles */
-  @media only screen and (max-width: 1200px) {
-    margin-left: 0;
-    padding: 1.5rem 2rem;
-
-    .title {
-      font-size: 2.5rem;
-    }
-
-    .text-content {
-      max-width: 60%;
-    }
-
-    .image-holder {
-      max-width: 40%;
     }
   }
 
   @media only screen and (max-width: 900px) {
     flex-direction: column;
     text-align: center;
-    padding: 2rem 1.5rem;
+    padding: 1rem 1.5rem;
 
     .text-content {
-      max-width: 100%;
+      width: 100%; /* Take full width for smaller screens */
+      text-align: center;
     }
 
     .image-holder {
-      max-width: 80%;
+      width: 100%; /* Take full width for smaller screens */
       margin-top: 1.5rem;
     }
 
     .title {
-      font-size: 2rem;
+      font-size: 1.8rem; /* Further reduced size for small screens */
     }
   }
 
   @media only screen and (max-width: 425px) {
-    padding: 1rem;
+    padding: 0.75rem;
 
-    .title {
-      font-size: 1.5rem;
+    .text-content {
+      width: 100%; /* Full width for very small screens */
+      text-align: center;
     }
 
-    .title + * {
-      font-size: 0.875rem;
+    .title {
+      font-size: 1.5rem; /* Further reduced size */
     }
 
     .button-link {
-      padding: 0.75rem 1rem;
+      padding: 0.5rem 0.75rem;
       font-size: 0.875rem;
     }
 
     .image-holder {
-      max-width: 100%;
+      width: 100%;
     }
   }
 `;

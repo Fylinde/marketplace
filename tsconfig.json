@@ -19,7 +19,7 @@
     "paths": {
       "@/*": ["*"] // Enables aliasing for simplified imports
     },
-    "types": ["node"] // Includes Node.js type definitions
+    "types": ["node", "msw"] // Includes Node.js type definitions
   },
   "include": ["src/**/*", "src/types/**/*", "custom.d.ts"], // Ensures custom types are included
   "exclude": ["node_modules", "build", "dist"] // Excludes build artifacts and dependencies

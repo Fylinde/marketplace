@@ -1,10 +1,10 @@
 
-import Box from "components/Box";
-import Button from "components/buttons/Button";
-import { Card1 } from "components/Card1";
-import Grid from "components/grid/Grid";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
-import TextField from "components/text-field/TextField";
+import Box from "../../components/Box";
+import Button from "../../components/buttons/Button";
+import { Card1 } from "../../components/Card1";
+import Grid from "../../components/grid/Grid";
+import DashboardPageHeader from "../../components/layout/DashboardPageHeader";
+import TextField from "../../components/text-field/TextField";
 import { Formik } from "formik";
 import { Link } from 'react-router-dom';
 import React from "react";
@@ -80,7 +80,7 @@ const AddressEditor = () => {
                   <Grid item md={6} xs={12}>
                     <TextField
                       name="contact"
-                      label="Phone"
+                      label="phoneNumber"
                       fullwidth
                       onBlur={handleBlur}
                       onChange={handleChange}

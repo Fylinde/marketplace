@@ -161,7 +161,7 @@ const Button: React.FC<ButtonProps> = ({
   as: Component = "button",
   href,
   danger,
-  children,
+  children = "Default Button Text", // Fallback value
   type = "button",
   loading,
   ...props
@@ -188,6 +188,7 @@ const Button: React.FC<ButtonProps> = ({
     </StyledButton>
   );
 };
+
 
 // Default Props
 Button.defaultProps = {

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { layoutConstant } from "utils/constants";
+import { layoutConstant } from "../../utils/constants";
 import { getTheme } from "../../utils/utils";
 
 const StyledMobileNavigationBar = styled.div`

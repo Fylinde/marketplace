@@ -32,13 +32,15 @@ const throttle = pThrottle({
   interval: 1000, // Per second
 });
 
-// Wrap Axios request function with throttling
-api.request = throttle(api.request);
+// Wrap Axios request function with throttling (disabled for non-production)
+if (process.env.NODE_ENV === "production") {
+  api.request = throttle(api.request);
+}
 
 // === Retry Logic ===
 // Automatically retry failed requests up to 3 times for specific errors
 axiosRetry(api, {
-  retries: 3,
+  retries: process.env.NODE_ENV === "production" ? 3 : 0, // Disable retries in development
   retryDelay: axiosRetry.exponentialDelay, // Exponential backoff
   retryCondition: (error) => {
     // Retry for network errors or rate-limiting errors (HTTP 429)
@@ -52,16 +54,17 @@ axiosRetry(api, {
 // === Request Interceptors ===
 api.interceptors.request.use(
   (config) => {
+    // Safely retrieve data from localStorage
+    const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+    const language = typeof window !== "undefined" ? localStorage.getItem("language") || DEFAULT_LANGUAGE : DEFAULT_LANGUAGE;
+    const currency = typeof window !== "undefined" ? localStorage.getItem("currency") || DEFAULT_CURRENCY : DEFAULT_CURRENCY;
+
     // Attach Authorization token to headers
-    const token = localStorage.getItem("authToken"); // Replace with appropriate token storage logic
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
     // Attach Localization Headers
-    const language = localStorage.getItem("language") || DEFAULT_LANGUAGE;
-    const currency = localStorage.getItem("currency") || DEFAULT_CURRENCY;
-
     config.headers["Accept-Language"] = language; // Set language for localization
     config.headers["X-Currency"] = currency; // Set currency for transactions
 
@@ -86,8 +89,8 @@ api.interceptors.response.use(
       console.log(`[Response] ${response.config.method?.toUpperCase()} - ${response.config.url}`, response);
     }
 
-    // Transform response data if needed
-    return response.data; // Simplifies access to API responses
+    // Safeguard against missing `data` in responses
+    return response.data || response; // Return raw response if `data` is missing
   },
   (error) => {
     console.error("[Response Error]", error.response || error.message);
@@ -97,8 +100,12 @@ api.interceptors.response.use(
       switch (error.response.status) {
         case 401: // Unauthorized
           console.warn("Unauthorized access - redirecting to login...");
-          localStorage.removeItem("authToken");
-          window.location.href = "/login";
+          // Safeguard against multiple redirects
+          if (!error.response.config.__isRedirecting) {
+            error.response.config.__isRedirecting = true;
+            localStorage.removeItem("authToken");
+            window.location.href = "/login"; // Uncomment for production
+          }
           break;
         case 403: // Forbidden
           console.warn("Forbidden - you do not have permission.");
@@ -124,6 +131,11 @@ api.interceptors.response.use(
 // === WebSocket or Server-Sent Events ===
 // This function sets up a WebSocket connection for real-time updates
 export const setupWebSocket = (url: string, onMessage: (data: any) => void) => {
+  if (!url || !url.startsWith("ws")) {
+    console.error("[WebSocket] Invalid URL:", url);
+    return null;
+  }
+
   const socket = new WebSocket(url);
 
   socket.onopen = () => {
@@ -131,8 +143,12 @@ export const setupWebSocket = (url: string, onMessage: (data: any) => void) => {
   };
 
   socket.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    onMessage(data); // Handle incoming messages
+    try {
+      const data = JSON.parse(event.data);
+      onMessage(data); // Handle incoming messages
+    } catch (error) {
+      console.error("[WebSocket] Failed to parse message:", event.data);
+    }
   };
 
   socket.onerror = (error) => {

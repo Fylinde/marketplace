@@ -1,14 +1,14 @@
 
-import IconButton from "components/buttons/IconButton";
-import { Chip } from "components/Chip";
-import FlexBox from "components/FlexBox";
-import Hidden from "components/hidden/Hidden";
-import Icon from "components/icon/Icon";
-import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
-import Pagination from "components/pagination/Pagination";
-import TableRow from "components/TableRow";
-import Typography, { SemiSpan, Small } from "components/Typography";
+import IconButton from "../../components/buttons/IconButton";
+import { Chip } from "../../components/Chip";
+import FlexBox from "../../components/FlexBox";
+import Hidden from "../../components/hidden/Hidden";
+import Icon from "../../components/icon/Icon";
+import CustomerDashboardLayout from "../../components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "../../components/layout/DashboardPageHeader";
+import Pagination from "../../components/pagination/Pagination";
+import TableRow from "../../components/TableRow";
+import Typography, { SemiSpan, Small } from "../../components/Typography";
 import { format } from "date-fns";
 import { Link } from "react-router-dom"; 
 import React from "react";

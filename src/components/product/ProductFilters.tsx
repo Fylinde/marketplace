@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts, fetchTags } from "../../redux/slices/products/productSlice";
 import { fetchCategories } from "../../redux/slices/products/categorySlice";
 import { fetchBrands } from "../../redux/slices/products/brandSlice";
-import { RootState } from "../../redux/store";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 import ProductFiltersContainer from "./styles/ProductFilters.styles";
 
 const ProductFilters: React.FC = () => {

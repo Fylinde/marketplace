@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import chatService from "services/chatService";
+import chatService from "../../../services/chatService";
 
 // Individual message structure
 export interface Message {

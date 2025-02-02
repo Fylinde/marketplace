@@ -1,14 +1,14 @@
 // Guidelines for safe packaging
 import React, { useState, useEffect } from "react";
-import Box from "components/Box";
-import Table from "components/table/Table";
-import Button from "components/buttons/Button";
-import Modal from "components/modal/Modal";
-import Input from "components/input/Input";
-import Pagination from "components/pagination/Pagination";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
-import { fetchPackagingGuidelines, createGuideline, deleteGuideline, updateGuideline } from "@/redux/slices/dashboard/enhancementsSlice";
-import { validateString } from "services/validationService";
+import Box from "../../../components/Box";
+import Table from "../../../components/table/Table";
+import Button from "../../../components/buttons/Button";
+import Modal from "../../../components/modal/Modal";
+import Input from "../../../components/input/Input";
+import Pagination from "../../../components/pagination/Pagination";
+import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
+import { fetchPackagingGuidelines, createGuideline, deleteGuideline, updateGuideline } from "../../../redux/slices/dashboard/enhancementsSlice";
+import { validateString } from "../../../services/validationService";
 
 interface PackagingGuideline {
   id: string;

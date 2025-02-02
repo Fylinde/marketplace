@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
-import { fetchShippingMethods } from '@/redux/slices/logistics/shippingSlice';
-import shippingService from 'services/shippingService';
+import { useAppDispatch, useAppSelector } from '../../../redux/reduxHooks';
+import { fetchShippingMethods } from '../../../redux/slices/logistics/shippingSlice';
+import shippingService from '../../../services/shippingService';
 import { getLocalizedText, formatCurrency } from '../../../utils/localizationUtils';
-import DashboardPageHeader from 'components/layout/DashboardPageHeader';
-import VendorDashboardLayout from 'components/layout/VendorDashboardLayout';
-import DataInput from 'components/dataInput/DataInput';
+import DashboardPageHeader from '../../../components/layout/DashboardPageHeader';
+import SellerDashboardLayout from 'components/layout/SellerDashboardLayout';
+import DataInput from '../../../components/dataInput/DataInput';
 import { Button, Table, Modal, Switch, InputNumber, Form, Select, Spin, Alert } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 
@@ -147,7 +147,7 @@ const ShippingSettings: React.FC<ShippingSettingsProps> = ({ onUpdate }) => {
   ];
 
   return (
-    <VendorDashboardLayout>
+    <SellerDashboardLayout>
       <ShippingSettingContainer>
         <DashboardPageHeader title={getLocalizedText('Shipping Settings', module)} />
         <HeaderContainer>
@@ -217,7 +217,7 @@ const ShippingSettings: React.FC<ShippingSettingsProps> = ({ onUpdate }) => {
           </Form>
         </Modal>
       </ShippingSettingContainer>
-    </VendorDashboardLayout>
+    </SellerDashboardLayout>
   );
 };
 

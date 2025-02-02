@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import KnowledgeBase from "./KnowledgeBase";
-import VendorSupport from "./VendorSupport";
+import SellerSupport from "../../../components/dashboard/Support/SellerSupport";
 import SupportTicketDetails from "./SupportTicketDetails";
 import AISuggestionsModal from "./AISuggestionsModal";
 
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/redux/store"; // Adjust path to match your setup
+import { RootState, AppDispatch } from "../../../redux/store"; // Adjust path to match your setup
 import {
   fetchSupportTickets,
   fetchKnowledgeBaseArticles,
   submitAISuggestion,
-} from "@/redux/slices/support/supportSlice";
-import { getLocalizedText } from "@/utils/localizationUtils";
+} from "../../../redux/slices/support/supportSlice";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 
 const SupportContainer = styled.div`
   padding: 20px;
@@ -79,9 +79,9 @@ const Support: React.FC = () => {
         <KnowledgeBase knowledgeBase={knowledgeBase} loading={loading} error={error} />
       </div>
 
-      {/* Vendor Support */}
+      {/* Seller Support */}
       <div className="section">
-        <VendorSupport
+        <SellerSupport
           tickets={tickets}
           loading={loading}
           error={error}

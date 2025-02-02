@@ -44,67 +44,19 @@ export const StyledCarousel = styled(
     transition: transform 0.5s ease-in-out;
   }
 
-  /* Arrow Buttons */
-  .arrow-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-    background-color: ${getTheme("colors.primary.main")};
-    color: ${getTheme("colors.primary.text")};
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    z-index: 10;
-
-    &:hover {
-      background-color: ${getTheme("colors.primary.dark")};
-      transform: translateY(-50%) scale(1.1);
-    }
-
-    &:focus {
-      outline: 2px solid ${getTheme("colors.primary.light")};
-    }
-
-    &[aria-label] {
-      cursor: pointer;
-    }
-  }
-
-  .right-arrow-class {
-    right: -32px;
-  }
-
-  .left-arrow-class {
-    left: -32px;
-  }
-
-  /* Arrow Visibility on Hover */
-  ${(props) =>
-    props.showArrowOnHover &&
-    `
-    [class*="arrow-class"] {
-      display: none;
-    }
-
-    :hover {
-      [class*="arrow-class"] {
-        display: block;
-      }
-    }
-
-    @media only screen and (max-width: ${deviceSize.sm}px) {
-      [class*="arrow-class"] {
-        display: block;
-      }
-    }
-  `}
-
   /* Dot Group */
   .custom-dot {
+    position: absolute;
+    bottom: -10px; /* Move indicators further up (adjusted from -20px) */
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     justify-content: center;
-    margin-top: ${(props) => props.dotGroupMarginTop || "1rem"};
     align-items: center;
+
+    @media only screen and (max-width: ${deviceSize.sm}px) {
+      bottom: -8px; /* Adjust further up for smaller screens */
+    }
   }
 
   /* Dot Styling */
@@ -170,4 +122,3 @@ export const StyledCarousel = styled(
     }
   }
 `;
-

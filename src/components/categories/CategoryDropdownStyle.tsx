@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { getTheme } from "utils/utils";
+import { getTheme } from "../../utils/utils";
 import { CategoryDropdownProps } from "./CategoryDropdown";
 
 export const StyledCategoryDropdown = styled.div<CategoryDropdownProps>`

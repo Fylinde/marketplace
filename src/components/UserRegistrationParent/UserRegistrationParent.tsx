@@ -1,14 +1,14 @@
 // src/pages/UserRegistrationParent.tsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import UserRegistrationLayout from "components/layout/UserRegistrationLayout";
-import SignInForm from "components/Registration/SignInForm";
-import CreateAccount from "components/Registration/CreateAccount";
-import EmailVerification from "components/Registration/EmailVerification";
-import RequestOTPForm from "components/Registration/RequestOTPForm";
-import VerifyOTPForm from "components/Registration/VerifyOTPForm";
-import Signout from "components/Registration/Signout";
-import CreateSellerAccount from "components/Registration/CreateSellerAccount";
+import UserRegistrationLayout from "../../components/layout/UserRegistrationLayout";
+import SignInForm from "../../components/Registration/SignInForm";
+import CreateAccount from "../../components/Registration/CreateAccount";
+import EmailVerification from "../../components/Registration/EmailVerification";
+import RequestOTPForm from "../../components/Registration/RequestOTPForm";
+import VerifyOTPForm from "../../components/Registration/VerifyOTPForm";
+import Signout from "../../components/Registration/Signout";
+import CreateSellerAccount from "../../components/Registration/CreateSellerAccount";
 import {
   saveAccountDetails,
   selectAccountDetails
@@ -89,7 +89,7 @@ const UserRegistrationParent: React.FC = () => {
           </UserRegistrationLayout>
         }
       />
-      <Route
+      {/* <Route
         path="create-seller-account"
         element={
           <UserRegistrationLayout title="Create Seller">
@@ -100,7 +100,7 @@ const UserRegistrationParent: React.FC = () => {
             />
           </UserRegistrationLayout>
         }
-      />
+      /> */}
 
     </Routes>
 

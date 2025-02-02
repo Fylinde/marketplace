@@ -1,11 +1,11 @@
 
-import Box from "components/Box";
-import Card from "components/Card";
-import FlexBox from "components/FlexBox";
-import Grid from "components/grid/Grid";
-import LazyImage from "components/LazyImage";
-import NavLink from "components/nav-link/NavLink";
-import Typography, { H3, SemiSpan, Small }  from "components/Typography";
+import Box from "../../../components/Box";
+import Card from "../../../components/Card";
+import FlexBox from "../../../components/FlexBox";
+import Grid from "../../../components/grid/Grid";
+import LazyImage from "../../../components/LazyImage";
+import NavLink from "../../../components/nav-link/NavLink";
+import Typography, { H3, SemiSpan, Small }  from "../../../components/Typography";
 import { Link } from 'react-router-dom';
 import React from "react";
 import { StyledMegaMenu1 } from "./MegaMenuStyle";

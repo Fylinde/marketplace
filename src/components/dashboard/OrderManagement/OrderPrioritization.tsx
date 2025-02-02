@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
-import { fetchOrders } from "@/redux/slices/orders/orderSlice";
-import Box from "components/Box";
-import Table from "components/table/Table";
-import Input from "components/input/Input";
-import Pagination from "components/pagination/Pagination";
-import Button from "components/buttons/Button";
-import Modal from "components/modal/Modal";
-import { Order } from "types/order";
+import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
+import { fetchOrders } from "../../../redux/slices/orders/orderSlice";
+import Box from "../../../components/Box";
+import Table from "../../../components/table/Table";
+import Input from "../../../components/input/Input";
+import Pagination from "../../../components/pagination/Pagination";
+import Button from "../../../components/buttons/Button";
+import Modal from "../../../components/modal/Modal";
+import { Order } from "../../../types/order";
 
 const OrderPrioritization: React.FC = () => {
   const dispatch = useAppDispatch();

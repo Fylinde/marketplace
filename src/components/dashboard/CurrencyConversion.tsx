@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import Box from "components/Box";
-import Chart from "components/chart/Chart";
+import Box from "../../components/Box";
+import Chart from "../../components/chart/Chart";
 import { useAppDispatch, useAppSelector } from "../../redux/reduxHooks";
 import { fetchCurrencyAnalytics } from "../../redux/slices/analytics/analyticsSlice";
 

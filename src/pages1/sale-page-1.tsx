@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   fetchFlashDeals,
   fetchSalesProducts,
-  fetchPersonalizedRecommendations,
+ // fetchPersonalizedRecommendations,
   selectProducts,
   selectFlashDeals,
   selectPersonalizedRecommendations,
@@ -13,21 +13,21 @@ import {
   fetchUserProfile,
   updateUserPreferences,
 } from "../redux/slices/auth/userSlice";
-import Box from "components/Box";
-import { Chip } from "components/Chip";
-import Container from "components/Container";
-import FlexBox from "components/FlexBox";
-import Grid from "components/grid/Grid";
-import SaleLayout1 from "components/layout/SaleLayout1";
-import SaleNavbar from "components/navbar/SaleNavbar";
-import Pagination from "components/pagination/Pagination";
-import ProductCard1 from "components/product-cards/ProductCard1";
-import Sticky from "components/sticky/Sticky";
-import { H1, H5, SemiSpan } from "components/Typography";
-import type { AppDispatch } from "../redux/store";
-import { Review } from "@/types/review";
-import { PageWithLayout } from "@/types/pageLayouts";
-import { RootState } from "../redux/store";
+import Box from "../components/Box";
+import { Chip } from "../components/Chip";
+import Container from "../components/Container";
+import FlexBox from "../components/FlexBox";
+import Grid from "../components/grid/Grid";
+import SaleLayout1 from "../components/layout/SaleLayout1";
+import SaleNavbar from "../components/navbar/SaleNavbar";
+import Pagination from "../components/pagination/Pagination";
+import ProductCard1 from "../components/product-cards/ProductCard1";
+import Sticky from "../components/sticky/Sticky";
+import { H1, H5, SemiSpan } from "../components/Typography";
+import type { AppDispatch, RootState } from "../redux/store";
+import { Review } from "../types/review";
+import { PageWithLayout } from "../types/pageLayouts";
+
 
 
 const SalePage1: PageWithLayout = () => {
@@ -55,7 +55,7 @@ const SalePage1: PageWithLayout = () => {
   useEffect(() => {
     dispatch(fetchFlashDeals());
     dispatch(fetchSalesProducts());
-    dispatch(fetchPersonalizedRecommendations());
+  //  dispatch(fetchPersonalizedRecommendations());
     dispatch(fetchUserProfile());
   }, [dispatch]);
 
@@ -219,7 +219,7 @@ const SalePage1: PageWithLayout = () => {
 // Explicitly assign a layout to the page
 SalePage1.layout = ({ children }: { children: ReactNode }) => (
   <SaleLayout1
-    title="Amazing Sales | Multivendor Ecommerce"
+    title="Amazing Sales | Multiseller Ecommerce"
     metaDescription="Discover flash deals and exclusive recommendations tailored for you."
   >
     {children}

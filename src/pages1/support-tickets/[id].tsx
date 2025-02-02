@@ -1,13 +1,13 @@
 
-import Avatar from "components/avatar/Avatar";
-import Box from "components/Box";
-import Button from "components/buttons/Button";
-import Divider from "components/Divider";
-import FlexBox from "components/FlexBox";
-import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
-import TextArea from "components/textarea/TextArea";
-import { H5, SemiSpan  } from "components/Typography";
+import Avatar from "../../components/avatar/Avatar";
+import Box from "../../components/Box";
+import Button from "../../components/buttons/Button";
+import Divider from "../../components/Divider";
+import FlexBox from "../../components/FlexBox";
+import CustomerDashboardLayout from "../../components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "../../components/layout/DashboardPageHeader";
+import TextArea from "../../components/textarea/TextArea";
+import { H5, SemiSpan  } from "../../components/Typography";
 import { format } from "date-fns";
 import { Link, useNavigate } from "react-router-dom"; 
 import React from "react";

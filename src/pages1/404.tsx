@@ -1,7 +1,7 @@
 
-import Button from "components/buttons/Button";
-import FlexBox from "components/FlexBox";
-import Image from "components/Image";
+import Button from "../components/buttons/Button";
+import FlexBox from "../components/FlexBox";
+import Image from "../components/Image";
 import { Link, useNavigate } from "react-router-dom";  
 import React from "react";
 

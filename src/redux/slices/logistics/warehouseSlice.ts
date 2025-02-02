@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import warehouseService from 'services/warehouseService';
+import warehouseService from '../../../services/warehouseService';
 
 interface Warehouse {
   id: string;

@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProductDetails, fetchRelatedProducts } from "@/redux/slices/products/productSlice";
-import { RootState } from "@/redux/store";
+//import { fetchProductDetails, fetchRelatedProducts } from "@/redux/slices/products/productSlice1";
 import ProductReviews from "./ProductReviews";
 import RelatedProducts from "./RelatedProducts";
 import ProductTryOn from "./TryOnWidget";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 import ProductDetailContainer from "./styles/ProductDetail.styles";
 import RecommendedItems from "../search/RecommendedItems";
 
@@ -15,8 +14,8 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
   const { currentProduct, loading, error } = useSelector((state: RootState) => state.products);
 
   useEffect(() => {
-    dispatch(fetchProductDetails(productId));
-    dispatch(fetchRelatedProducts({ productId }));
+   // dispatch(fetchProductDetails(productId));
+  //  dispatch(fetchRelatedProducts({ productId }));
   }, [dispatch, productId]);
 
   if (loading) return <div>Loading product details...</div>;

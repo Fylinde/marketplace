@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Table, Button, Spin, Alert, Input, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "redux/store";
-import { fetchProducts, removeProduct } from "@/redux/slices/products/productSlice";
-import { getLocalizedText } from "utils/localizationUtils";
+import { AppDispatch, RootState } from "../../../redux/store";
+import { fetchProducts, removeProduct } from "../../../redux/slices/products/productSlice";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 import DeleteProduct from "./DeleteProduct";
 
 const { Search } = Input;
@@ -26,8 +26,9 @@ const ProductList: React.FC<ProductListProps> = ({ onSelectProduct }) => {
   const [categoryFilter, setCategoryFilter] = useState("all");
 
   useEffect(() => {
-    dispatch(fetchProducts({}));
+    dispatch(fetchProducts({ filters: {}, page: 1 })); // Provide the required structure
   }, [dispatch]);
+  
 
   const handleDeleteProduct = (product: any) => {
     setSelectedProduct(product);

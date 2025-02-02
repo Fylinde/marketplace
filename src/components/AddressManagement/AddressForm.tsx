@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addUserAddress } from 'services/addressService';
+import { addUserAddress } from '../../services/addressService';
 import { useNavigate } from 'react-router-dom';
 import './AddressForm.css';
 
@@ -9,9 +9,9 @@ const AddressForm: React.FC = () => {
         street: '',
         city: '',
         state: '',
-        postal_code: '',
+        postalCode: '',
         country: '',
-        phone_number: '',
+        phoneNumber: '',
     });
     
     // Error handling state
@@ -55,9 +55,9 @@ const AddressForm: React.FC = () => {
                 <input type="text" name="street" placeholder="Street" onChange={handleChange} />
                 <input type="text" name="city" placeholder="City" onChange={handleChange} />
                 <input type="text" name="state" placeholder="State" onChange={handleChange} />
-                <input type="text" name="postal_code" placeholder="Postal Code" onChange={handleChange} />
+                <input type="text" name="postalCode" placeholder="Postal Code" onChange={handleChange} />
                 <input type="text" name="country" placeholder="Country" onChange={handleChange} />
-                <input type="text" name="phone_number" placeholder="Phone Number" onChange={handleChange} />
+                <input type="text" name="phoneNumber" placeholder="Phone Number" onChange={handleChange} />
                 <button type="submit">Add Address</button>
             </form>
         </div>

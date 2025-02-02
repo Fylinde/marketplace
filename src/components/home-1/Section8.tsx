@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Grid from "components/grid/Grid";
-import LazyImage from "components/LazyImage";
+import Grid from "../../components/grid/Grid";
+import LazyImage from "../../components/LazyImage";
 import { Link } from "react-router-dom";
 import Container from "../Container";
 import { fetchBanners } from "../../redux/slices/marketing/bannerSlice";
-import { RootState, AppDispatch } from "redux/store";
-import { Banner } from "@/types/banner";
+import { RootState, AppDispatch } from "../../redux/store";
+import { Banner } from "../../types/banner";
 
 
 const Section8: React.FC = () => {

@@ -5,12 +5,12 @@ export interface Address {
   id: string;
   fullName: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   addressLine1: string;
   addressLine2?: string;
   city: string;
   state: string;
-  zipCode: string;
+  postalCode: string;
   country: string;
   isDefault: boolean; // Whether the address is the default
 }

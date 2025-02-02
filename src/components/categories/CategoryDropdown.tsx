@@ -1,4 +1,4 @@
-import navigations from "data/navigations";
+import navigations from "../../data/navigations";
 import React from "react";
 import CategoryMenuItem from "./category-menu-item/CategoryMenuItem";
 import { StyledCategoryDropdown } from "./CategoryDropdownStyle";

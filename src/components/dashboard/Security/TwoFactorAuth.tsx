@@ -6,9 +6,9 @@ import {
   fetchTwoFactorStatus,
   enableTwoFactor,
   verifyTwoFactor,
-} from "@/redux/slices/security/securitySlice";
-import { RootState, AppDispatch } from "@/redux/store";
-import { getLocalizedText } from "utils/localizationUtils";
+} from "../../../redux/slices/security/securitySlice";
+import { RootState, AppDispatch } from "../../../redux/store";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 
 const TwoFactorContainer = styled.div`
   padding: 20px;

@@ -60,7 +60,7 @@ const CreateAccount: React.FC = () => {
     const registrationData = {
       full_name,
       email: isEmail ? emailOrPhone : null,
-      phone_number: !isEmail ? emailOrPhone : null,
+      phoneNumber: !isEmail ? emailOrPhone : null,
       password,
       profile_picture: null,
       preferences: null,

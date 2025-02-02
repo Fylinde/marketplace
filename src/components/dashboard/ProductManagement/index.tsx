@@ -24,8 +24,9 @@ const ProductManagement: React.FC = () => {
 
   // Fetch products dynamically
   useEffect(() => {
-    dispatch(fetchProducts({})); // Provide an empty object if no specific filters are needed
+    dispatch(fetchProducts({ filters: {}, page: 1 })); // Provide the required structure
   }, [dispatch]);
+  
 
 
   // State for managing product deletion
@@ -52,7 +53,7 @@ const ProductManagement: React.FC = () => {
       <AddProduct />
 
       {/* Edit Product */}
-      <EditProduct />
+      <EditProduct /> 
 
       {/* Product List */}
       <ProductList onSelectProduct={handleSelectProduct} /> {/* Pass `handleSelectProduct` */}

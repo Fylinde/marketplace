@@ -13,17 +13,18 @@ export const convertCurrency = (
   amount: number,
   fromCurrency: string,
   toCurrency: string,
-  exchangeRate: ExchangeRate | null
+  exchangeRate: ExchangeRate | null,
+  precision: number = 2 // Default precision
 ): number => {
   if (!exchangeRate) {
     console.error("Exchange rate data is unavailable.");
-    return amount;
+    return parseFloat(amount.toFixed(precision));
   }
 
   const { baseCurrency, rates } = exchangeRate;
 
-  // Fallback for missing rates or matching currencies
-  if (fromCurrency === toCurrency) return parseFloat(amount.toFixed(2));
+  // Fallback for matching currencies or missing rates
+  if (fromCurrency === toCurrency) return parseFloat(amount.toFixed(precision));
   const fromRate = fromCurrency === baseCurrency ? 1 : rates[fromCurrency] || 0;
   const toRate = toCurrency === baseCurrency ? 1 : rates[toCurrency] || 0;
 
@@ -32,10 +33,10 @@ export const convertCurrency = (
     console.error(
       `Missing exchange rate for currencies: ${fromCurrency}, ${toCurrency}`
     );
-    return parseFloat(amount.toFixed(2));
+    return parseFloat(amount.toFixed(precision));
   }
 
   // Perform conversion
   const convertedAmount = (amount / fromRate) * toRate;
-  return parseFloat(convertedAmount.toFixed(2));
+  return parseFloat(convertedAmount.toFixed(precision));
 };

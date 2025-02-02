@@ -2,16 +2,19 @@ import { Address } from "./address";
 
 // Define interfaces for each part of the state
 export interface FileMetadata {
-    name: string;
-    size: number;
-    type: string;
-  }
+  name: string;
+  size: number;
+  type: string;
+  lastModified: number;
+}
+
   
   // Define interfaces for each part of the state
   export interface AccountDetails {
     full_name: string;
     email: string;
     password: string;
+    phoneNumber?: string;
   }
 
 
@@ -40,7 +43,12 @@ export interface FileMetadata {
   export interface ContactDetails {
     firstName: string;
     middleName?: string;
+    fullName?: string;
     lastName: string;
+    email?: string;
+    city?: string;
+    country?: string;
+    street?: string;
     residentialAddress: string;
     countryOfCitizenship: string;
     countryOfResidence: string;
@@ -49,6 +57,8 @@ export interface FileMetadata {
     state: string;
     dateOfBirth: { day: string; month: string; year: string };
     phoneNumber: string;
+    addressLine1?: string;
+    addressLine2?: string;
     additionalAddressInfo?: {
       secondaryAddress: string;
       secondaryPostalCode: string;
@@ -61,6 +71,7 @@ export interface FileMetadata {
       expiryDate: { day: string; month: string; year: string };
     };
   }
+  
   
 
 export interface BillingInformation {
@@ -78,49 +89,42 @@ export interface BillingInformation {
 
   
   
-  // Updated BillingAddress without redundant credit card details
-  export interface BillingAddress extends Address {
-    id?: string;
+  export interface BillingAddress {
     fullName: string;
     email: string;
-    phone: string;
+    phoneNumber?: string; // Optional
     addressLine1: string;
     addressLine2?: string;
-    street: string;
     city: string;
     state: string;
-    postal_code: string;
     country: string;
-    phone_number?: string;
+    street: string;
+    postalCode?: string; // Optional
+    firstName?: string;
+    lastName?: string;
+    id?: string;
+    is_primary?: boolean;
   }
+  
+  
   
 
   
   export interface PaymentDetails {
-    cardNumber: string;            // Credit card number as a string
-    cardholderName: string;        // Cardholder's name
+    cardNumber: string;
+    cardholderName: string;
     expiryDate: {
       month: string;
       year: string;
     };
-    cvv: string;                   // CVV as a string to handle both 3 and 4 digit codes
-    billingAddress: BillingAddress; // Billing address structure
-    currency: string;              // Currency as a required field
+    cvv: string;
+    currency: string;
   }
   
-  
-  
-  export interface ShopDetails {
-    storeName: string;
-    productCategories: string[];
-    businessAddress: string;
-    shippingDetails: string;
-    returnPolicy: string;
-  }
   
   export interface VerificationDetails {
-    identityDocument: File | null;
-    businessDocument: File | null;
+    identityDocument: FileMetadata | null;
+    businessDocument: FileMetadata | null;
     additionalComments?: string;
     verificationMethod?: string;
     phoneNumber?: string;
@@ -130,8 +134,8 @@ export interface BillingInformation {
     primaryContactLastName?: string;
   }
   
-  interface DocumentDetails {
-    documents: File[];
+  export interface DocumentDetails {
+    documents: FileMetadata[];
   }
   
   export interface SellerData {
@@ -143,13 +147,7 @@ export interface BillingInformation {
     contactPersonLastName: string;
     smsVerificationLanguage: string;
     verificationMethod: string;
-  }
-  
-  export interface StoreData {
-    storeName: string;
-    upc: string;
-    manufacturerBrandOwner: string;
-    trademarkOwnership: string;
+    sellerId?: string;
   }
   
   // types.ts
@@ -163,7 +161,8 @@ export interface BillingInformation {
     numberOfEmployees?: string;
   }
   
-  export interface CompanyInformation {
+export interface CompanyInformation {
+    businessInformation: BusinessInformation;
     companyName: string;
     companyRegistrationNumber: string;
     taxId: string;
@@ -187,22 +186,34 @@ export interface BillingInformation {
     verificationMethod: string;
   }
   
-  export interface StoreInformation {
-    storeName: string;
-    upc: string;
-    manufacturerBrandOwner: string;
-    trademarkOwnership: string;
-  }
-  
-  
+
   
   export interface SellerVerification {
     email: string;
+    emailOrPhone?: string;
     verificationCode: string;
     isVerified: boolean;
-    verificationMethod: string;
     verificationStatus: string;
     verificationError: string | null;
+    expirationTime: Date | null;
+    businessLocation?: string;
+    businessType?: string;
+    businessName?: string;
+    companyName?: string;
+    companyRegistrationNumber?: string;
+    taxId?: string;
+    countryOfIncorporation?: string;
+    businessAddress?: string;
+    phoneNumber?: string;
+    contactPersonFirstName?: string;
+    contactPersonMiddleName?: string;
+    contactPersonLastName?: string;
+    smsVerificationLanguage?: string;
+    verificationMethod?: string;
+    businessIndustry?: string;
+    yearsInOperation?: number;
+    businessWebsite?: string;
+    altPhoneNumber?: string;
   }
   
   // IdentityVerificationInterface.ts
@@ -232,6 +243,7 @@ export interface BillingInformation {
     bankName: string;
     routingCode: string;
     proofOfBankOwnership: FileMetadata | undefined;
+    accountHolderName?: string;
   }
   
   
@@ -246,8 +258,8 @@ export interface BillingInformation {
   }
   
   
-  interface DocumentUploadType {
-    file: File | null;            // The uploaded file
+  export interface DocumentUploadType {
+    file: FileMetadata | null;            // The uploaded file
     fileName: string;             // Name of the file
     uploadStatus: 'idle' | 'uploading' | 'succeeded' | 'failed'; // Upload status
     uploadError: string | null;   // Any error message
@@ -259,6 +271,8 @@ export interface BillingInformation {
     name: string;
     email: string;
     context: string;
+    createdAt?: string;
+    role: string;
     // Add other fields based on your API response
   }
   

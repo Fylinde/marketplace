@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Tabs, Card, Spin, Alert } from "antd";
 import styled from "styled-components";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
-import { fetchPerformance } from "redux/slices/analytics/performanceSlice";
-import { fetchAllFeedback } from "@/redux/slices/support/feedbackSlice";
+import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
+import { fetchPerformance } from "../../../redux/slices/analytics/performanceSlice";
+import { fetchAllFeedback } from "../../../redux/slices/support/feedbackSlice";
 import CustomerFeedback from "./CustomerFeedback";
-import { getLocalizedText } from "utils/localizationUtils";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 
 const DashboardContainer = styled.div`
   padding: 20px;

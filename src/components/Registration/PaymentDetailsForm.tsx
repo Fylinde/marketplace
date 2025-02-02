@@ -1,97 +1,64 @@
 import React from "react";
-import { useDispatch } from "react-redux";
-import { savePaymentDetails } from "../../redux/slices/auth/registrationSlice";
-import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import ProgressIndicator from "./ProgressIndicator";
-import { BillingAddress, PaymentDetails } from "../../types/sharedTypes";
-import "./PaymentDetailsForm.css";
+import { PaymentDetails } from "../../types/sharedTypes";
+import { useDispatch } from "react-redux";
+import { tokenizePaymentDetailsThunk } from "../../redux/slices/orders/paymentSlice";
+import { AppDispatch } from "../../redux/store";
 
 interface PaymentDetailsFormProps {
-  data: PaymentDetails;
+  paymentDetails: PaymentDetails;
   onUpdatePayment: (updatedData: Partial<PaymentDetails>) => void;
-  onUpdateBillingAddress: (updatedData: Partial<BillingAddress>) => void;
-  onSubmitPaymentToken?: (token: string) => void;
+  onSubmitPaymentToken: (token: string) => void;
   onNext: () => void;
 }
 
 const PaymentDetailsForm: React.FC<PaymentDetailsFormProps> = ({
-  data,
+  paymentDetails,
   onUpdatePayment,
-  onUpdateBillingAddress,
   onSubmitPaymentToken,
   onNext,
 }) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   const initialValues: PaymentDetails = {
-    cardNumber: data.cardNumber || "",
-    cardholderName: data.cardholderName || "",
+    cardNumber: paymentDetails.cardNumber || "",
+    cardholderName: paymentDetails.cardholderName || "",
     expiryDate: {
-      month: data.expiryDate.month || "1",
-      year: data.expiryDate.year || new Date().getFullYear().toString(),
+      month: paymentDetails.expiryDate?.month || "1",
+      year: paymentDetails.expiryDate?.year || new Date().getFullYear().toString(),
     },
-    cvv: data.cvv || "",
-    billingAddress: {
-      street: data.billingAddress.street || "",
-      city: data.billingAddress.city || "",
-      state: data.billingAddress.state || "",
-      postal_code: data.billingAddress.postal_code || "",
-      country: data.billingAddress.country || "",
-      phone_number: data.billingAddress.phone_number || "",
-      fullName: data.billingAddress.fullName || "",
-      email: data.billingAddress.email || "",
-      addressLine1: data.billingAddress.addressLine1 || "",
-      addressLine2: data.billingAddress.addressLine2 || "",
-      phone: data.billingAddress.phone || "",
-      zipCode: data.billingAddress.zipCode || "",
-      postalCode: data.billingAddress.postalCode || "",
-      firstName: data.billingAddress.firstName || "",
-      lastName: data.billingAddress.lastName || "",
-    },
-    currency: data.currency || "USD",
+    cvv: paymentDetails.cvv || "",
+    currency: paymentDetails.currency || "USD",
   };
 
   const validationSchema = Yup.object().shape({
     cardNumber: Yup.string()
       .required("Card number is required")
-      .matches(/^[0-9]{16}$/, "Card number must be 16 digits"),
-    cardholderName: Yup.string()
-      .required("Cardholder name is required")
-      .matches(/^[A-Za-z\s]+$/, "Cardholder name must only contain letters and spaces"),
+      .matches(/^[0-9]{16}$/, "Card number must be exactly 16 digits and contain only numbers."),
+    cardholderName: Yup.string().required("Cardholder name is required"),
     expiryDate: Yup.object().shape({
       month: Yup.string().required("Month is required"),
       year: Yup.string().required("Year is required"),
     }),
-    billingAddress: Yup.object().shape({
-      street: Yup.string().required("Street is required"),
-      city: Yup.string().required("City is required"),
-      state: Yup.string().required("State is required"),
-      postal_code: Yup.string().required("Postal code is required"),
-      country: Yup.string().required("Country is required"),
-    }),
+    cvv: Yup.string()
+      .required("CVV is required")
+      .matches(/^[0-9]{3,4}$/, "CVV must be 3 or 4 digits"),
     currency: Yup.string().required("Currency is required"),
   });
 
-  const handleTokenization = async () => {
+  const handleSubmit = async (values: PaymentDetails) => {
     try {
-      const token = await getPaymentTokenFromGateway();
-      if (onSubmitPaymentToken) {
-        onSubmitPaymentToken(token);
-      }
+      // Dispatch the thunk and unwrap the result to extract the token
+      const token = await dispatch(tokenizePaymentDetailsThunk(values)).unwrap();
+      onSubmitPaymentToken(token); // Pass the token to the parent component
+      onNext(); // Proceed to the next step
     } catch (error) {
-      console.error("Tokenization error:", error);
+      console.error("Failed to tokenize payment details:", error);
+      alert("Tokenization failed. Please try again.");
     }
   };
-
-  const handleSubmit = (values: PaymentDetails) => {
-    dispatch(savePaymentDetails(values));
-    onUpdatePayment(values);
-    handleTokenization();
-    onNext();
-  };
+  
 
   return (
     <Formik
@@ -100,56 +67,35 @@ const PaymentDetailsForm: React.FC<PaymentDetailsFormProps> = ({
       onSubmit={handleSubmit}
     >
       {({ setFieldValue }) => (
-        <Form className="payment-details-form">
-          <ProgressIndicator currentStep={3} />
-          <h1>Payment details</h1>
-          <p className="subscription-info">
-            Pay a monthly fee of EUR 39 (+ taxes) for access to marketplaces in North America, Europe, and Asia Pacific.
-          </p>
+        <Form>
+          <h2>Payment Details</h2>
+          <p>Your card details are tokenized securely and will not be stored or shared.</p>
 
           <div className="form-group">
-            <label htmlFor="currency">Currency</label>
+            <label htmlFor="cardNumber">Card Number</label>
             <Field
-              as="select"
-              name="currency"
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                const currency = e.target.value;
-                setFieldValue("currency", currency);
-                onUpdatePayment({ currency });
-              }}
-            >
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
-              <option value="JPY">JPY</option>
-              <option value="AUD">AUD</option>
-              <option value="CAD">CAD</option>
-            </Field>
-            <ErrorMessage name="currency" component="div" className="error-message" />
+              name="cardNumber"
+              type="text"
+              placeholder="Enter your 16-digit card number"
+            />
+            <ErrorMessage name="cardNumber" component="div" />
           </div>
 
           <div className="form-group">
-            <label htmlFor="cardNumber">Card number</label>
-            <Field name="cardNumber" type="text" />
-            <ErrorMessage name="cardNumber" component="div" className="error-message" />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="cardholderName">Cardholder name</label>
+            <label htmlFor="cardholderName">Cardholder Name</label>
             <Field name="cardholderName" type="text" />
-            <ErrorMessage name="cardholderName" component="div" className="error-message" />
+            <ErrorMessage name="cardholderName" component="div" />
           </div>
 
           <div className="form-group">
-            <label htmlFor="expiryDate">Expires on</label>
-            <div className="expiry-date">
+            <label htmlFor="expiryDate">Expires On</label>
+            <div className="expiry-date-group">
               <Field
                 as="select"
                 name="expiryDate.month"
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                  const newMonth = e.target.value;
-                  setFieldValue("expiryDate.month", newMonth);
-                }}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setFieldValue("expiryDate.month", e.target.value)
+                }
               >
                 {[...Array(12).keys()].map((month) => (
                   <option key={month + 1} value={month + 1}>
@@ -160,10 +106,9 @@ const PaymentDetailsForm: React.FC<PaymentDetailsFormProps> = ({
               <Field
                 as="select"
                 name="expiryDate.year"
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                  const newYear = e.target.value;
-                  setFieldValue("expiryDate.year", newYear);
-                }}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setFieldValue("expiryDate.year", e.target.value)
+                }
               >
                 {[...Array(10).keys()].map((i) => {
                   const year = new Date().getFullYear() + i;
@@ -175,35 +120,34 @@ const PaymentDetailsForm: React.FC<PaymentDetailsFormProps> = ({
                 })}
               </Field>
             </div>
-            <ErrorMessage name="expiryDate.month" component="div" className="error-message" />
-            <ErrorMessage name="expiryDate.year" component="div" className="error-message" />
+            <ErrorMessage name="expiryDate.month" component="div" />
+            <ErrorMessage name="expiryDate.year" component="div" />
           </div>
 
-          <h2>Billing Address</h2>
-          {/* Billing Address Fields */}
-          {/* Add similar fields here for street, city, state, postal_code, country, etc. */}
-
-          <div className="form-navigation">
-            <button
-              type="button"
-              onClick={() => navigate("/business/contact-details")}
-              className="previous-button"
-            >
-              Previous
-            </button>
-            <button type="submit" className="next-button">
-              Next
-            </button>
+          <div className="form-group">
+            <label htmlFor="cvv">CVV</label>
+            <Field name="cvv" type="text" />
+            <ErrorMessage name="cvv" component="div" />
           </div>
+
+          <div className="form-group">
+            <label htmlFor="currency">Currency</label>
+            <Field as="select" name="currency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+              <option value="JPY">JPY</option>
+              <option value="AUD">AUD</option>
+              <option value="CAD">CAD</option>
+            </Field>
+            <ErrorMessage name="currency" component="div" />
+          </div>
+
+          <button type="submit">Next</button>
         </Form>
       )}
     </Formik>
   );
 };
-
-// Simulated tokenization function
-async function getPaymentTokenFromGateway(): Promise<string> {
-  return "secure_payment_token";
-}
 
 export default PaymentDetailsForm;

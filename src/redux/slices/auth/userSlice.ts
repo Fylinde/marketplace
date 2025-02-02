@@ -31,6 +31,8 @@ export interface UserState {
   loading: boolean;
   error: string | null;
   currentSegment: UserSegment; // Add this line
+  userContext?: string;
+  currency?: string;
 }
 
 const initialState: UserState = {
@@ -43,6 +45,8 @@ const initialState: UserState = {
   loading: false,
   error: null,
   currentSegment: 'B2C',
+  userContext: '',
+  currency: '',
 };
 
 export const fetchUserProfile = createAsyncThunk<

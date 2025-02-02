@@ -11,7 +11,7 @@ const Notifications = () => {
   });
 
   useEffect(() => {
-    const ws = new WebSocket("wss://your-backend.com/notifications");
+    const ws = new WebSocket("wss://mock-server/notifications"); //'ws://mock-server', true
     ws.onmessage = (message) => {
       const notification = JSON.parse(message.data);
 

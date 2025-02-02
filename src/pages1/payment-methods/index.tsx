@@ -1,17 +1,17 @@
 
-import Button from "components/buttons/Button";
-import IconButton from "components/buttons/IconButton";
-import Card from "components/Card";
-import FlexBox from "components/FlexBox";
-import Icon from "components/icon/Icon";
-import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
-import Pagination from "components/pagination/Pagination";
-import TableRow from "components/TableRow";
+import Button from "../../components/buttons/Button";
+import IconButton from "../../components/buttons/IconButton";
+import Card from "../../components/Card";
+import FlexBox from "../../components/FlexBox";
+import Icon from "../../components/icon/Icon";
+import CustomerDashboardLayout from "../../components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "../../components/layout/DashboardPageHeader";
+import Pagination from "../../components/pagination/Pagination";
+import TableRow from "../../components/TableRow";
 import Typography from "components/Typography";
 import { Link } from "react-router-dom";
 import React from "react";
-import { H5 } from "components/Typography";
+import { H5 } from "../../components/Typography";
 
 const AddressList = () => {
   return (

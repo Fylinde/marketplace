@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Box from "../Box";
 import Typography, { H3 } from "../Typography";
-import { getProducts } from "services/productService";
-import { Product } from "../../types/Product"; // Ensure the type matches the API response
+import { useDispatch } from "react-redux";
+import { fetchProducts } from "../../redux/slices/products/productSlice";
+import { AppDispatch } from "../../redux/store";
+import { Product } from "../../types/Product";
 
 export interface ProductDescriptionProps {
   description?: string;
@@ -11,22 +13,26 @@ export interface ProductDescriptionProps {
 
 const ProductDescription: React.FC<ProductDescriptionProps> = ({ description }) => {
   const { id } = useParams<{ id: string }>();
+  const dispatch = useDispatch<AppDispatch>();
   const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     if (id) {
-      getProducts(id)
+      // Dispatch fetchProducts with appropriate parameters
+      dispatch(fetchProducts({ filters: {}, page: 1 }))
+        .unwrap() // Unwrap the result
         .then((response) => {
-          const product = response.products.find((p: Product) => p.id === id);
-          if (!product) {
+          const foundProduct = response.data.find((p: Product) => p.id === id);
+          if (!foundProduct) {
             throw new Error(`Product with id ${id} not found`);
           }
-          setProduct(product); // Assign the extracted product
+          setProduct(foundProduct); // Assign the extracted product
         })
-        .catch((error) => console.error("Failed to fetch product details", error));
+        .catch((error) => {
+          console.error("Failed to fetch product details", error);
+        });
     }
-  }, [id]);
-  
+  }, [id, dispatch]);
 
   if (!product) return <p>Loading...</p>;
 

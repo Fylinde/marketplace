@@ -1,90 +1,71 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import {
-    setSellerVerificationCode,
-    setVerificationStatus,
-    setVerificationError,
-    selectSellerVerification
-} from '../../../redux/slices/auth/registrationSlice';
-import { SellerVerification } from '../../../types/sharedTypes';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { RootState, AppDispatch } from "../../../redux/store";
+import { verifySellerCodeThunk } from "../../../redux/slices/auth/registrationSlice";
+import { Container, Title, Input, Button, Message } from "./SellerVerificationFormWrapper";
+import { SellerVerification } from "../../../types/sharedTypes";
 
 interface SellerVerificationFormProps {
-    data: SellerVerification;
-    onUpdate: (updatedData: Partial<SellerVerification>) => void;
-    onNext: () => void;
+  data: SellerVerification;
+  onUpdate: (data: Partial<SellerVerification>) => void;
 }
 
 const SellerVerificationForm: React.FC<SellerVerificationFormProps> = ({ data, onUpdate }) => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { email, verificationError, verificationCode } = useSelector(selectSellerVerification);
+  const [code, setCode] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
-    // Log Redux state on component load
-    console.log('Redux Verification Data:', { email, verificationError, verificationCode });
-    console.log('Email before verification:', email); // Add this log to check email
+  const storedEmail = useSelector((state: RootState) => {
+    console.log("[DEBUG] Redux accountDetails:", state.registration.accountDetails);
+    return state.registration.accountDetails?.email || data.email;
+  });
 
+  const { isVerified, verificationError } = useSelector(
+    (state: RootState) => state.registration
+  );
 
+  useEffect(() => {
+    if (!storedEmail) {
+      console.error("[ERROR] No email found for verification.");
+    }
+  }, [storedEmail]);
 
-    const verifyCodeWithServer = async (code: string) => {
-        try {
-            const response = await axios.post('http://localhost:8000/auth/verify-code', {
-                email,
-                code,
-            });
-            return response.data.isValid; // Assuming the response has an `isValid` field
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                console.error('Network Error Details:', error.toJSON()); // Log detailed error info
-            } else {
-                console.error('Unexpected Error:', error);
-            }
-            return false;
-        }
-    };
+  const handleVerification = async () => {
+    try {
+      if (!storedEmail) {
+        console.error("[ERROR] No email found for verification.");
+        return;
+      }
 
+      console.log("[DEBUG] Dispatching verifySellerCodeThunk with:", { email: storedEmail, code });
+      const result = await dispatch(verifySellerCodeThunk({ email: storedEmail, code })).unwrap();
 
+      console.log("[DEBUG] Verification Response:", result);
+      if (result?.isVerified) {
+        console.log("[DEBUG] Verification successful! Navigating to next step...");
+        navigate("/register/seller/professional/combined-information");
+      }
+    } catch (error) {
+      console.error("[ERROR] Verification failed:", error);
+    }
+  };
 
-    const handleVerification = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!email) {
-            console.error("Email is missing from Redux state.");
-            dispatch(setVerificationError("Email is missing. Please restart the registration process."));
-            return;
-        }
-
-        const isValidCode = await verifyCodeWithServer(verificationCode);
-        if (isValidCode) {
-            dispatch(setVerificationStatus(true));
-            dispatch(setVerificationError(null));
-            navigate('/register/seller/type-selection');
-        } else {
-            dispatch(setVerificationError('Invalid verification code'));
-        }
-    };
-
-
-    return (
-        <div className="verification-form">
-            <h2>Email Verification</h2>
-            <p>A verification code has been sent to your email: {email}</p>
-            <form onSubmit={handleVerification}>
-                {verificationError && <p className="error">{verificationError}</p>}
-                <label htmlFor="verificationCode">Verification Code</label>
-                <input
-                    type="text"
-                    id="verificationCode"
-                    placeholder="Enter the code"
-                    value={verificationCode}
-                    onChange={(e) => dispatch(setSellerVerificationCode(e.target.value))}
-                    required
-                />
-                <button type="submit" className="submit-button">Verify</button>
-            </form>
-        </div>
-    );
+  return (
+    <Container>
+      <Title>Verify Your Account</Title>
+      <Input
+        type="text"
+        placeholder="Enter verification code"
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+      />
+      <Button onClick={handleVerification}>Verify</Button>
+      {storedEmail && <Message>Email: {storedEmail}</Message>}
+      {isVerified && <Message>Verification Successful!</Message>}
+      {verificationError && <Message isError>{verificationError}</Message>}
+    </Container>
+  );
 };
 
 export default SellerVerificationForm;

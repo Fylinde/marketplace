@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
-import { fetchSupportTicketById, fetchAISolutions, escalateTicketToHuman } from "@/redux/slices/support/supportSlice";
+import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
+import { fetchSupportTicketById, fetchAISolutions, escalateTicketToHuman } from "../../../redux/slices/support/supportSlice";
 import styled from "styled-components";
 import { Spin, Alert, Button as AntButton } from "antd";
 import AISuggestionsModal from "./AISuggestionsModal";
-import { getLocalizedText } from "utils/localizationUtils";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 
 interface SupportTicketDetailsProps {
   ticketId: string;

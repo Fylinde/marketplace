@@ -14,9 +14,8 @@ import { H5, H6, Paragraph, SemiSpan } from "../Typography";
 import { fetchColors } from "../../redux/slices/products/productSlice";
 import { fetchBrands } from "../../redux/slices/products/brandSlice";
 import { fetchCategories } from "../../redux/slices/products/categorySlice";
-import { RootState } from "../../redux/store";
 import { updateFilters, toggleOption, resetFilters } from "../../redux/slices/support/filterSlice"; // Actions for filters
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 
 interface Category {
   title: string;

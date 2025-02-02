@@ -2,8 +2,8 @@ import React from "react";
 import { Pie, Line } from "react-chartjs-2";
 import styled from "styled-components";
 import { Spin, Alert } from "antd";
-import { getLocalizedText } from "utils/localizationUtils";
-import { Feedback } from "@/services/feedbackService";
+import { getLocalizedText } from "../../../utils/localizationUtils";
+import { Feedback } from "../../../services/feedbackService";
 
 const FeedbackContainer = styled.div`
   padding: 20px;

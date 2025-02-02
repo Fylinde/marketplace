@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Box from "components/Box";
-import Button from "components/buttons/Button";
-import Modal from "components/modal/Modal";
-import Input from "components/input/Input";
-import Table from "components/table/Table";
-import { validateFields, validateString, validateNumeric } from "services/validationService";
+import Box from "../../../components/Box";
+import Button from "../../../components/buttons/Button";
+import Modal from "../../../components/modal/Modal";
+import Input from "../../../components/input/Input";
+import Table from "../../../components/table/Table";
+import { validateFields, validateString, validateNumeric } from "../../../services/validationService";
 
 // Define the type for Address
 interface Address {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShopDetails } from '../../types/sharedTypes';
+import { ShopDetails } from '../../types/shop';
 
 interface ShopDetailsSectionProps {
   shopDetails: ShopDetails;

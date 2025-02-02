@@ -8,17 +8,16 @@ import {
   fetchSalesProducts,
   selectProducts,
 } from "../redux/slices/products/productSlice";
-import Container from "components/Container";
-import FlexBox from "components/FlexBox";
-import Grid from "components/grid/Grid";
-import SaleLayout2 from "components/layout/SaleLayout2";
-import Pagination from "components/pagination/Pagination";
-import ProductCard1 from "components/product-cards/ProductCard1";
-import Box from "components/Box";
-import { H1, H5, SemiSpan } from "components/Typography";
-import type { AppDispatch } from "../redux/store";
-import { Review } from "@/types/review";
-import { RootState } from "../redux/store";
+import Container from "../components/Container";
+import FlexBox from "../components/FlexBox";
+import Grid from "../components/grid/Grid";
+import SaleLayout2 from "../components/layout/SaleLayout2";
+import Pagination from "../components/pagination/Pagination";
+import ProductCard1 from "../components/product-cards/ProductCard1";
+import Box from "../components/Box";
+import { H1, H5, SemiSpan } from "../components/Typography";
+import type { AppDispatch, RootState } from "../redux/store";
+import { Review } from "../types/review";
 import { Product } from "../types/Product"; // Import the Product type
 
 const saleCategoryList: { icon: string; title: string; segment: "B2C" | "B2B" | "C2C" }[] = [

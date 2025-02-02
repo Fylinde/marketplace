@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { Address } from '../models/Address';
+
+import { Address } from '../types/address';
 
 const API_URL = process.env.REACT_APP_ADDRESS_SERVICE_URL || 'http://localhost:8007/addresses';
 
@@ -8,9 +9,9 @@ interface AddressData {
   street: string;
   city: string;
   state: string;
-  postal_code: string;
+  postalCode: string;
   country: string;
-  phone_number: string;
+  phoneNumber: string;
 }
 
 // Function for adding a new user address

@@ -1,5 +1,5 @@
 
-import Card from "components/Card";
+import Card from "../../../components/Card";
 import React from "react";
 import CategoryMenuItem from "../category-menu-item/CategoryMenuItem";
 import MegaMenu3 from "./MegaMenu3";

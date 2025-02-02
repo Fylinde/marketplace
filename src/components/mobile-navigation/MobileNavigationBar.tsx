@@ -4,7 +4,7 @@ import Icon from "../icon/Icon";
 import NavLink from "../nav-link/NavLink";
 import StyledMobileNavigationBar from "./MobileNavigationBar.style";
 import { useAppSelector, useAppDispatch } from "../../redux/reduxHooks";
-import { Chip } from "components/Chip";
+import { Chip } from "../../components/Chip";
 import Tooltip from "../../components/tooltip/Tooltip"; // Add a tooltip component
 import { fetchNavigationItems } from "../../redux/slices/support/navigationSlice"; // Redux action for dynamic navigation
 

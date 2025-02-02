@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-import { BillingInformation } from "@/types/sharedTypes";
+import { BillingInformation } from "../../../types/sharedTypes";
 import billingService from "../../../services/billingService";
 
 

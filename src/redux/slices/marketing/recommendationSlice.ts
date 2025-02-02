@@ -1,7 +1,7 @@
 // src/redux/slices/recommendationSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import RecommendationService from "../../../services/RecommendationService";
-import { Recommendation } from "@/types/Recommendation";
+import { Recommendation } from "../../../types/Recommendation";
 
 
 interface RecommendationState {

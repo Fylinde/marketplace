@@ -16,19 +16,10 @@ const StyledSellerRegistrationLayout = styled.div`
   }
 
   /* Progress Indicator */
-  .progress-indicator {
-    background: linear-gradient(90deg, #4A90E2, #007BFF);
-    color: #FFFFFF;
-    padding: 1rem 2rem;
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.progress-indicator-wrapper {
+  margin: 1rem 0; /* Add spacing around the progress bar */
+}
+
 
 
   /* Main Content Area */

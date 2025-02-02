@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Card, Steps, Button, Space } from "antd";
-import { RootState } from "../redux/store";
 import { fetchCartItems } from "../redux/slices/orders/cartSlice";
 import { fetchPaymentMethods } from "../redux/slices/orders/paymentSlice";
 import { setCurrentStep } from "../redux/slices/orders/checkoutSlice";
@@ -12,7 +11,7 @@ import PaymentMethodForm from "../components/checkout/PaymentMethodForm";
 import OrderSummary from "../components/checkout/OrderSummary";
 import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute";
 import { PageWithLayout } from "../types/pageLayouts";
-import type { AppDispatch } from "../redux/store";
+import type { AppDispatch, RootState } from "../redux/store";
 
 const { Step } = Steps;
 

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { debounce } from "../../utils/debounce";
 import { useAppSelector } from "../../redux/reduxHooks";
 import { fetchSuggestions, executeSearch, setFilters } from "@/redux/slices/utils/searchSlice";
-import { RootState } from "redux/store";
 import Box from "../Box";
 import FlexBox from "../FlexBox";
 import Card from "../Card";
@@ -17,9 +16,9 @@ import AdvancedSearchFilters from "./AdvancedSearchFilters";
 import SearchSuggestions from "./SearchSuggestions";
 import StyledSearchBox from "../search-box/SearchBoxStyle";
 import { createCrossModalPayload } from "../../utils/CrossModalProcessor";
-import { executePersonalizedSearch, executeCrossModalSearch } from "@/redux/slices/utils/searchSlice";
+import { executePersonalizedSearch, executeCrossModalSearch } from "../../redux/slices/utils/searchSlice";
 import { useSelector, useDispatch } from "react-redux";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 
 const SearchBar: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

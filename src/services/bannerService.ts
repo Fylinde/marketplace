@@ -1,6 +1,6 @@
 // src/services/bannerService.ts
 import axios from 'axios';
-import { Banner } from 'types/banner';
+import { Banner } from '../types/banner';
 
 const API_URL = '/api/banners'; // Replace with actual API endpoint
 

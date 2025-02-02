@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchEscrowAnalytics } from "@/redux/slices/orders/escrowSlice";
+import { fetchEscrowAnalytics } from "../../../../redux/slices/orders/escrowSlice";
 import { Chart } from "react-chartjs-2";
 import { getLocalizedText } from "../../../../utils/localizationUtils";
 import type { AppDispatch } from "../../../../redux/store";

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Box from "components/Box";
-import Button from "components/buttons/Button";
-import Modal from "@/components/modal/Modal";
-import Table from "@/components/table/Table";
-import Input from "@/components/input/Input";
-import { validateBankDetails } from "services/validationService";
+import Box from "../../../components/Box";
+import Button from "../../../components/buttons/Button";
+import Modal from "../../..//components/modal/Modal";
+import Table from "../../..//components/table/Table";
+import Input from "../../..//components/input/Input";
+import { validateBankDetails } from "../../../services/validationService";
 
 
 

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import {
   fetchWarehouses,
   fetchRecommendations,
   fetchSharedInventory,
-} from '@/redux/slices/logistics/warehouseSlice';
+} from '../../redux/slices/logistics/warehouseSlice';
 import warehouseService from '../../services/warehouseService';
 import { Table, Button, Spin, Modal, Alert } from 'antd';
 import { getLocalizedText } from '../../utils/localizationUtils';

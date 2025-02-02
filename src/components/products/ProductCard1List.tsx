@@ -7,8 +7,7 @@ import Pagination from "../pagination/Pagination";
 import ProductCard1 from "../product-cards/ProductCard1";
 import { SemiSpan } from "../Typography";
 import { fetchProducts } from "../../redux/slices/products/productSlice";
-import { RootState } from "../../redux/store";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 import { Product } from "../../types/Product";
 
 export interface ProductCard1ListProps {

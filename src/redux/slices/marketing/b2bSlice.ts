@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import b2bService from "services/b2bService";
-import { RootState } from "redux/store";
+import b2bService from "../../../services/b2bService";
+import { RootState } from "../../store";
 
 // Define the structure of B2B pricing items
 interface B2BPricing {

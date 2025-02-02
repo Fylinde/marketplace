@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../../../../redux/reduxHooks";
 import { fetchTransactionHistory } from "../../../../redux/slices/orders/transactionSlice";
 import styled from "styled-components";
 import { Table, Spin, Alert, Input } from "antd";

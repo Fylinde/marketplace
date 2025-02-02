@@ -1,8 +1,8 @@
 
-import Button from "components/buttons/Button";
-import Card from "components/Card";
-import MenuItem from "components/MenuItem";
-import { Span } from "components/Typography";
+import Button from "../../components/buttons/Button";
+import Card from "../../components/Card";
+import MenuItem from "../../components/MenuItem";
+import { Span } from "../../components/Typography";
 import { debounce } from "lodash";
 import { Link } from "react-router-dom";
 import React, { useCallback, useEffect, useState } from "react";

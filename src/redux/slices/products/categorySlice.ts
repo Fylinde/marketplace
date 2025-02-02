@@ -28,17 +28,39 @@ const initialState: CategoryState = {
 const extractErrorMessage = (error: any): string =>
   error?.response?.data?.message || error.message || 'An error occurred';
 
+
+
 // Async thunk to fetch all categories
-export const fetchCategories = createAsyncThunk(
-  'categories/fetchAll',
-  async (_, thunkAPI) => {
-    try {
-      return await categoryService.fetchCategories();
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
+// Async thunk to fetch all categories
+export const fetchCategories = createAsyncThunk<
+  Category[],
+  void,
+  { rejectValue: string }
+>("categories/fetchCategories", async (_, thunkAPI) => {
+  try {
+    // Try fetching categories from the backend
+    const response = await fetch(`/api/categories`);
+    if (!response.ok) {
+      throw new Error(`Backend API returned ${response.status}`);
     }
+    const data = await response.json();
+
+    // Fallback to mock data if the backend returns an empty array
+    if (data.categories.length === 0) {
+      console.warn("Backend returned empty categories, falling back to mock data.");
+      const { mockCategories } = await import("../../../mock/data/categories");
+      return mockCategories;
+    }
+
+    return data.categories;
+  } catch (error) {
+    console.error("Error fetching categories from backend:", error);
+
+    // Fallback to mock data in case of errors
+    const { mockCategories } = await import("../../../mock/data/categories");
+    return mockCategories;
   }
-);
+});
 
 // Async thunk to fetch a single category by ID
 export const fetchCategoryById = createAsyncThunk(
@@ -62,18 +84,19 @@ const categorySlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+
     builder
       .addCase(fetchCategories.pending, (state) => {
-        state.loading = true;
+        state.loadingCategories = true;
         state.error = null;
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingCategories = false;
         state.categories = action.payload;
       })
       .addCase(fetchCategories.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
+        state.loadingCategories = false;
+        state.error = action.payload || "Failed to load categories";
       })
       .addCase(fetchCategoryById.pending, (state) => {
         state.loading = true;
@@ -91,7 +114,11 @@ const categorySlice = createSlice({
 });
 
 // Selectors
-export const selectCategories = (state: RootState) => state.categories; // Return the entire state slice
+export const selectCategories = (state: RootState) => ({
+  categories: state.categories.categories,
+  loading: state.categories.loadingCategories,
+  error: state.categories.error,
+});
 export const selectSelectedCategory = (state: RootState) => state.categories.selectedCategory;
 export const selectCategoryError = (state: RootState) => state.categories.error;
 

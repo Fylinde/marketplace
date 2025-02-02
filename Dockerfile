@@ -1,29 +1,28 @@
-# Dockerfile
+# Dockerfile for marketplace
 
 # Use an official Node.js runtime as a parent image
-FROM node:16
+FROM node:18-alpine
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package.json package-lock.json ./
+# Copy package.json and yarn.lock
+COPY package.json yarn.lock ./
 
 # Install dependencies
- RUN npm install
+RUN yarn install
 
 # Copy the rest of the application
 COPY . .
 
-# Build the React app for production
-#RUN npm run build
+# Expose port 3000 for the React dev server
+EXPOSE 3000
 
-# Use nginx to serve the app
-#FROM nginx:alpine
-#COPY --from=0 /app/build /usr/share/nginx/html
+# Copy the start.sh script into the container
+COPY start.sh .
 
-# Expose the port the app runs on
-EXPOSE 80
+# Make start.sh executable
+RUN chmod +x start.sh
 
-# Start the app
-CMD ["npm", "start"]
+# Use start.sh as the container's entry point
+CMD ["./start.sh"]

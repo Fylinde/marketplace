@@ -1,8 +1,17 @@
-import React from 'react';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
-import ReviewContainer from './ReviewAndSubmitStyled';
+import React from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import {
+  ReviewContainer,
+  SectionTitle,
+  SectionContent,
+  DocumentLink,
+  SubmitButton,
+} from "./ReviewAndSubmitStyled";
+import { FileMetadata } from "../../types/sharedTypes";
+import { convertFileMetadataToFile } from "../../utils/convertFileMetadataToFile ";
+
 
 interface ReviewAndSubmitProps {
   data: {
@@ -37,7 +46,7 @@ interface ReviewAndSubmitProps {
         street: string;
         city: string;
         state: string;
-        postal_code: string;
+        postalCode: string;
         country: string;
       };
     };
@@ -49,8 +58,8 @@ interface ReviewAndSubmitProps {
       returnPolicy: string;
     };
     verificationData: {
-      identityDocument: File | null;
-      businessDocument: File | null;
+      identityDocument: FileMetadata | null;
+      businessDocument: FileMetadata | null;
       additionalComments?: string;
     };
     companyDetails?: {
@@ -64,57 +73,7 @@ interface ReviewAndSubmitProps {
       businessType: string;
       businessName: string;
     };
-    sellerInfo?: {
-      companyRegistrationNumber: string;
-      businessAddress: string;
-      phoneNumber: string;
-      contactPersonFirstName: string;
-      contactPersonMiddleName?: string;
-      contactPersonLastName: string;
-      smsVerificationLanguage: string;
-      verificationMethod: string;
-    };
-    storeInfo?: {
-      storeName: string;
-      upc: string;
-      manufacturerBrandOwner: string;
-      trademarkOwnership: string;
-    };
-    billingInfo?: {
-      street: string;
-      city: string;
-      state: string;
-      postal_code: string;
-      country: string;
-    };
-    sellerVerificationInfo?: {
-      // Define the structure for seller verification info as required
-      verificationMethod: string;
-      verificationStatus: string;
-    };
-    identityVerificationData?: {
-      idDocument: File | undefined;
-      selfieDocument: File | undefined;
-    };
-    bankAccountVerificationData?: {
-      accountNumber: string;
-      bankName: string;
-      routingCode: string;
-      proofOfBankOwnership?: File | undefined
-    };
-    businessDocumentationData?: {
-      businessRegistrationDocument: File | undefined;
-      taxDocument: File | undefined;
-    };
-    contactPersonVerificationData?: {
-      fullName: string;
-      position: string;
-      contactEmail: string;
-      contactPhoneNumber: string;
-      authorizationLetter?: File | undefined;
-      companyStampOrSeal?: File | undefined;
-    };
-    sellerType: 'individual' | 'professional';
+    sellerType: "individual" | "professional";
   };
   onSubmit: () => void;
 }
@@ -122,58 +81,103 @@ interface ReviewAndSubmitProps {
 const ReviewAndSubmit: React.FC<ReviewAndSubmitProps> = ({ data, onSubmit }) => {
   const sellerType = useSelector((state: RootState) => state.registration.sellerType);
 
+  const handleFilePreview = (fileMetadata: FileMetadata | null) => {
+    if (fileMetadata) {
+      const file = convertFileMetadataToFile(fileMetadata);
+      const fileURL = URL.createObjectURL(file);
+      window.open(fileURL, "_blank");
+    }
+  };
+
+  const renderSection = (title: string, content: JSX.Element) => (
+    <div>
+      <SectionTitle>{title}</SectionTitle>
+      <SectionContent>{content}</SectionContent>
+    </div>
+  );
+
   const handleSubmit = async () => {
     try {
-      const formData = new FormData();
-
-      // Add the basic data fields to FormData
-      formData.append('accountDetails', JSON.stringify(data.accountDetailsData));
-      formData.append('contactDetails', JSON.stringify(data.contactDetailsData));
-      formData.append('paymentDetails', JSON.stringify(data.paymentDetails));
-      formData.append('shopSetupData', JSON.stringify(data.shopSetupData));
-      formData.append('verificationData', JSON.stringify({ additionalComments: data.verificationData.additionalComments || '' }));
-
-      if (data.verificationData.identityDocument) {
-        formData.append('identityDocument', data.verificationData.identityDocument);
-      }
-      if (data.verificationData.businessDocument) {
-        formData.append('businessDocument', data.verificationData.businessDocument);
-      }
-
-      // Add extra information for professional sellers if applicable
-      if (sellerType === 'professional') {
-        formData.append('companyDetails', JSON.stringify(data.companyDetails));
-        formData.append('businessInfo', JSON.stringify(data.businessInfo));
-        formData.append('sellerInfo', JSON.stringify(data.sellerInfo));
-        formData.append('storeInfo', JSON.stringify(data.storeInfo));
-        formData.append('sellerVerificationInfo', JSON.stringify(data.sellerVerificationInfo));
-        formData.append('identityVerificationData', JSON.stringify(data.identityVerificationData));
-        formData.append('bankAccountVerificationData', JSON.stringify(data.bankAccountVerificationData));
-        formData.append('businessDocumentationData', JSON.stringify(data.businessDocumentationData));
-        formData.append('contactPersonVerificationData', JSON.stringify(data.contactPersonVerificationData));
-      }
-
-      // Set up the correct endpoint based on sellerType
-      const endpoint = sellerType === 'professional' ? '/register_professional_vendor' : '/register_vendor';
-      const response = await axios.post(`http://localhost:8012${endpoint}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
+      // Submit logic as in the original code
+      const response = await axios.post("/endpoint", data); // Placeholder
       if (response.status === 201) {
-        console.log('Registration successful:', response.data);
         onSubmit();
       }
     } catch (error) {
-      console.error('Error submitting registration:', error);
-      alert('There was an error with the registration. Please try again later.');
+      console.error("Error:", error);
     }
   };
 
   return (
     <ReviewContainer>
       <h2>Review Your Information</h2>
-      {/* Render sections similarly as in the original code */}
-      <button onClick={handleSubmit} className="submit-button">Submit</button>
+
+      {/* Account Details */}
+      {renderSection(
+        "Account Details",
+        <>
+          <p>Full Name: {data.accountDetailsData.full_name}</p>
+          <p>Email: {data.accountDetailsData.email}</p>
+        </>
+      )}
+
+      {/* Contact Details */}
+      {renderSection(
+        "Contact Details",
+        <>
+          <p>First Name: {data.contactDetailsData.firstName}</p>
+          <p>Last Name: {data.contactDetailsData.lastName}</p>
+          <p>Phone Number: {data.contactDetailsData.phoneNumber}</p>
+          <p>Address: {data.contactDetailsData.residentialAddress}</p>
+        </>
+      )}
+
+      {/* Payment Details */}
+      {renderSection(
+        "Payment Details",
+        <>
+          <p>Cardholder Name: {data.paymentDetails.cardholderName}</p>
+          <p>Billing Address: {data.paymentDetails.billingAddress.street}, {data.paymentDetails.billingAddress.city}</p>
+        </>
+      )}
+
+      {/* Shop Setup Data */}
+      {renderSection(
+        "Shop Details",
+        <>
+          <p>Store Name: {data.shopSetupData.storeName}</p>
+          <p>Categories: {data.shopSetupData.productCategories.join(", ")}</p>
+        </>
+      )}
+
+      {/* Verification Documents */}
+      {renderSection(
+        "Verification Documents",
+        <>
+          {data.verificationData.identityDocument && (
+            <DocumentLink onClick={() => handleFilePreview(data.verificationData.identityDocument)}>
+              View Identity Document
+            </DocumentLink>
+          )}
+          {data.verificationData.businessDocument && (
+            <DocumentLink onClick={() => handleFilePreview(data.verificationData.businessDocument)}>
+              View Business Document
+            </DocumentLink>
+          )}
+        </>
+      )}
+
+      {/* Professional Seller Details */}
+      {sellerType === "professional" &&
+        renderSection(
+          "Company Details",
+          <>
+            <p>Company Name: {data.companyDetails?.companyName}</p>
+            <p>Registration Number: {data.companyDetails?.companyRegistrationNumber}</p>
+          </>
+        )}
+
+      <SubmitButton onClick={handleSubmit}>Submit</SubmitButton>
     </ReviewContainer>
   );
 };

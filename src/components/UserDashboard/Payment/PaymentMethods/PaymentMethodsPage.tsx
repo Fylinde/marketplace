@@ -29,7 +29,7 @@ const PaymentMethodsPage = () => {
       }
     }
   };
-  
+
 
   if (loading) return <p>{getLocalizedText("loading", "common")}</p>;
   if (error) return <p>{getLocalizedText("error", "common", { error })}</p>;

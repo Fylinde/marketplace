@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { setFilters, fetchSearchResults } from "@/redux/slices/utils/searchSlice";
+import { setFilters, fetchSearchResults } from "../../redux/slices/utils/searchSlice";
 import { debounce } from "../../utils/debounce";
 import Box from "../Box";
 import FlexBox from "../FlexBox";

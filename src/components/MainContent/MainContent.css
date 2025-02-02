@@ -1,5 +1,5 @@
 /* src/components/MainContent/MainContent.css */
-.hero-section, .category-highlights, .top-products, .featured-vendors, .user-recommendations {
+.hero-section, .category-highlights, .top-products, .featured-sellers, .user-recommendations {
     margin: 20px 0;
     padding: 20px;
     background-color: #f8f9fa;
@@ -12,13 +12,13 @@
     height: auto;
   }
   
-  .categories, .product-grid, .vendor-grid, .recommendations-grid {
+  .categories, .product-grid, .seller-grid, .recommendations-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
   }
   
-  .category, .product-card, .vendor-card, .recommendation-card {
+  .category, .product-card, .seller-card, .recommendation-card {
     flex: 1 1 calc(25% - 30px);
     background-color: #ffffff;
     border-radius: 8px;
@@ -27,7 +27,7 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
   
-  .category img, .product-card img, .vendor-card img, .recommendation-card img {
+  .category img, .product-card img, .seller-card img, .recommendation-card img {
     width: 100%;
     height: auto;
     margin-bottom: 10px;

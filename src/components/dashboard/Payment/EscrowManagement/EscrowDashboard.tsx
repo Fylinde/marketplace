@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchEscrowTransactions } from "@/redux/slices/orders/escrowSlice";
+import { fetchEscrowTransactions } from "../../../../redux/slices/orders/escrowSlice";
 import EscrowAnalytics from "./EscrowAnalytics";
 import PerformanceMetrics from "./PerformanceMetrics";
 import EscrowNotificationSystem from "./EscrowNotificationSystem";

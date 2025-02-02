@@ -1,25 +1,24 @@
-// Track order historyimport React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
 import { fetchOrderHistory } from "../../../redux/slices/orders/orderSlice";
-import Box from "components/Box";
-import Table from "components/table/Table";
-import Button from "components/buttons/Button";
-import Modal from "components/modal/Modal";
-import Input from "components/input/Input";
-import Pagination from "components/pagination/Pagination";
-import { Order } from "types/order";
-import { RootState } from "../../../redux/store";
-import React, { useEffect, useState } from "react";
-import type { AppDispatch } from "../../../redux/store";
-import { useDispatch, useSelector } from "react-redux";
-
+import Box from "../../../components/Box";
+import Table from "../../../components/table/Table";
+import Button from "../../../components/buttons/Button";
+import Modal from "../../../components/modal/Modal";
+import Input from "../../../components/input/Input";
+import Pagination from "../../../components/pagination/Pagination";
+import { Order } from "../../../types/order";
+import type { AppDispatch, RootState } from "../../../redux/store";
+import { formatCurrency, getLocalizedText } from "../../../utils/localizationUtils";
 
 const OrderHistory: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const orders = useAppSelector((state: RootState) => state.orders.history);
   const isLoading = useAppSelector((state: RootState) => state.orders.loading);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"All" | "Pending" | "Processing" | "Delivered" | "Cancelled">("All");
+  const [filterStatus, setFilterStatus] = useState<"All" | "Pending" | "Processing" | "Delivered" | "Cancelled">(
+    "All"
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
@@ -30,10 +29,9 @@ const OrderHistory: React.FC = () => {
     dispatch(fetchOrderHistory({ page: currentPage, filters }));
   }, [dispatch, currentPage, filterStatus]);
 
-
-
   const filteredOrders = orders.filter((order) => {
-    const matchesSearch = order.id.includes(searchTerm) || (order.customerNote || "").toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      order.id.includes(searchTerm) || (order.customerNote || "").toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === "All" || order.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -50,40 +48,37 @@ const OrderHistory: React.FC = () => {
 
   return (
     <Box>
-      <h1>Order History</h1>
+      <h1>{getLocalizedText("orderHistory", "orders")}</h1>
 
       {/* Search and Filters */}
       <Box display="flex" justifyContent="space-between" mb="20px">
         <Input
-          label="Search Orders"
+          label={getLocalizedText("searchOrders", "orders")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value as any)}
-        >
-          <option value="All">All</option>
-          <option value="Pending">Pending</option>
-          <option value="Processing">Processing</option>
-          <option value="Delivered">Delivered</option>
-          <option value="Cancelled">Cancelled</option>
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as any)}>
+          <option value="All">{getLocalizedText("all", "common")}</option>
+          <option value="Pending">{getLocalizedText("pending", "orders")}</option>
+          <option value="Processing">{getLocalizedText("processing", "orders")}</option>
+          <option value="Delivered">{getLocalizedText("delivered", "orders")}</option>
+          <option value="Cancelled">{getLocalizedText("cancelled", "orders")}</option>
         </select>
       </Box>
 
       {/* Order Table */}
       {isLoading ? (
-        <p>Loading orders...</p>
+        <p>{getLocalizedText("loadingOrders", "orders")}</p>
       ) : (
         <>
           <Table>
             <thead>
               <tr>
-                <th>Order ID</th>
-                <th>Date</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{getLocalizedText("orderId", "orders")}</th>
+                <th>{getLocalizedText("date", "orders")}</th>
+                <th>{getLocalizedText("total", "orders")}</th>
+                <th>{getLocalizedText("status", "orders")}</th>
+                <th>{getLocalizedText("actions", "orders")}</th>
               </tr>
             </thead>
             <tbody>
@@ -91,10 +86,14 @@ const OrderHistory: React.FC = () => {
                 <tr key={order.id}>
                   <td>{order.id}</td>
                   <td>{new Date(order.date).toLocaleDateString()}</td>
-                  <td>${order.total.toFixed(2)}</td>
-                  <td>{order.status}</td>
                   <td>
-                    <Button onClick={() => handleSelectOrder(order)}>View Details</Button>
+                    {formatCurrency(order.total, order.buyerCurrency || order.currency || "USD")}
+                  </td>
+                  <td>{getLocalizedText(order.status.toLowerCase(), "orders")}</td>
+                  <td>
+                    <Button onClick={() => handleSelectOrder(order)}>
+                      {getLocalizedText("viewDetails", "orders")}
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -113,14 +112,14 @@ const OrderHistory: React.FC = () => {
       {/* Order Details Modal */}
       {selectedOrder && (
         <Modal
-          title={`Order Details: ${selectedOrder.id}`}
+          title={`${getLocalizedText("orderDetails", "orders")}: ${selectedOrder.id}`}
           open={!!selectedOrder}
           onClose={closeOrderModal}
         >
           <Box>
-            <h3>Customer Information</h3>
+            <h3>{getLocalizedText("customerInformation", "orders")}</h3>
             <p>
-              <strong>Shipping Address:</strong>{" "}
+              <strong>{getLocalizedText("shippingAddress", "orders")}:</strong>{" "}
               {selectedOrder.shippingAddress && selectedOrder.shippingAddress.length > 0 ? (
                 selectedOrder.shippingAddress.map((address, index) => (
                   <div key={index}>
@@ -130,20 +129,21 @@ const OrderHistory: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <span>No shipping address available.</span>
+                <span>{getLocalizedText("noShippingAddress", "orders")}</span>
               )}
             </p>
             <p>
-              <strong>Customer Note:</strong> {selectedOrder.customerNote || "No notes provided"}
+              <strong>{getLocalizedText("customerNote", "orders")}:</strong>{" "}
+              {selectedOrder.customerNote || getLocalizedText("noNotesProvided", "orders")}
             </p>
 
-            <h3>Order Items</h3>
+            <h3>{getLocalizedText("orderItems", "orders")}</h3>
             <Table>
               <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>Quantity</th>
-                  <th>Price</th>
+                  <th>{getLocalizedText("product", "orders")}</th>
+                  <th>{getLocalizedText("quantity", "orders")}</th>
+                  <th>{getLocalizedText("price", "orders")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -151,28 +151,36 @@ const OrderHistory: React.FC = () => {
                   <tr key={item.productId}>
                     <td>{item.productName}</td>
                     <td>{item.quantity}</td>
-                    <td>${item.price.toFixed(2)}</td>
+                    <td>
+                      {formatCurrency(
+                        item.buyerPrice || item.price || 0,
+                        selectedOrder.buyerCurrency || selectedOrder.currency || "USD"
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </Table>
 
-            <h3>Order Summary</h3>
+            <h3>{getLocalizedText("orderSummary", "orders")}</h3>
             <p>
-              <strong>Subtotal:</strong> ${selectedOrder.subtotal.toFixed(2)}
+              <strong>{getLocalizedText("subtotal", "orders")}:</strong>{" "}
+              {formatCurrency(selectedOrder.subtotal, selectedOrder.buyerCurrency || "USD")}
             </p>
             <p>
-              <strong>Shipping Fee:</strong> ${selectedOrder.shippingFee.toFixed(2)}
+              <strong>{getLocalizedText("shippingFee", "orders")}:</strong>{" "}
+              {formatCurrency(selectedOrder.shippingFee, selectedOrder.buyerCurrency || "USD")}
             </p>
             <p>
-              <strong>Discount:</strong> ${selectedOrder.discount.toFixed(2)}
+              <strong>{getLocalizedText("discount", "orders")}:</strong>{" "}
+              {formatCurrency(selectedOrder.discount, selectedOrder.buyerCurrency || "USD")}
             </p>
             <p>
-              <strong>Total:</strong> ${selectedOrder.total.toFixed(2)}
+              <strong>{getLocalizedText("total", "orders")}:</strong>{" "}
+              {formatCurrency(selectedOrder.total, selectedOrder.buyerCurrency || "USD")}
             </p>
           </Box>
         </Modal>
-
       )}
     </Box>
   );

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import discountService from 'services/discountService';
+import discountService from '../../../services/discountService';
 
 
 interface DiscountRecommendation {

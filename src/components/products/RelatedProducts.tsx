@@ -7,8 +7,7 @@ import Grid from "../grid/Grid";
 import ProductCard1 from "../product-cards/ProductCard1";
 import { H3 } from "../Typography";
 import { fetchRelatedProducts } from "../../redux/slices/products/productSlice";
-import { RootState } from "../../redux/store";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 import Modal from "../modal/Modal";
 import ProductIntro from "../products/ProductIntro";
 import { Product } from "../../types/Product";
@@ -28,9 +27,10 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productId }) => {
 
   useEffect(() => {
     if (productId) {
-      dispatch(fetchRelatedProducts({ productId, filters, page }));
+        dispatch(fetchRelatedProducts(productId));
     }
-  }, [dispatch, productId, filters, page]);
+}, [dispatch, productId]);
+
 
   useEffect(() => {
     if (inView && !loading) {

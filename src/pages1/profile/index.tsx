@@ -1,14 +1,14 @@
 
-import Avatar from "components/avatar/Avatar";
-import Box from "components/Box";
-import Button from "components/buttons/Button";
-import Card from "components/Card";
-import FlexBox from "components/FlexBox";
-import Grid from "components/grid/Grid";
-import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
-import TableRow from "components/TableRow";
-import Typography, { H3, H5, Small } from "components/Typography";
+import Avatar from "../../components/avatar/Avatar";
+import Box from "../../components/Box";
+import Button from "../../components/buttons/Button";
+import Card from "../../components/Card";
+import FlexBox from "../../components/FlexBox";
+import Grid from "../../components/grid/Grid";
+import CustomerDashboardLayout from "../../components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "../../components/layout/DashboardPageHeader";
+import TableRow from "../../components/TableRow";
+import Typography, { H3, H5, Small } from "../../components/Typography";
 import { format } from "date-fns";
 import { Link } from "react-router-dom"; 
 import React from "react";

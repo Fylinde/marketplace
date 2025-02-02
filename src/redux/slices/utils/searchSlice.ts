@@ -332,17 +332,6 @@ const searchSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchSearchResults.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchSearchResults.fulfilled, (state, action) => {
-        state.loading = false;
-        state.results = action.payload.results;
-        state.hasMore = action.payload.hasMore;
-      })
-      .addCase(fetchSearchResults.rejected, (state) => {
-        state.loading = false;
-      })
       .addCase(fetchMoreSearchResults.fulfilled, (state, action) => {
         state.results = [...state.results, ...action.payload.results];
         state.hasMore = action.payload.hasMore;

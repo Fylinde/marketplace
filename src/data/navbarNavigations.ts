@@ -37,14 +37,14 @@ const navbarNavigations = [
         ],
       },
       {
-        title: "Vendor",
+        title: "Seller",
         child: [
           {
-            title: "All vendors",
+            title: "All Sellers",
             url: "/shops",
           },
           {
-            title: "Vendor store",
+            title: "Seller store",
             url: "/shop/34324",
           },
         ],
@@ -138,22 +138,22 @@ const navbarNavigations = [
     ],
   },
   {
-    title: "Vendor Account",
+    title: "Seller Account",
     child: [
       {
         title: "Dashboard",
-        url: "/vendor/dashboard",
+        url: "/Seller/dashboard",
       },
       {
         title: "Products",
         child: [
           {
             title: "All products",
-            url: "/vendor/products",
+            url: "/seller/products",
           },
           {
             title: "Add/Edit product",
-            url: "/vendor/products/248104",
+            url: "/seller/products/248104",
           },
         ],
       },
@@ -162,17 +162,17 @@ const navbarNavigations = [
         child: [
           {
             title: "All orders",
-            url: "/vendor/orders",
+            url: "/seller/orders",
           },
           {
             title: "Order details",
-            url: "/vendor/orders/248104",
+            url: "/seller/orders/248104",
           },
         ],
       },
       {
         title: "Profile",
-        url: "/vendor/account-settings",
+        url: "/seller/account-settings",
       },
     ],
   },

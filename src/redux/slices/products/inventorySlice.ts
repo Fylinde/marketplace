@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import inventoryService from "../../../services/inventoryService";
-import { RootState } from "redux/store";
+import { RootState } from "../../store";
 
 // Async Thunks
 export const fetchInventory = createAsyncThunk(

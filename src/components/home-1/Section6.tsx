@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "redux/store"; // Adjust based on your project structure
-import LazyImage from "components/LazyImage";
+import { RootState, AppDispatch } from "../../redux/store"; // Adjust based on your project structure
+import LazyImage from "../../components/LazyImage";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
 import Container from "../Container";
@@ -12,8 +12,8 @@ import ProductCard1 from "../product-cards/ProductCard1";
 import StyledProductCategory from "./ProductCategoryStyle";
 import { fetchBrands } from "../../redux/slices/products/brandSlice"; // Redux actions for fetching brands and products
 import { fetchProductsByBrand } from "../../redux/slices/products/productSlice";
-import { Brand } from "types/brand";
-import { Product } from "types/Product";
+import { Brand } from "../../types/brand";
+import { Product } from "../../types/Product";
 
 const Section6: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -98,26 +98,25 @@ const Section6: React.FC = () => {
           {loadingProducts ? (
             <p>Loading Products...</p>
           ) : (
-          <Grid container spacing={6}>
-            {products.slice(0, 6).map((item: Product) => (
-              <Grid item lg={4} sm={6} xs={12} key={item.id}>
-                <ProductCard1
-                  hoverEffect
-                  id={item.id}
-                  imgUrl={item.imgUrl || "/assets/images/default-product.png"}
-                  title={item.title || "Untitled"}
-                  sellerPrice={item.sellerPrice}
-                  buyerPrice={item.buyerPrice}
-                  sellerCurrency={item.sellerCurrency}
-                  buyerCurrency={item.buyerCurrency}
-                  exchangeRates={currentRates} // Pass currentRates instead of exchangeRates
-                  rating={typeof item.rating === "number" ? item.rating : undefined}
-                  productUrl={`/product/${item.id}`}
-                />
-              </Grid>
-            ))}
-          </Grid>
-
+            <Grid container spacing={6}>
+              {products.slice(0, 6).map((item: Product) => (
+                <Grid item lg={4} sm={6} xs={12} key={item.id}>
+                  <ProductCard1
+                    hoverEffect
+                    id={item.id}
+                    imgUrl={item.imgUrl || "/assets/images/default-product.png"}
+                    title={item.title || "Untitled"}
+                    sellerPrice={item.sellerPrice}
+                    buyerPrice={item.buyerPrice}
+                    sellerCurrency={item.sellerCurrency}
+                    buyerCurrency={item.buyerCurrency}
+                    exchangeRates={currentRates || { baseCurrency: "USD", rates: {} }} // Fallback to default exchangeRates
+                    rating={typeof item.rating === "number" ? item.rating : undefined}
+                    productUrl={`/product/${item.id}`}
+                  />
+                </Grid>
+              ))}
+            </Grid>
           )}
         </Box>
       </FlexBox>

@@ -1,10 +1,10 @@
 import React from "react";
-import Box from "components/Box";
-import HoverBox from "components/HoverBox";
-import LazyImage from "components/LazyImage";
-import { H4, Small } from "components/Typography";
-import FlexBox from "components/FlexBox";
-import Button from "components/buttons/Button";
+import Box from "../../components/Box";
+import HoverBox from "../../components/HoverBox";
+import LazyImage from "../../components/LazyImage";
+import { H4, Small } from "../../components/Typography";
+import FlexBox from "../../components/FlexBox";
+import Button from "../../components/buttons/Button";
 import ViewInSpaceButton from "../buttons/ViewInSpaceButton";
 
 

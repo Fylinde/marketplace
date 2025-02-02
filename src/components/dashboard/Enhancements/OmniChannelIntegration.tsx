@@ -6,7 +6,7 @@ import {
   fetchInventory,
   fetchOrders,
   syncInventory,
-} from "../../../redux/slices/products/omniChannelSlice "; // Redux slice actions
+} from "../../../redux/slices/products/omniChannelSlice"; // Redux slice actions
 import { getLocalizedText } from "../../../utils/localizationUtils";
 import type { AppDispatch, RootState } from "../../../redux/store";
 import { Product } from "@/types/Product";

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
 import { fetchPaymentHistory } from "../../../redux/slices/orders/paymentSlice";
 import styled from "styled-components";
 import { Table, Spin, Alert } from "antd";

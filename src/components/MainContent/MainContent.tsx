@@ -1,14 +1,14 @@
 import React from 'react';
 import HeroSection from './HeroSection';
 import CategoryHighlights from './CategoryHighlights';
-import FeaturedVendors from './FeaturedVendors';
+import FeaturedSellers from './FeaturedSellers';
 
 const MainContent: React.FC = () => {
   return (
     <main className="main-content">
       <HeroSection />
       <CategoryHighlights />
-      <FeaturedVendors />
+      <FeaturedSellers />
       {/* Add more components as needed */}
     </main>
   );

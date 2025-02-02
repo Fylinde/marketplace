@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { executeSearch } from "@/redux/slices/utils/searchSlice";
+import { executeSearch } from "../../redux/slices/utils/searchSlice";
 import ImageProcessor from "../../utils/imageProcessor";
 import styled from "styled-components";
 import Box from "../Box";

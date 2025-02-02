@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import orderService from "@/services/orderService";
-import Box from "components/Box";
-import Card from "components/Card";
-import Typography, { H5, H6, Paragraph } from "components/Typography";
+import orderService from "../../services/orderService";
+import Box from "../../components/Box";
+import Card from "../../components/Card";
+import Typography, { H5, H6, Paragraph } from "../../components/Typography";
 
 const PageOrderDetail: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();

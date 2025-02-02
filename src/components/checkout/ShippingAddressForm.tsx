@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Input, Button, Select, Alert, Spin, Typography } from "antd";
 import { setShippingAddress, fetchShippingMethods } from "../../redux/slices/logistics/shippingSlice";
-import { RootState } from "../../redux/store";
 import shippingCalculator from "../../utils/shippingCalculator";
 import {
   validateString,
@@ -17,7 +16,7 @@ import {
   ErrorMessage,
   LoadingSpinner,
 } from "./styles/ShippingAddressForm.styles";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 
 
 const { Option } = Select;

@@ -102,9 +102,9 @@ const NotificationCenter = () => {
       typeof error === "object" && error !== null && "message" in error
         ? (error as { message: string }).message
         : typeof error === "string"
-        ? error
-        : "Unknown error";
-  
+          ? error
+          : "Unknown error";
+
     return (
       <p>
         {getLocalizedText("errorFetchingNotifications", "notificationCenter", {
@@ -113,7 +113,7 @@ const NotificationCenter = () => {
       </p>
     );
   }
-  
+
 
   return (
     <div className="notification-center">

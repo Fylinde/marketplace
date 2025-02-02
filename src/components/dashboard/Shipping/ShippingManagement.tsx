@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
-import { fetchShippingMethods } from "@/redux/slices/logistics/shippingSlice";
-import shippingService from "services/shippingService";
-import { getLocalizedText, formatCurrency } from "@/utils/localizationUtils";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
-import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
-import DataInput from "components/dataInput/DataInput";
-import Button from "@/components/buttons/Button";
+import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
+import { fetchShippingMethods } from "../../../redux/slices/logistics/shippingSlice";
+import shippingService from "../../../services/shippingService";
+import { getLocalizedText, formatCurrency } from "../../../utils/localizationUtils";
+import DashboardPageHeader from "../../../components/layout/DashboardPageHeader";
+import SellerDashboardLayout from "../../../components/layout/SellerDashboardLayout";
+import DataInput from "../../../components/dataInput/DataInput";
+import Button from "../../../components/buttons/Button";
 import { Spin, Alert, Table, Modal } from "antd";
 import { ColumnsType } from "antd/lib/table";
-import { ShippingData } from "@/redux/slices/logistics/shippingSlice";
+import { ShippingData } from "../../../redux/slices/logistics/shippingSlice";
 
 
 const ShippingManagementContainer = styled.div`
@@ -124,7 +124,7 @@ const ShippingManagement: React.FC<ShippingManagementProps> = ({
   ];
 
   return (
-    <VendorDashboardLayout>
+    <SellerDashboardLayout>
       <ShippingManagementContainer>
         <DashboardPageHeader title={getLocalizedText("Shipping Management", "shipping")} />
         <HeaderContainer>
@@ -191,7 +191,7 @@ const ShippingManagement: React.FC<ShippingManagementProps> = ({
           />
         </Modal>
       </ShippingManagementContainer>
-    </VendorDashboardLayout>
+    </SellerDashboardLayout>
   );
 };
 

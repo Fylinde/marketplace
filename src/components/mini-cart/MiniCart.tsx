@@ -10,7 +10,12 @@ import { StyledMiniCart, StyledCartItem } from "./MiniCartStyle";
 import { removeItemFromCart, changeCartAmount } from "../../redux/slices/orders/cartSlice";
 import { formatCurrency } from "../../utils/localizationUtils";
 
-const MiniCart: React.FC = () => {
+
+export type MiniCartProps = {
+  toggleSidenav: () => void;
+  currentStep: number;
+};
+const MiniCart: React.FC<MiniCartProps> = ({ toggleSidenav, currentStep }) => {
   const dispatch = useAppDispatch();
 
   // Redux State

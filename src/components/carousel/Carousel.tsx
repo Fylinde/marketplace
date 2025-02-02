@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { colorOptions } from "interfaces";
+import { colorOptions } from "../../interfaces";
 import {
   ButtonBack,
   ButtonNext,
@@ -8,7 +8,7 @@ import {
   Slider,
 } from "pure-react-carousel";
 import "pure-react-carousel/dist/react-carousel.es.css";
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { CSSProperties } from "styled-components";
 import IconButton from "../buttons/IconButton";
 import Icon from "../icon/Icon";
@@ -23,12 +23,11 @@ export interface CarouselProps {
   isIntrinsicHeight?: boolean;
   hasMasterSpinner?: boolean;
   infinite?: boolean;
-  autoPlay?: boolean;
-  pauseOnHover?: boolean;
+  autoPlay?: boolean | { delay: number; pauseOnHover: boolean };
   keyboardNavigation?: boolean;
   swipeNavigation?: boolean;
-  transitionEffect?: "slide" | "fade"; // New transition effects
-  animationSpeed?: number; // Speed in ms
+  transitionEffect?: "slide" | "fade";
+  animationSpeed?: number;
   step?: number;
   interval?: number;
   showDots?: boolean;
@@ -58,7 +57,6 @@ const Carousel: React.FC<CarouselProps> = ({
   hasMasterSpinner,
   infinite,
   autoPlay,
-  pauseOnHover,
   keyboardNavigation,
   swipeNavigation,
   transitionEffect = "slide",
@@ -79,6 +77,11 @@ const Carousel: React.FC<CarouselProps> = ({
   leftButtonStyle,
   rightButtonStyle,
 }) => {
+  const [isPlaying, setIsPlaying] = useState(
+    typeof autoPlay === "boolean" ? autoPlay : autoPlay?.delay ? autoPlay.delay > 0 : false
+  );
+  
+
   const handleKeyDown = (event: KeyboardEvent) => {
     if (keyboardNavigation) {
       if (event.key === "ArrowLeft") {
@@ -89,7 +92,7 @@ const Carousel: React.FC<CarouselProps> = ({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (keyboardNavigation) {
       window.addEventListener("keydown", handleKeyDown);
       return () => {
@@ -97,6 +100,16 @@ const Carousel: React.FC<CarouselProps> = ({
       };
     }
   }, [keyboardNavigation]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (typeof autoPlay === "object" && isPlaying) {
+      timer = setInterval(() => {
+        (ButtonNext as any)?.props?.onClick();
+      }, autoPlay.delay);
+    }
+    return () => clearInterval(timer);
+  }, [autoPlay, isPlaying]);
 
   return (
     <StyledCarousel
@@ -107,8 +120,7 @@ const Carousel: React.FC<CarouselProps> = ({
       isIntrinsicHeight={isIntrinsicHeight}
       hasMasterSpinner={hasMasterSpinner}
       infinite={infinite}
-      isPlaying={autoPlay}
-      interval={interval}
+      isPlaying={isPlaying}
       transitionEffect={transitionEffect}
       animationSpeed={animationSpeed}
       dotColor={dotColor}
@@ -116,8 +128,16 @@ const Carousel: React.FC<CarouselProps> = ({
       spacing={spacing}
       showDots={showDots}
       currentSlide={currentSlide}
-      onMouseEnter={pauseOnHover ? () => (autoPlay = false) : undefined}
-      onMouseLeave={pauseOnHover ? () => (autoPlay = true) : undefined}
+      onMouseEnter={
+        typeof autoPlay === "object" && autoPlay.pauseOnHover
+          ? () => setIsPlaying(false)
+          : undefined
+      }
+      onMouseLeave={
+        typeof autoPlay === "object" && autoPlay.pauseOnHover
+          ? () => setIsPlaying(true)
+          : undefined
+      }
       swipeable={swipeNavigation}
       showArrowOnHover={showArrowOnHover}
     >
@@ -169,7 +189,7 @@ interface RenderDotsProps {
   currentSlide: number;
   visibleSlides: number;
   totalSlides: number;
-  carouselStore: any; // Adjust this to the proper type if you have it
+  carouselStore: any;
 }
 
 const renderDots = ({
@@ -211,7 +231,6 @@ Carousel.defaultProps = {
   hasMasterSpinner: false,
   infinite: false,
   autoPlay: false,
-  pauseOnHover: true,
   keyboardNavigation: true,
   swipeNavigation: true,
   step: 1,

@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import Button from "components/buttons/Button";
-import Card from "components/Card";
-import DropZone from "components/DropZone";
-import Grid from "components/grid/Grid";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
-import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
-import Select from "components/Select";
-import TextField from "components/text-field/TextField";
+import Button from "../../../components/buttons/Button";
+import Card from "../../../components/Card";
+import DropZone from "../../../components/DropZone";
+import Grid from "../../../components/grid/Grid";
+import DashboardPageHeader from "../../../components/layout/DashboardPageHeader";
+import SellerDashboardLayout from "../../../components/layout/SellerDashboardLayout";
+import Select from "../../../components/Select";
+import TextField from "../../../components/text-field/TextField";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { fetchCategories, fetchTags, createProduct } from "services/productService";
+import { fetchTags, createProduct } from "../../../redux/slices/products/productSlice";
+import { fetchCategories } from "../../../redux/slices/products/categorySlice";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCurrentExchangeRates } from "../../../redux/slices/utils/exchangeRateSlice";
-import { AppDispatch } from "redux/store";
+import { AppDispatch } from "../../../redux/store";
 import { MultiValue, SingleValue } from "react-select";
-import { SelectOption } from "@/types/selectOption";
+import { SelectOption } from "../../../types/selectOption";
 import { getLocalizedText } from "../../../utils/localizationUtils";
+import { uploadFile } from "../../../utils/fileUploadUtils";
 
 // Styled Components
 const StyledWrapper = styled.div`
@@ -78,35 +80,94 @@ const AddProduct = () => {
 
   useEffect(() => {
     // Fetch categories dynamically
-    fetchCategories().then((data) => {
-      setCategories(
-        data.map((category: { id: string; name: string }) => ({
-          label: category.name,
-          value: category.id,
-        }))
-      );
-    });
-
+    dispatch(fetchCategories())
+      .unwrap()
+      .then((data: { id: string; name: string }[]) => {
+        setCategories(
+          data.map((category) => ({
+            label: category.name,
+            value: category.id,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error("Failed to fetch categories:", error);
+      });
+  
     // Fetch tag suggestions
-    fetchTags().then((data) =>
-      setTagSuggestions(
-        data.map((tag: string) => ({
-          label: tag,
-          value: tag,
-        }))
-      )
-    );
-  }, []);
+    dispatch(fetchTags())
+      .unwrap()
+      .then((data: string[]) => {
+        setTagSuggestions(
+          data.map((tag) => ({
+            label: tag,
+            value: tag,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error("Failed to fetch tags:", error);
+      });
+  }, [dispatch]);
+  
+
+  useEffect(() => {
+    // Fetch categories dynamically
+    dispatch(fetchCategories())
+      .unwrap()
+      .then((data) => {
+        setCategories(
+          data.map((category: { id: string; name: string }) => ({
+            label: category.name,
+            value: category.id,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error("Failed to fetch categories:", error);
+      });
+  
+    // Fetch tag suggestions
+    dispatch(fetchTags())
+      .unwrap()
+      .then((data) => {
+        setTagSuggestions(
+          data.map((tag: string) => ({
+            label: tag,
+            value: tag,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error("Failed to fetch tags:", error);
+      });
+  }, [dispatch]);
+  
 
   const handleFormSubmit = async (values: FormValues) => {
     try {
-      const response = await createProduct(values);
+      // Convert File[] to string[] (e.g., base64 or file URLs)
+      const convertedImages = await Promise.all(
+        values.images.map(async (file) => {
+          // Assuming you have a function to upload files and get their URL
+          return uploadFile(file); // Replace this with actual upload logic
+        })
+      );
+  
+      const productData = {
+        ...values,
+        images: convertedImages, // Replace File[] with string[]
+      };
+  
+      const response = await createProduct(productData);
       alert("Product added successfully!");
     } catch (error) {
       console.error("Error adding product:", error);
       alert("Failed to add product.");
     }
   };
+  
+  
 
   const calculateBuyerPrice = async (sellerPrice: number) => {
     const rateAction = await dispatch(fetchCurrentExchangeRates());
@@ -114,8 +175,8 @@ const AddProduct = () => {
     const exchangeRate = rates[buyerCurrency];
     return sellerPrice * (exchangeRate || 1); // Fallback to 1 if exchangeRate is undefined
   };
-  
-  
+
+
 
   return (
     <StyledWrapper>
@@ -128,7 +189,7 @@ const AddProduct = () => {
             bg="primary.light"
             px="2rem"
             as="a"
-            href="/vendor/products"
+            href="/seller/products"
           >
             {getLocalizedText("addProduct.backButton", "product")}
           </Button>
@@ -205,7 +266,7 @@ const AddProduct = () => {
 
                 {/* Transaction Type */}
                 <Grid item sm={6} xs={12}>
-                <Select
+                  <Select
                     name="transactionType"
                     label="Transaction Type"
                     options={[
@@ -470,6 +531,6 @@ const checkoutSchema = yup.object().shape({
     ),
 });
 
-AddProduct.layout = VendorDashboardLayout;
+AddProduct.layout = SellerDashboardLayout;
 
 export default AddProduct;

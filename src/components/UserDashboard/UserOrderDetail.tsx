@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../../redux/reduxHooks";
 import {
   fetchOrderById,
   requestRefund,
-} from "@/redux/slices/orders/orderSlice";
-import { RootState } from "@/redux/store";
-import Box from "components/Box";
-import Card from "components/Card";
-import FlexBox from "components/FlexBox";
-import Grid from "components/grid/Grid";
-import Button from "components/buttons/Button";
-import Table from "components/table/Table";
-import Typography, { H5, H6, Paragraph } from "components/Typography";
-import Modal from "components/modal/Modal";
-import Divider from "components/Divider";
+} from "../../redux/slices/orders/orderSlice";
+import { RootState } from "../../redux/store";
+import Box from "../../components/Box";
+import Card from "../../components/Card";
+import FlexBox from "../../components/FlexBox";
+import Grid from "../../components/grid/Grid";
+import Button from "../../components/buttons/Button";
+import Table from "../../components/table/Table";
+import Typography, { H5, H6, Paragraph } from "../../components/Typography";
+import Modal from "../../components/modal/Modal";
+import Divider from "../../components/Divider";
 
 const UserOrderDetail: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();

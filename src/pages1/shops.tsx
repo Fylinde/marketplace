@@ -1,9 +1,9 @@
-import FlexBox from "components/FlexBox";
-import Grid from "components/grid/Grid";
-import NavbarLayout from "components/layout/NavbarLayout";
-import Pagination from "components/pagination/Pagination";
-import ShopCard1 from "components/shop/ShopCard1";
-import { H2, SemiSpan } from "components/Typography";
+import FlexBox from "../components/FlexBox";
+import Grid from "../components/grid/Grid";
+import NavbarLayout from "../components/layout/NavbarLayout";
+import Pagination from "../components/pagination/Pagination";
+import ShopCard1 from "../components/shop/ShopCard1";
+import { H2, SemiSpan } from "../components/Typography";
 import React from "react";
 
 const ShopList = () => {
@@ -37,7 +37,7 @@ const shopList = [
     name: "Scarlett Beauty",
     rating: 5,
     address: "845 N. Stonybrook Ave. Tonawanda, NY 14210, Denmark",
-    phone: "(613) 343-9004",
+    phoneNumber: "(613) 343-9004",
     coverImgUrl: "/assets/images/banners/cycle.png",
     imgUrl: "/assets/images/faces/propic.png",
     shopUrl: "/shop/53244445",
@@ -46,7 +46,7 @@ const shopList = [
     name: "Scroll Through",
     rating: 5,
     address: "845 N. Stonybrook Ave. Tonawanda, NY 14210, Denmark",
-    phone: "(613) 343-9004",
+    phoneNumber: "(613) 343-9004",
     coverImgUrl: "/assets/images/banners/banner.png",
     imgUrl: "/assets/images/faces/propic(1).png",
     shopUrl: "/shop/53244445",
@@ -55,7 +55,7 @@ const shopList = [
     name: "Coveted Clicks",
     rating: 4.5,
     address: "845 N. Stonybrook Ave. Tonawanda, NY 14210, Denmark",
-    phone: "(613) 343-9004",
+    phoneNumber: "(613) 343-9004",
     coverImgUrl: "/assets/images/banners/banner-3.png",
     imgUrl: "/assets/images/faces/propic(2).png",
     shopUrl: "/shop/53244445",
@@ -64,7 +64,7 @@ const shopList = [
     name: "Constant Shoppers",
     rating: 4,
     address: "845 N. Stonybrook Ave. Tonawanda, NY 14210, Denmark",
-    phone: "(613) 343-9004",
+    phoneNumber: "(613) 343-9004",
     coverImgUrl: "/assets/images/banners/banner-4.png",
     imgUrl: "/assets/images/faces/propic(3).png",
     shopUrl: "/shop/53244445",
@@ -73,7 +73,7 @@ const shopList = [
     name: "Keyboard Kiosk",
     rating: 5,
     address: "845 N. Stonybrook Ave. Tonawanda, NY 14210, Denmark",
-    phone: "(613) 343-9004",
+    phoneNumber: "(613) 343-9004",
     coverImgUrl: "/assets/images/banners/banner-5.png",
     imgUrl: "/assets/images/faces/propic(4).png",
     shopUrl: "/shop/53244445",
@@ -82,7 +82,7 @@ const shopList = [
     name: "Anytime Buys",
     rating: 5,
     address: "845 N. Stonybrook Ave. Tonawanda, NY 14210, Denmark",
-    phone: "(613) 343-9004",
+    phoneNumber: "(613) 343-9004",
     coverImgUrl: "/assets/images/banners/banner-6.png",
     imgUrl: "/assets/images/faces/propic(5).png",
     shopUrl: "/shop/53244445",
@@ -91,7 +91,7 @@ const shopList = [
     name: "Word Wide Wishes",
     rating: 4,
     address: "845 N. Stonybrook Ave. Tonawanda, NY 14210, Denmark",
-    phone: "(613) 343-9004",
+    phoneNumber: "(613) 343-9004",
     coverImgUrl: "/assets/images/banners/banner-7.png",
     imgUrl: "/assets/images/faces/propic(6).png",
     shopUrl: "/shop/53244445",
@@ -100,7 +100,7 @@ const shopList = [
     name: "Cybershop",
     rating: 5,
     address: "845 N. Stonybrook Ave. Tonawanda, NY 14210, Denmark",
-    phone: "(613) 343-9004",
+    phoneNumber: "(613) 343-9004",
     coverImgUrl: "/assets/images/banners/banner-8.png",
     imgUrl: "/assets/images/faces/propic(7).png",
     shopUrl: "/shop/53244445",
@@ -109,7 +109,7 @@ const shopList = [
     name: "Scarlett Beauty",
     rating: 5,
     address: "845 N. Stonybrook Ave. Tonawanda, NY 14210, Denmark",
-    phone: "(613) 343-9004",
+    phoneNumber: "(613) 343-9004",
     coverImgUrl: "/assets/images/banners/banner-9.png",
     imgUrl: "/assets/images/faces/propic(8).png",
     shopUrl: "/shop/53244445",

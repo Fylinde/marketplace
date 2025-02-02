@@ -1,11 +1,11 @@
 
-import Box from "components/Box";
-import Button from "components/buttons/Button";
-import { Card1 } from "components/Card1";
-import Grid from "components/grid/Grid";
-import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
-import TextField from "components/text-field/TextField";
+import Box from "../../components/Box";
+import Button from "../../components/buttons/Button";
+import { Card1 } from "../../components/Card1";
+import Grid from "../../components/grid/Grid";
+import CustomerDashboardLayout from "../../components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "../../components/layout/DashboardPageHeader";
+import TextField from "../../components/text-field/TextField";
 import { Formik } from "formik";
 import { Link, useParams } from "react-router-dom"; 
 import React from "react";

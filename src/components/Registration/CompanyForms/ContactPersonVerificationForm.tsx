@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ContactPersonVerification } from '@/types/sharedTypes';
+import { ContactPersonVerification } from '../../../types/sharedTypes';
 import { FormContainer, FileUpload } from './ContactPersonVerificationForm.styles';
 
 interface ContactPersonVerificationFormProps {

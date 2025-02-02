@@ -14,19 +14,21 @@ import { Card1 } from "../components/Card1";
 import ProductCard7 from "../components/product-cards/ProductCard7";
 import { changeCartAmount, removeItem, applyDiscount } from "../redux/slices/orders/cartSlice";
 import { formatCurrency, getLocalizedText } from "../utils/localizationUtils";
-
+import shippingCalculator from "../utils/shippingCalculator"; // Import shipping calculator
 
 const Cart = () => {
   const dispatch = useAppDispatch();
 
-  // Redux State
+  // Redux State with fallback for currency
   const {
     cartList,
     totalBuyerPrice,
     discount,
     freeShippingThreshold,
-    currency,
+    currency: currencyState,
   } = useAppSelector((state) => state.cart);
+
+  const currency = currencyState || "USD"; // Fallback to "USD" if currency is undefined
 
   const [paymentMethod, setPaymentMethod] = useState<string>("fiat"); // Default to fiat
   const [paymentFees, setPaymentFees] = useState<number>(0); // Fee for selected method
@@ -35,8 +37,12 @@ const Cart = () => {
   const [voucher, setVoucher] = useState<string>("");
 
   // Calculate Free Shipping Progress
-  const freeShippingProgress = Math.min((totalBuyerPrice / freeShippingThreshold!) * 100, 100);
-  const remainingForFreeShipping = Math.max(freeShippingThreshold! - totalBuyerPrice, 0);
+  const freeShippingProgress = freeShippingThreshold
+    ? Math.min((totalBuyerPrice / freeShippingThreshold) * 100, 100)
+    : 0;
+  const remainingForFreeShipping = freeShippingThreshold
+    ? Math.max(freeShippingThreshold - totalBuyerPrice, 0)
+    : 0;
 
   // Calculate Payment Fees
   const calculatePaymentFees = (method: string) => {
@@ -58,7 +64,31 @@ const Cart = () => {
     setTotalCostWithShipping(totalBuyerPrice + fees + shippingCost - discount);
   };
 
+  // Calculate and Set Shipping Cost
+  const calculateShippingCost = async () => {
+    try {
+      const result = await shippingCalculator.calculateShipping({
+        methodId: "standard",
+        address: {
+          country: "US", // Example country
+          state: "NY", // Example state
+          city: "New York", // Add city property
+          postalCode: "10001", // Example postal code
+        },
+        cartTotal: totalBuyerPrice,
+      });
+  
+      setShippingCost(result.shippingCost); // Update shipping cost
+      setTotalCostWithShipping(totalBuyerPrice + paymentFees + result.shippingCost - discount);
+    } catch (error) {
+      console.error("Error calculating shipping cost:", error);
+    }
+  };
+  
 
+  useEffect(() => {
+    calculateShippingCost();
+  }, [totalBuyerPrice]);
 
   // Handle Voucher Application
   const applyVoucher = () => {

@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "redux/store"; // Adjust based on your store setup
 import Card from "components/Card";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
@@ -9,22 +8,21 @@ import Container from "../Container";
 import Grid from "../grid/Grid";
 import ProductCard4 from "../product-cards/ProductCard4";
 import ProductCard5 from "../product-cards/ProductCard5";
-import { fetchTopRatedProducts } from "../../redux/slices/products/productSlice"; // Import the appropriate Redux actions
+import { fetchTopRatedProducts } from "../../redux/slices/products/productSlice";
 import { fetchFeaturedBrands } from "../../redux/slices/products/brandSlice";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 
 const Section4: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // Fetch state from Redux
   const {
-    topRatedProducts = [], // Fallback to empty array to avoid undefined issues
+    topRatedProducts = [],
     loading: topRatedLoading,
     error: topRatedError,
   } = useSelector((state: RootState) => state.products);
 
   const {
-    featuredBrands = [], // Fallback to empty array for safety
+    featuredBrands = [],
     loading: featuredLoading,
     error: featuredError,
   } = useSelector((state: RootState) => state.brands);
@@ -60,17 +58,14 @@ const Section4: React.FC = () => {
                     {topRatedProducts.map((item) => (
                       <Grid item md={3} sm={6} xs={6} key={item.id}>
                         <Link to={`/product/${item.id}`}>
-                          <ProductCard4
-                            imgUrl={item.imgUrl || "/assets/images/default-product.png"} // Fallback for missing image
-                            title={item.title || "Untitled"} // Fallback for missing title
-                            rating={
-                              typeof item.rating === "number"
-                                ? item.rating
-                                : item.rating?.average || 0 // Handle complex rating structure
-                            }
-                            price={item.price || 0} // Fallback for price
-                            reviewCount={item.reviewCount || 0} // Fallback for review count
+                        <ProductCard4
+                            imgUrl={item.imgUrl || "/assets/images/default-product.png"}
+                            title={item.title || "Untitled"}
+                            rating={typeof item.rating === "number" ? item.rating : item.rating?.average || 0} // Handle complex rating structure
+                            price={item.price || 0}
+                            reviewCount={item.reviewCount || 0}
                           />
+
                         </Link>
                       </Grid>
                     ))}
@@ -97,8 +92,8 @@ const Section4: React.FC = () => {
                       <Grid item sm={6} xs={12} key={item.id}>
                         <Link to={`/brand/${item.id}`}>
                           <ProductCard5
-                            title={item.title || "Untitled"} // Fallback for missing title
-                            imgUrl={item.imgUrl || "/assets/images/default-brand.png"} // Fallback for missing image
+                            title={item.title || "Untitled"}
+                            imgUrl={item.imgUrl || "/assets/images/default-brand.png"}
                           />
                         </Link>
                       </Grid>

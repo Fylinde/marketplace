@@ -1,7 +1,7 @@
 import React from "react";
 import ReactSelect, { SingleValue, ActionMeta, StylesConfig } from "react-select";
 import { SelectOption } from "../types/selectOption";
-import Typography from "components/Typography";
+import Typography from "../components/Typography";
 
 interface SingleSelectProps {
   options: SelectOption[]; // The options for the select dropdown

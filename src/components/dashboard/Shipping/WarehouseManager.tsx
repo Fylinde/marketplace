@@ -1,15 +1,15 @@
 import React from "react";
-import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
+import SellerDashboardLayout from "../../../components/layout/SellerDashboardLayout";
+import DashboardPageHeader from "../../../components/layout/DashboardPageHeader";
 import Warehouse from "../../../components/warehouse/Warehouse";
 import { getLocalizedText } from "../../../utils/localizationUtils";
 
 const WarehouseManager: React.FC = () => {
   return (
-    <VendorDashboardLayout>
+    <SellerDashboardLayout>
       <DashboardPageHeader title={getLocalizedText("Warehouse Management", "warehouse")} />
       <Warehouse />
-    </VendorDashboardLayout>
+    </SellerDashboardLayout>
   );
 };
 

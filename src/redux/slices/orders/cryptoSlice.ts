@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import cryptoService from "services/cryptoService";
+import cryptoService from "../../../services/cryptoService";
 
 interface CryptoPayment {
   orderId: string;

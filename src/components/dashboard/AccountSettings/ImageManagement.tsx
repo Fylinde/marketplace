@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Box from "components/Box";
-import Button from "components/buttons/Button";
-import Modal from "components/modal/Modal";
+import Box from "../../../components/Box";
+import Button from "../../../components/buttons/Button";
+import Modal from "../../../components/modal/Modal";
 
 interface Image {
   id: string;

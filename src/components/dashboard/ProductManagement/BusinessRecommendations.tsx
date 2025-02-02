@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
-import { fetchRecommendations } from "@/redux/slices/support/aiSlice";
-import { WebSocketService } from "services/websocketService";
-import priceService from "services/priceService";
-import discountService from "@/services/discountService";
-import { exportToCSV } from "@/utils/exportUtils";
+import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
+import { fetchRecommendations } from "../../../redux/slices/support/aiSlice";
+import { WebSocketService } from "../../../services/websocketService";
+import priceService from "../../../services/priceService";
+import discountService from "../../../services/discountService";
+import { exportToCSV } from "../../../utils/exportUtils";
 import { Spin, Card, List, Alert, Typography, Button, Tooltip } from "antd";
 import styled from "styled-components";
 import { getLocalizedText } from "../../../utils/localizationUtils";
 import { Recommendation as BaseRecommendation } from "../../../types/Recommendation";
-import { AppDispatch, RootState } from "redux/store";
+import { AppDispatch, RootState } from "../../../redux/store";
 import { useSelector, useDispatch } from "react-redux";
 
 const { Title } = Typography;
@@ -44,7 +44,7 @@ const Section = styled.div`
   margin-bottom: 20px;
 `;
 
-const webSocketService = new WebSocketService("wss://your-websocket-url");
+const webSocketService = new WebSocketService('ws://mock-server', true);
 
 const RecommendationList: React.FC<RecommendationListProps> = ({
   title,

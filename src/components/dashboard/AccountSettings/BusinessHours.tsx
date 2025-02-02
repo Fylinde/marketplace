@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Box from "components/Box";
-import Button from "components/buttons/Button";
-import Modal from "components/modal/Modal";
-import Input from "components/input/Input";
-import Table from "components/table/Table";
+import Box from "../../../components/Box";
+import Button from "../../../components/buttons/Button";
+import Modal from "../../../components/modal/Modal";
+import Input from "../../../components/input/Input";
+import Table from "../../../components/table/Table";
 
 // Define the type for a single day's business hours
 interface BusinessHour {

@@ -10,8 +10,9 @@ import {
   ResponsiveContainer,
   Brush,
 } from "recharts";
-import Box from "components/Box";
-import Button from "components/buttons/Button";
+import Box from "../../components/Box";
+import Button from "../../components/buttons/Button";
+import { getLocalizedText } from "../../utils/localizationUtils";
 
 // Define the type for chart data
 interface ChartDataPoint {
@@ -40,7 +41,8 @@ const CustomChart: React.FC<CustomChartProps> = ({
   const [zoomStart, setZoomStart] = useState<number>(0);
   const [zoomEnd, setZoomEnd] = useState<number>(data.length - 1);
 
-  const toggleDataKey = (key: string) => {
+  const toggleDataKey = (key: string | undefined) => {
+    if (!key) return;
     setActiveDataKeys((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
@@ -51,16 +53,20 @@ const CustomChart: React.FC<CustomChartProps> = ({
     setZoomEnd(data.length - 1);
   };
 
-  const handleBrushChange = (startIndex: number, endIndex: number) => {
-    setZoomStart(startIndex);
-    setZoomEnd(endIndex);
+  const handleBrushChange = (startIndex?: number, endIndex?: number) => {
+    setZoomStart(startIndex ?? 0);
+    setZoomEnd(endIndex ?? data.length - 1);
   };
 
   const filteredData = data.slice(zoomStart, zoomEnd + 1);
 
   return (
     <Box>
-      {title && <h3 style={{ textAlign: "center", marginBottom: "20px" }}>{title}</h3>}
+      {title && (
+        <h3 style={{ textAlign: "center", marginBottom: "20px" }}>
+          {getLocalizedText(title, "customChart")}
+        </h3>
+      )}
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -68,7 +74,7 @@ const CustomChart: React.FC<CustomChartProps> = ({
           <YAxis />
           <Tooltip />
           <Legend
-            onClick={(e) => toggleDataKey(e.dataKey)}
+            onClick={(e) => toggleDataKey(e.dataKey as string)}
             wrapperStyle={{ cursor: "pointer" }}
           />
           {activeDataKeys.map((key, index) => (
@@ -90,7 +96,7 @@ const CustomChart: React.FC<CustomChartProps> = ({
         </LineChart>
       </ResponsiveContainer>
       <Box display="flex" justifyContent="center" mt="20px">
-        <Button onClick={resetZoom}>Reset Zoom</Button>
+        <Button onClick={resetZoom}>{getLocalizedText("resetZoom", "customChart")}</Button>
       </Box>
     </Box>
   );

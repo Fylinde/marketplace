@@ -3,9 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { Input, Collapse, Spin, Alert } from "antd";
 import styled from "styled-components";
 import { fetchKnowledgeBaseArticles, selectKnowledgeBase } from "../../../redux/slices/support/supportSlice";
-import { getLocalizedText } from "utils/localizationUtils";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 import type { AppDispatch, RootState } from "../../../redux/store";
-import { KnowledgeBaseArticle } from "@/redux/slices/support/supportSlice";
+import { KnowledgeBaseArticle } from "../../../redux/slices/support/supportSlice";
 
 
 

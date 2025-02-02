@@ -1,7 +1,7 @@
 // src/layouts/AccountRegistrationLayout.tsx
 import React from "react";
-import Header from "components/header/Header"; // Adjust paths if needed
-import Footer from "components/footer/Footer";
+import Header from "../../components/header/Header"; // Adjust paths if needed
+import Footer from "../../components/footer/Footer";
 import StyledAccountRegistrationLayout from "./AccountRegistrationLayoutStyle";
 
 interface AccountRegistrationLayoutProps {

@@ -1,15 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
+import { ProductFilters } from "../../../types/Product";
 
-interface ProductFilters {
-  context: "B2B" | "B2C" | "C2C" | null;
-  buyerPrice: [number, number]; // Dual pricing: buyer price range
-  sellerPrice: [number, number]; // Dual pricing: seller price range
-  availability: "inStock" | "outOfStock" | null;
-  selectedCategories: string[];
-}
+
 
 const initialState: ProductFilters = {
+  segment: '',
   context: null,
   buyerPrice: [0, 1000],
   sellerPrice: [0, 1000],

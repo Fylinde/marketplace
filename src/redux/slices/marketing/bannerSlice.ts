@@ -1,7 +1,7 @@
 // slices/bannerSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import bannerService from "services/bannerService"; // Service for API calls
-import { Banner } from "@/types/banner";
+import bannerService from "../../../services/bannerService"; // Service for API calls
+import { Banner } from "../../../types/banner";
 
 // Async Thunk to fetch banners
 export const fetchBanners = createAsyncThunk(

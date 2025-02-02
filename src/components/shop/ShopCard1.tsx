@@ -13,7 +13,7 @@ export interface ShopCard1Props {
   name: string;
   rating: number;
   address: string;
-  phone: string;
+  phoneNumber: string;
   coverImgUrl: string;
   imgUrl: string;
   shopUrl: string;
@@ -23,7 +23,7 @@ const ShopCard1: React.FC<ShopCard1Props> = ({
   name,
   rating,
   address,
-  phone,
+  phoneNumber,
   coverImgUrl,
   imgUrl,
   shopUrl,
@@ -53,7 +53,7 @@ const ShopCard1: React.FC<ShopCard1Props> = ({
             phone_filled
           </Icon>
           <SemiSpan color="white" ml="12px">
-            {phone}
+            {phoneNumber}
           </SemiSpan>
         </FlexBox>
       </Box>

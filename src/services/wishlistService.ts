@@ -1,5 +1,5 @@
 import axios from "axios";
-import { WishlistItem } from "@/redux/slices/orders/wishlistSlice";
+import { WishlistItem } from "../redux/slices/orders/wishlistSlice";
 
 export const fetchWishlistAPI = async (): Promise<WishlistItem[]> => {
   const response = await axios.get("/api/wishlist");

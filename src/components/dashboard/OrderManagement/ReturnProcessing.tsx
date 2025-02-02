@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import Box from "components/Box";
-import Table from "components/table/Table";
-import Button from "components/buttons/Button";
-import Chatbot from "components/chatbot/Chatbot";
-import TryOnViewer from "@/components/TryOn/TryOnViewer";
-import { useTranslation } from "react-i18next";
+import Box from "../../../components/Box";
+import Table from "../../../components/table/Table";
+import Button from "../../../components/buttons/Button";
+import Chatbot from "../../../components/chatbot/Chatbot";
+import TryOnViewer from "../../../components/TryOn/TryOnViewer";
+import { getLocalizedText, formatCurrency } from "../../../utils/localizationUtils";
 
 interface Return {
   id: string;
   product: string;
   reason: string;
   status: "Pending" | "Approved" | "Rejected";
-  currency: string;
+  buyerCurrency: string;
+  sellerCurrency: string;
   buyerPrice: number;
   sellerPrice: number;
   paymentType: "Fiat" | "Crypto" | "Escrow";
@@ -38,45 +39,57 @@ const StyledTable = styled(Table)`
   width: 100%;
   margin-top: 20px;
 
-  th, td {
+  th,
+  td {
     text-align: left;
     padding: 10px;
   }
 
   @media (max-width: 768px) {
-    th, td {
+    th,
+    td {
       font-size: 14px;
     }
   }
 `;
 
 const ReturnProcessing: React.FC = () => {
-  const { t } = useTranslation();
+  const [returns, setReturns] = useState<Return[]>([]);
+  const [openModalId, setOpenModalId] = useState<number | null>(null);
 
-  const [returns, setReturns] = useState<Return[]>([
-    {
-      id: "1",
-      product: "Laptop",
-      reason: "Defective",
-      status: "Pending",
-      currency: "USD",
-      buyerPrice: 1000,
-      sellerPrice: 950,
-      paymentType: "Fiat",
-    },
-    {
-      id: "2",
-      product: "Phone",
-      reason: "Wrong Item Delivered",
-      status: "Approved",
-      currency: "EUR",
-      buyerPrice: 800,
-      sellerPrice: 760,
-      paymentType: "Escrow",
-    },
-  ]);
+  // Fetch returns dynamically
+  useEffect(() => {
+    const fetchReturns = async () => {
+      // Replace with actual API call
+      const fetchedReturns: Return[] = [
+        {
+          id: "1",
+          product: "Laptop",
+          reason: "Defective",
+          status: "Pending",
+          buyerCurrency: "USD",
+          sellerCurrency: "EUR",
+          buyerPrice: 1000,
+          sellerPrice: 950,
+          paymentType: "Fiat",
+        },
+        {
+          id: "2",
+          product: "Phone",
+          reason: "Wrong Item Delivered",
+          status: "Approved",
+          buyerCurrency: "USD",
+          sellerCurrency: "EUR",
+          buyerPrice: 800,
+          sellerPrice: 760,
+          paymentType: "Escrow",
+        },
+      ];
+      setReturns(fetchedReturns);
+    };
 
-  const [openModalId, setOpenModalId] = useState<number | null>(null); // Modal state
+    fetchReturns();
+  }, []);
 
   const updateStatus = (id: string, status: Return["status"]) => {
     setReturns((prev) =>
@@ -86,17 +99,17 @@ const ReturnProcessing: React.FC = () => {
 
   return (
     <StyledBox>
-      <h2>{t("returnProcessingTitle")}</h2>
-      <Chatbot sessionId="12345" language="en" />
+      <h2>{getLocalizedText("returnProcessingTitle", "returnAndRefund")}</h2>
+      <Chatbot sessionId="12345" />
       <StyledTable>
         <thead>
           <tr>
-            <th>{t("productColumn")}</th>
-            <th>{t("reasonColumn")}</th>
-            <th>{t("statusColumn")}</th>
-            <th>{t("priceColumn")}</th>
-            <th>{t("paymentTypeColumn")}</th>
-            <th>{t("actionsColumn")}</th>
+            <th>{getLocalizedText("productColumn", "returnAndRefund")}</th>
+            <th>{getLocalizedText("reasonColumn", "returnAndRefund")}</th>
+            <th>{getLocalizedText("statusColumn", "returnAndRefund")}</th>
+            <th>{getLocalizedText("priceColumn", "returnAndRefund")}</th>
+            <th>{getLocalizedText("paymentTypeColumn", "returnAndRefund")}</th>
+            <th>{getLocalizedText("actionsColumn", "returnAndRefund")}</th>
           </tr>
         </thead>
         <tbody>
@@ -105,35 +118,35 @@ const ReturnProcessing: React.FC = () => {
               <td>
                 {ret.product}
                 <TryOnViewer
-                    productId={Number(ret.id)} // Convert id to number
-                    isOpen={openModalId === Number(ret.id)} // Modal is open if id matches
-                    onClose={() => setOpenModalId(null)} // Close modal
-                    fetchAsset={() =>
-                      new Promise((resolve) => {
-                        console.log(`Fetching asset for product ID: ${ret.id}`);
-                        resolve(`Asset for product ID: ${ret.id}`); // Mock resolved value
-                      })
-                    }
-                  />
+                  productId={Number(ret.id)}
+                  isOpen={openModalId === Number(ret.id)}
+                  onClose={() => setOpenModalId(null)}
+                  fetchAsset={() =>
+                    new Promise((resolve) => {
+                      console.log(`Fetching asset for product ID: ${ret.id}`);
+                      resolve(`Asset for product ID: ${ret.id}`);
+                    })
+                  }
+                />
                 <Button onClick={() => setOpenModalId(Number(ret.id))}>
-                  {t("viewProduct")}
+                  {getLocalizedText("viewProduct", "returnAndRefund")}
                 </Button>
               </td>
               <td>{ret.reason}</td>
-              <td>{t(ret.status.toLowerCase())}</td>
+              <td>{getLocalizedText(ret.status.toLowerCase(), "returnAndRefund")}</td>
               <td>
-                {t("buyerPrice")}: {ret.currency} {ret.buyerPrice.toFixed(2)} <br />
-                {t("sellerPrice")}: {ret.currency} {ret.sellerPrice.toFixed(2)}
+                {getLocalizedText("buyerPrice", "returnAndRefund")}: {formatCurrency(ret.buyerPrice, ret.buyerCurrency)} <br />
+                {getLocalizedText("sellerPrice", "returnAndRefund")}: {formatCurrency(ret.sellerPrice, ret.sellerCurrency)}
               </td>
-              <td>{t(ret.paymentType.toLowerCase())}</td>
+              <td>{getLocalizedText(ret.paymentType.toLowerCase(), "returnAndRefund")}</td>
               <td>
                 {ret.status === "Pending" && (
                   <>
                     <Button onClick={() => updateStatus(ret.id, "Approved")}>
-                      {t("approveButton")}
+                      {getLocalizedText("approveButton", "returnAndRefund")}
                     </Button>
                     <Button onClick={() => updateStatus(ret.id, "Rejected")}>
-                      {t("rejectButton")}
+                      {getLocalizedText("rejectButton", "returnAndRefund")}
                     </Button>
                   </>
                 )}
@@ -141,7 +154,6 @@ const ReturnProcessing: React.FC = () => {
             </tr>
           ))}
         </tbody>
-
       </StyledTable>
     </StyledBox>
   );

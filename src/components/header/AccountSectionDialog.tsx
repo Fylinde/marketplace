@@ -1,6 +1,6 @@
 import React, { cloneElement, Fragment, ReactElement, useState } from "react";
 import Modal from "../modal/Modal";
-import AccountSection from "components/sessions/AccountSection";
+import AccountSection from "../../components/sessions/AccountSection";
 
 export interface AccountSectionDialogProps {
   handle: ReactElement;

@@ -20,49 +20,49 @@ import ReturnAndRefund from "./ReturnAndRefund"; // Correct path for widgets
 import ReturnProcessing from "./ReturnProcessing";
 import SLAComplianceTracker from "./SLAComplianceTracker";
 import TaxCompliance from "./TaxCompliance";
-import { RootState } from "@/redux/store";
+import { RootState } from "../../../redux/store";
 
 const OrderManagement: React.FC = () => {
-    // Dynamically retrieve `orderId` from Redux store via `selectedOrder`
-    const selectedOrder = useSelector((state: RootState) => state.orders.selectedOrder);
-    const orderId = selectedOrder?.id; // Extract `orderId` if `selectedOrder` exists
-  
-    if (!orderId) {
-      return <p>No Order Selected</p>; // Gracefully handle missing `orderId`
-    }
-  
-    return (
-      <div>
-        {/* Example Widgets */}
-        <TaxPreviewWidget
-          items={[
-            { category: "Electronics", price: 500 },
-            { category: "Books", price: 50 },
-          ]}
-          country="US"
-          currency="USD"
-        />
-        <AnalyticDashboard />
-        <AutomatedOrderRules />
-        <BulkOrderProcessing />
-        <CancellationManagement />
-        <CustomerMessaging />
-        <DisputeManagement />
-        <FeedbackAndRatings />
-        <FraudDetectionAndPrevention />
-        <FulfillmentOptions />
-        <NotificationsCenter />
-        <OrderDetails />
-        <OrderHistory />
-        <OrderPrioritization />
-        <PackagingGuidelines />
-        <RefundAutomation />
-        <ReturnAndRefund orderId={orderId} /> {/* Dynamically pass `orderId` */}
-        <ReturnProcessing />
-        <SLAComplianceTracker />
-        <TaxCompliance />
-      </div>
-    );
-  };
-  
-  export default OrderManagement;
+  // Dynamically retrieve `orderId` from Redux store via `selectedOrder`
+  const selectedOrder = useSelector((state: RootState) => state.orders.selectedOrder);
+  const orderId = selectedOrder?.id; // Extract `orderId` if `selectedOrder` exists
+
+  if (!orderId) {
+    return <p>No Order Selected</p>; // Gracefully handle missing `orderId`
+  }
+
+  return (
+    <div>
+      {/* Example Widgets */}
+      <TaxPreviewWidget
+        items={[
+          { category: "Electronics", price: 500 },
+          { category: "Books", price: 50 },
+        ]}
+        country="US"
+        currency="USD"
+      />
+      <AnalyticDashboard />
+      <AutomatedOrderRules />
+      <BulkOrderProcessing />
+      <CancellationManagement />
+      <CustomerMessaging />
+      <DisputeManagement />
+      <FeedbackAndRatings />
+      <FraudDetectionAndPrevention />
+      <FulfillmentOptions />
+      <NotificationsCenter />
+      <OrderDetails />
+      <OrderHistory />
+      <OrderPrioritization />
+      <PackagingGuidelines />
+      <RefundAutomation />
+      <ReturnAndRefund orderId={orderId} /> {/* Dynamically pass `orderId` */}
+      <ReturnProcessing />
+      <SLAComplianceTracker />
+      <TaxCompliance />
+    </div>
+  );
+};
+
+export default OrderManagement;

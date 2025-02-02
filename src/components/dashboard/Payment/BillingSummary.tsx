@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
 import { fetchBillingSummary } from "../../../redux/slices/orders/billingSlice";
 import styled from "styled-components";
 import { Card, Spin, Alert } from "antd";
-import { getLocalizedText } from "utils/localizationUtils";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 
 const SummaryContainer = styled.div`
   padding: 20px;

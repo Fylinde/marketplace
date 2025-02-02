@@ -1,3 +1,5 @@
+import { ExchangeRate } from "./ExchangeRate";
+
 export interface CartItem {
     id: string;
     productId: string; // Add productId
@@ -18,4 +20,6 @@ export interface CartItem {
     escrow?: boolean; // Escrow-enabled item
     taxRate?: number; // Add this if needed
     imgUrl?: string;
+    exchangeRate?: ExchangeRate;
+    lockedExchangeRate?: number;
   }

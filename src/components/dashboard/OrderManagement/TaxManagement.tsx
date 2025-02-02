@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
-import { fetchSellerTaxConfigurations, fetchSupportedCountries } from '@/redux/slices/logistics/taxSlice';
+import { useAppDispatch, useAppSelector } from '../../../redux/reduxHooks';
+import { fetchSellerTaxConfigurations, fetchSupportedCountries } from '../../../redux/slices/logistics/taxSlice';
 import { Button, Table, Modal, Form, InputNumber, Select } from 'antd';
 import styled from 'styled-components';
 import { getLocalizedText } from '../../../utils/localizationUtils';

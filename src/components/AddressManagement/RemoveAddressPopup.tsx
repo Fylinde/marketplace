@@ -16,7 +16,7 @@ const RemoveAddressPopup: React.FC<RemoveAddressPopupProps> = ({ address, onConf
     <div className="remove-address-popup">
       <h3>Remove Address</h3>
       <p>Are you sure you want to remove this address?</p>
-      <p>{address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country}</p>
+      <p>{address.street}, {address.city}, {address.state}, {address.postalCode}, {address.country}</p>
 
       <div className="actions">
         <button onClick={onConfirm}>Yes, Remove</button>

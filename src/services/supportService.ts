@@ -1,6 +1,6 @@
 import axios from "../redux/slices/utils/axiosSetup";
 import chatbotService from "./chatbotService";
-import { KnowledgeBaseArticle } from "@/redux/slices/support/supportSlice";
+import { KnowledgeBaseArticle } from "../redux/slices/support/supportSlice";
 
 const BASE_URL = "/api/support";
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import HoverBox from "components/HoverBox";
-import LazyImage from "components/LazyImage";
+import HoverBox from "../../components/HoverBox";
+import LazyImage from "../../components/LazyImage";
 import Card from "../Card";
 import FlexBox from "../FlexBox";
 import Button from "../buttons/Button";

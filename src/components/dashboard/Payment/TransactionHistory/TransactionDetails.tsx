@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
-import { fetchTransactionDetails } from "@/redux/slices/orders/transactionSlice";
+import { useAppDispatch, useAppSelector } from "../../../../redux/reduxHooks";
+import { fetchTransactionDetails } from "../../../../redux/slices/orders/transactionSlice";
 import styled from "styled-components";
 import { Spin, Alert, Card } from "antd";
 import { useParams } from "react-router-dom";
-import { getLocalizedText } from "utils/localizationUtils";
+import { getLocalizedText } from "../../../../utils/localizationUtils";
 
 const TransactionDetailsContainer = styled.div`
   padding: 20px;

@@ -11,7 +11,7 @@ const BillingAddressSection: React.FC<BillingAddressSectionProps> = ({ billingAd
     <h3>Billing Address</h3>
     <p>Street: {billingAddress.street}</p>
     <p>City: {billingAddress.city}</p>
-    <p>Postal Code: {billingAddress.postal_code}</p>
+    <p>Postal Code: {billingAddress.postalCode}</p>
   </div>
 );
 

@@ -1,7 +1,7 @@
 import React, { Fragment, useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { CSSProperties } from "styled-components";
-import LazyImage from "components/LazyImage";
+import LazyImage from "../../components/LazyImage";
 import Box from "../Box";
 import Button from "../buttons/Button";
 import Card from "../Card";

@@ -1,6 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface FiltersState {
+  filters: {
+    context?: string;
+    buyerPrice?: number[];
+    sellerPrice?: number[];
+    [key: string]: any;
+  };
   category: string | null;
   minPrice: number | null;
   maxPrice: number | null;
@@ -14,6 +20,12 @@ export interface FiltersState {
 }
 
 const initialState: FiltersState = {
+  filters: {
+    context: '',
+    buyerPrice: [],
+    sellerPrice: [],
+     key: [],
+  },
   sellerId: undefined,
   priceRange: [0, 1000],
   sort: "popularity", // Default value

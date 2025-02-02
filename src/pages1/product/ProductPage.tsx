@@ -1,25 +1,25 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 import {
   fetchProductDetails,
   fetchLocalizedPrices,
-  fetchTryOnData,
   fetchRelatedProducts,
-} from "@/redux/slices/products/productSlice";
-import { fetchCurrentExchangeRates } from "@/redux/slices/utils/exchangeRateSlice";
-import ExchangeRateCard from "@/components/exchange/ExchangeRateCard";
-import CurrencyConverter from "@/components/exchange/CurrencyConverter";
-import ProductReviews from "@/components/product/ProductReviews";
-import RelatedProducts from "@/components/product/RelatedProducts";
-import ProductTryOn from "@/components/product/TryOnWidget";
-import Chatbot from "@/components/chatbot/Chatbot";
-import SellerChat from "@/components/sellerChat/SellerChat";
-import ProductPageHelmet from "@/components/product/ProductPageHelmet";
-import ProductSchema from "@/components/product/ProductSchema";
+} from "../../redux/slices/products/productSlice";
+import { fetchTryOnData } from "../../redux/slices/utils/tryOnSlice";
+import { fetchCurrentExchangeRates } from "../../redux/slices/utils/exchangeRateSlice";
+import ExchangeRateCard from "../../components/exchange/ExchangeRateCard";
+import CurrencyConverter from "../../components/exchange/CurrencyConverter";
+import ProductReviews from "../../components/product/ProductReviews";
+import RelatedProducts from "../../components/product/RelatedProducts";
+import ProductTryOn from "../../components/product/TryOnWidget";
+import Chatbot from "../../components/chatbot/Chatbot";
+import SellerChat from "../../components/sellerChat/SellerChat";
+import ProductPageHelmet from "../../components/product/ProductPageHelmet";
+import ProductSchema from "../../components/product/ProductSchema";
 import styled from "styled-components";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import type { AppDispatch } from "../../redux/store";
+import { getLocalizedText } from "../../utils/localizationUtils";
+import type { AppDispatch, RootState  } from "../../redux/store";
 
 const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language: string }> = ({
   productId,
@@ -40,16 +40,16 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
         dispatch(fetchProductDetails(productId)),
         dispatch(fetchLocalizedPrices({ productId, buyerCurrency })),
         dispatch(fetchTryOnData(productId)),
-        dispatch(fetchRelatedProducts({ productId })),
+      //  dispatch(fetchRelatedProducts({ productId })),
         dispatch(fetchCurrentExchangeRates()), // Fetch exchange rates
       ]);
     };
     fetchData();
   }, [dispatch, productId, buyerCurrency]);
 
-  if (loading) return <PageContainer>Loading product details...</PageContainer>;
-  if (error) return <PageContainer>Error: {error}</PageContainer>;
-  if (!currentProduct) return <PageContainer>Product not found</PageContainer>;
+  if (loading) return <PageContainer>{getLocalizedText("loading", "product")}</PageContainer>;
+  if (error) return <PageContainer>{getLocalizedText(error, "product")}</PageContainer>;
+  if (!currentProduct) return <PageContainer>{getLocalizedText("productNotFound", "product")}</PageContainer>;
 
   const buyerPrice = localizedPrices[productId]?.buyerPrice || currentProduct.price;
   const sellerPrice = localizedPrices[productId]?.sellerPrice || currentProduct.price;
@@ -58,7 +58,7 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
     <PageContainer>
       <ProductPageHelmet
         title={currentProduct.name}
-        description={currentProduct.description || "No description available"}
+        description={currentProduct.description || getLocalizedText("noDescription", "product")}
       />
       <ProductSchema product={currentProduct} />
 
@@ -71,24 +71,26 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
           <h1>{currentProduct.name}</h1>
           <LocalizedPrice>
             <p>
-              Seller Price: <span>${sellerPrice}</span>
+              {getLocalizedText("sellerPrice", "product")}: <span>${sellerPrice}</span>
             </p>
             <p>
-              Your Price ({buyerCurrency}):{" "}
-              <span>{buyerPrice.toFixed(2)} {buyerCurrency}</span>
+              {getLocalizedText("yourPrice", "product")} ({buyerCurrency}):
+              <span>
+                {buyerPrice.toFixed(2)} {buyerCurrency}
+              </span>
             </p>
           </LocalizedPrice>
           <CurrencyConverter rates={rates} baseCurrency={baseCurrency} /> {/* Pass rates and baseCurrency */}
           <p>{currentProduct.description}</p>
           <AddToCart>
-            <button>Add to Cart</button>
-            <button>Add to Wishlist</button>
-            <button>Share</button>
+            <button>{getLocalizedText("addToCart", "product")}</button>
+            <button>{getLocalizedText("addToWishlist", "product")}</button>
+            <button>{getLocalizedText("share", "product")}</button>
           </AddToCart>
           <StockInfo stock={currentProduct.stock ?? 0}>
             {currentProduct.stock !== undefined && currentProduct.stock > 0
-              ? `In Stock (${currentProduct.stock} available)`
-              : "Out of Stock"}
+              ? `${getLocalizedText("inStock", "product")} (${currentProduct.stock} ${getLocalizedText("available", "product")})`
+              : getLocalizedText("outOfStock", "product")}
           </StockInfo>
           {currentProduct.tryOnAvailable && <ProductTryOn productId={productId} />}
         </DetailsContainer>
@@ -106,13 +108,13 @@ const ProductPage: React.FC<{ productId: string; buyerCurrency: string; language
 
       {/* Chat Section */}
       <ChatSection>
-        <Chatbot sessionId={productId} language={language} />
+        <Chatbot sessionId={productId} />
         <SellerChat chatId={productId} />
       </ChatSection>
 
       {/* Related Products Section */}
       <RelatedSection>
-        <h2>Related Products</h2>
+        <h2>{getLocalizedText("relatedProducts", "product")}</h2>
         <RelatedProducts productId={productId} />
       </RelatedSection>
     </PageContainer>

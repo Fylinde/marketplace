@@ -1,11 +1,11 @@
 // Dynamic Translations Loader
-import enChatbot from 'locales/en/chatbot.json';
-import enRefundAutomation from 'locales/en/refundAutomation.json';
-import enShipping from 'locales/en/shipping.json';
-import enReturnAndRefund from 'locales/en/returnAndRefund.json';
-import esReturnAndRefund from 'locales/es/returnAndRefund.json';
-import esChatbot from 'locales/es/chatbot.json';
-import esShipping from 'locales/es/shipping.json';
+import enChatbot from '../locales/en/chatbot.json';
+import enRefundAutomation from '../locales/en/refundAutomation.json';
+import enShipping from '../locales/en/shipping.json';
+import enReturnAndRefund from '../locales/en/returnAndRefund.json';
+import esReturnAndRefund from '../locales/es/returnAndRefund.json';
+import esChatbot from '../locales/es/chatbot.json';
+import esShipping from '../locales/es/shipping.json';
 
 const translations: Record<string, Record<string, Record<string, string>>> = {
   en: {

@@ -1,10 +1,10 @@
 import React from "react";
-import Modal from "components/modal/Modal";
-import Button from "components/buttons/Button";
-import Box from "components/Box";
+import Modal from "../../../components/modal/Modal";
+import Button from "../../../components/buttons/Button";
+import Box from "../../../components/Box";
 import styled from "styled-components";
 import { Spin } from "antd";
-import { getLocalizedText } from "utils/localizationUtils";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 
 interface AISuggestionsModalProps {
   isOpen: boolean;

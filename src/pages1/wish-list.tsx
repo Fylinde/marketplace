@@ -13,10 +13,9 @@ import {
   removeFromWishlist,
   fetchRecommendations,
 } from "../redux/slices/orders/wishlistSlice";
-import { RootState } from "../redux/store";
-import type { AppDispatch } from "../redux/store";
+import type { AppDispatch, RootState } from "../redux/store";
 import type { PageWithLayout } from "../types/pageLayouts";
-import { Product } from "@/types/Product";
+import { Product } from "../types/Product";
 
 const WishList: PageWithLayout = () => {
   const dispatch = useDispatch<AppDispatch>();

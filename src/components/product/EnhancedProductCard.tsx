@@ -5,8 +5,7 @@ import {
   fetchPersonalizedRecommendations,
   fetchCommunityQuestions,
 } from "../../redux/slices/products/productCardSlice";
-import { RootState } from "../../redux/store";
-import { WebSocketService } from "services/websocketService";
+import { WebSocketService } from "../../services/websocketService";
 import Countdown from "react-countdown";
 import Rating from "../rating/Rating";
 import Button from "../buttons/Button";
@@ -14,11 +13,11 @@ import Icon from "../icon/Icon";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 import { Product } from "../../types/Product";
 
 // WebSocket Service Initialization
-const webSocketService = new WebSocketService("wss://your-websocket-url");
+const webSocketService = new WebSocketService('ws://mock-server', true);
 
 // Styled Components
 const ProductCardContainer = styled.div`

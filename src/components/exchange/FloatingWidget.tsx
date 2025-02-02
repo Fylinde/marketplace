@@ -35,10 +35,10 @@ const FloatingWidget: React.FC = () => {
             width: "300px",
           }}
         >
-        <h2>Exchange Rates</h2>
-        <ExchangeRateCard rates={rates || {}} baseCurrency={baseCurrency || "USD"} />
-        <h2>Currency Converter</h2>
-        <CurrencyConverter rates={rates || {}} baseCurrency={baseCurrency || "USD"} />
+          <h2>Exchange Rates</h2>
+          <ExchangeRateCard rates={rates || {}} baseCurrency={baseCurrency || "USD"} />
+          <h2>Currency Converter</h2>
+          <CurrencyConverter rates={rates || {}} baseCurrency={baseCurrency || "USD"} />
         </div>
       )}
     </div>

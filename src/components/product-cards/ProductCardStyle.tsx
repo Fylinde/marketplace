@@ -1,4 +1,4 @@
-import { deviceSize } from "utils/constants";
+import { deviceSize } from "../../utils/constants";
 import styled from "styled-components";
 import { space } from "styled-system";
 import { getTheme } from "../../utils/utils";

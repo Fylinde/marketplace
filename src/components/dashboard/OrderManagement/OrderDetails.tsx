@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
-import Box from "components/Box";
-import Button from "components/buttons/Button";
-import Modal from "components/modal/Modal";
-import Input from "components/input/Input";
-import Table from "components/table/Table";
+import Box from "../../../components/Box";
+import Button from "../../../components/buttons/Button";
+import Modal from "../../../components/modal/Modal";
+import Input from "../../../components/input/Input";
+import Table from "../../../components/table/Table";
 import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../redux/reduxHooks";
 import { fetchOrderById, updateOrderStatus } from "../../../redux/slices/orders/orderSlice";
 import { RootState } from "../../../redux/store";
-import { sendMessage } from "@/redux/slices/communication/chatbotSlice ";
-import { Order } from "types/order";
+import { sendMessage } from "../../../redux/slices/communication/chatbotSlice ";
+import { Order } from "../../../types/order";
+import { formatCurrency, getLocalizedText } from "../../..//utils/localizationUtils";
 
 const OrderDetails: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
@@ -67,21 +68,22 @@ const OrderDetails: React.FC = () => {
     setTrackingModalOpen(false);
   };
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <p>{getLocalizedText("loading", "common")}</p>;
   if (error) return <p>{error}</p>;
 
   return (
     <Box>
-      <h1>Order Details</h1>
+      <h1>{getLocalizedText("orderDetails", "orders")}</h1>
       {order ? (
         <>
           <Box>
-            <h3>Customer Information</h3>
+            <h3>{getLocalizedText("customerInformation", "orders")}</h3>
             <p>
-              <strong>Note:</strong> {order.customerNote || "No customer note provided."}
+              <strong>{getLocalizedText("note", "orders")}:</strong>{" "}
+              {order.customerNote || getLocalizedText("noCustomerNote", "orders")}
             </p>
             <p>
-              <strong>Address:</strong>{" "}
+              <strong>{getLocalizedText("address", "orders")}:</strong>{" "}
               {order.shippingAddress && order.shippingAddress.length > 0 ? (
                 order.shippingAddress.map((address, index) => (
                   <div key={index}>
@@ -91,20 +93,19 @@ const OrderDetails: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <span>No shipping address available.</span>
+                <span>{getLocalizedText("noShippingAddress", "orders")}</span>
               )}
             </p>
           </Box>
 
-
           <Box>
-            <h3>Order Items</h3>
+            <h3>{getLocalizedText("orderItems", "orders")}</h3>
             <Table>
               <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>Quantity</th>
-                  <th>Price</th>
+                  <th>{getLocalizedText("product", "orders")}</th>
+                  <th>{getLocalizedText("quantity", "orders")}</th>
+                  <th>{getLocalizedText("price", "orders")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -112,7 +113,12 @@ const OrderDetails: React.FC = () => {
                   <tr key={item.productId}>
                     <td>{item.productName}</td>
                     <td>{item.quantity}</td>
-                    <td>${item.price.toFixed(2)}</td>
+                    <td>
+                      {formatCurrency(
+                        item.buyerPrice || item.price || 0,
+                        order.buyerCurrency || order.currency || "USD"
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -120,27 +126,35 @@ const OrderDetails: React.FC = () => {
           </Box>
 
           <Box>
-            <h3>Order Summary</h3>
+            <h3>{getLocalizedText("orderSummary", "orders")}</h3>
             <p>
-              <strong>Subtotal:</strong> ${order.subtotal.toFixed(2)}
+              <strong>{getLocalizedText("subtotal", "orders")}:</strong>{" "}
+              {formatCurrency(order.subtotal, order.buyerCurrency || order.currency || "USD")}
             </p>
             <p>
-              <strong>Shipping Fee:</strong> ${order.shippingFee.toFixed(2)}
+              <strong>{getLocalizedText("shippingFee", "orders")}:</strong>{" "}
+              {formatCurrency(order.shippingFee, order.buyerCurrency || order.currency || "USD")}
             </p>
             <p>
-              <strong>Discount:</strong> ${order.discount.toFixed(2)}
+              <strong>{getLocalizedText("discount", "orders")}:</strong>{" "}
+              {formatCurrency(order.discount, order.buyerCurrency || order.currency || "USD")}
             </p>
             <p>
-              <strong>Total:</strong> ${order.total.toFixed(2)}
+              <strong>{getLocalizedText("total", "orders")}:</strong>{" "}
+              {formatCurrency(order.total, order.buyerCurrency || order.currency || "USD")}
             </p>
             <p>
-              <strong>Status:</strong> {order.status}
+              <strong>{getLocalizedText("status", "orders")}:</strong> {order.status}
             </p>
           </Box>
 
           <Box>
-            <Button onClick={() => setMessageModalOpen(true)}>Message Customer</Button>
-            <Button onClick={() => setTrackingModalOpen(true)}>Update Tracking</Button>
+            <Button onClick={() => setMessageModalOpen(true)}>
+              {getLocalizedText("messageCustomer", "orders")}
+            </Button>
+            <Button onClick={() => setTrackingModalOpen(true)}>
+              {getLocalizedText("updateTracking", "orders")}
+            </Button>
             <select
               value={order.status}
               onChange={(e) =>
@@ -149,31 +163,31 @@ const OrderDetails: React.FC = () => {
                 )
               }
             >
-              <option value="Pending">Pending</option>
-              <option value="Processing">Processing</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Cancelled">Cancelled</option>
+              <option value="Pending">{getLocalizedText("pending", "orders")}</option>
+              <option value="Processing">{getLocalizedText("processing", "orders")}</option>
+              <option value="Delivered">{getLocalizedText("delivered", "orders")}</option>
+              <option value="Cancelled">{getLocalizedText("cancelled", "orders")}</option>
             </select>
           </Box>
         </>
       ) : (
-        <p>No order details available.</p>
+        <p>{getLocalizedText("noOrderDetails", "orders")}</p>
       )}
 
       {/* Message Modal */}
       {messageModalOpen && (
         <Modal
-          title="Send a Message to Customer"
+          title={getLocalizedText("sendMessage", "orders")}
           open={messageModalOpen}
           onClose={() => setMessageModalOpen(false)}
         >
           <Box>
             <Input
-              label="Message"
+              label={getLocalizedText("message", "orders")}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <Button onClick={handleSendMessage}>Send Message</Button>
+            <Button onClick={handleSendMessage}>{getLocalizedText("send", "orders")}</Button>
           </Box>
         </Modal>
       )}
@@ -181,17 +195,19 @@ const OrderDetails: React.FC = () => {
       {/* Tracking Modal */}
       {trackingModalOpen && (
         <Modal
-          title="Update Tracking Information"
+          title={getLocalizedText("updateTracking", "orders")}
           open={trackingModalOpen}
           onClose={() => setTrackingModalOpen(false)}
         >
           <Box>
             <Input
-              label="Tracking Number"
+              label={getLocalizedText("trackingNumber", "orders")}
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
             />
-            <Button onClick={handleUpdateTracking}>Update</Button>
+            <Button onClick={handleUpdateTracking}>
+              {getLocalizedText("update", "orders")}
+            </Button>
           </Box>
         </Modal>
       )}

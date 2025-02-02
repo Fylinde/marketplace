@@ -11,7 +11,7 @@ import {
   space,
   SpaceProps,
 } from "styled-system";
-import { layoutConstant } from "utils/constants";
+import { layoutConstant } from "../utils/constants";
 
 const Container = styled.div<
   LayoutProps & ColorProps & PositionProps & SpaceProps & FlexboxProps

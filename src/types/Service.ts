@@ -11,7 +11,7 @@ export interface Service {
     images?: string[];
     createdAt: string;
     updatedAt?: string;
-    vendorId: string; // The vendor providing the service
+    sellerId: string; // The seller providing the service
     location?: string; // Optional: location of the service
     [key: string]: any; // Allow for flexible additional properties
   }

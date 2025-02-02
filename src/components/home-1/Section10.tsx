@@ -8,7 +8,7 @@ import Container from "../Container";
 import Grid from "../grid/Grid";
 import Typography from "../Typography";
 import { fetchCategories } from "../../redux/slices/products/categorySlice"; // Redux action for fetching categories
-import { RootState, AppDispatch } from "redux/store"; // Adjust the import path based on your project structure
+import { RootState, AppDispatch } from "../../redux/store"; // Adjust the import path based on your project structure
 
 // Extend the Category interface to ensure proper typing
 interface Category {

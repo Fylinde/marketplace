@@ -1,5 +1,6 @@
 import React from "react";
 import Button from "../buttons/Button";
+import { getLocalizedText } from "../../utils/localizationUtils"; // Adjust the path as needed
 
 interface ViewInSpaceButtonProps {
   productId?: string | number; // Optional to avoid breaking existing files
@@ -12,39 +13,27 @@ const ViewInSpaceButton: React.FC<ViewInSpaceButtonProps> = ({
 }) => {
   const handleViewInSpace = () => {
     if (!isArEnabled) {
-      alert("AR is not available for this product.");
+      alert(getLocalizedText("arNotAvailable", "general")); // Translatable AR availability message
       return;
     }
     if (productId) {
       console.log(`Opening AR view for product: ${productId}`);
-      // Trigger AR view for a specific product (e.g., navigate to AR page or open modal)
+      // Trigger AR view for a specific product
     } else {
       console.log("Opening generic AR viewer");
-      // Fallback logic for AR view when no productId is provided
+      // Fallback logic for generic AR view
     }
   };
 
-  const handleClick = () => {
-    if (!isArEnabled) return;
-
-    if (productId) {
-      console.log(`Opening AR viewer for product ID: ${productId}`);
-      // Logic to handle AR viewing for a specific product
-    } else {
-      console.log("Opening generic AR viewer");
-      // Fallback logic for generic AR viewing
-    }
-  };
+  if (!isArEnabled) return null; // Return null if AR is disabled
 
   return (
-    isArEnabled && (
-      <Button
-        style={{ marginTop: "10px", padding: "5px 10px" }}
-        onClick={handleViewInSpace} // Using handleViewInSpace for the button click
-      >
-        View in Your Space
-      </Button>
-    )
+    <Button
+      style={{ marginTop: "10px", padding: "5px 10px" }}
+      onClick={handleViewInSpace}
+    >
+      {getLocalizedText("viewInYourSpace", "general")} {/* Translatable button label */}
+    </Button>
   );
 };
 

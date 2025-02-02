@@ -1,11 +1,11 @@
 import React from "react";
-import Card from "components/Card";
-import { Chip } from "components/Chip";
-import HoverBox from "components/HoverBox";
-import LazyImage from "components/LazyImage";
-import FlexBox from "components/FlexBox";
-import Button from "components/buttons/Button";
-import { H4, Small } from "components/Typography";
+import Card from "../../components/Card";
+import { Chip } from "../../components/Chip";
+import HoverBox from "../../components/HoverBox";
+import LazyImage from "../../components/LazyImage";
+import FlexBox from "../../components/FlexBox";
+import Button from "../../components/buttons/Button";
+import { H4, Small } from "../../components/Typography";
 import ViewInSpaceButton from "../buttons/ViewInSpaceButton";
 
 

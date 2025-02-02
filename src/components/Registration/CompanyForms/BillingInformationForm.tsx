@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { saveBillingAddress } from "../../../redux/slices/auth/registrationSlice";
-import { BillingAddress, PaymentDetails } from "../../../types/sharedTypes";
+import { BillingAddress } from "../../../types/sharedTypes";
 import "./BillingInformationForm.css";
 
 interface BillingInformationFormProps {
@@ -18,60 +18,19 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({
   const dispatch = useDispatch();
 
   const [billingAddress, setBillingAddress] = useState<BillingAddress>({
-    street: data.street || "",
-    city: data.city || "",
-    state: data.state || "",
-    postal_code: data.postal_code || "",
-    country: data.country || "",
-    phone_number: data.phone_number || "",
     fullName: data.fullName || "",
     email: data.email || "",
+    phoneNumber: data.phoneNumber || "",
     addressLine1: data.addressLine1 || "",
     addressLine2: data.addressLine2 || "",
-    phone: data.phone || "",
-    zipCode: data.zipCode || "",
+    city: data.city || "",
+    state: data.state || "",
     postalCode: data.postalCode || "",
-    firstName: data.firstName || "",
-    lastName: data.lastName || "",
+    country: data.country || "",
+    street: data.street || "", // Add the 'street' field here
   });
 
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
-    cardNumber: "",
-    cardholderName: "",
-    expiryDate: {
-      month: "",
-      year: "",
-    },
-    cvv: "",
-    billingAddress: billingAddress,
-    currency: "USD", // Default currency
-  });
-
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setBillingAddress((prev) => ({
-      ...prev,
-      street: data.street || "",
-      city: data.city || "",
-      state: data.state || "",
-      postal_code: data.postal_code || "",
-      country: data.country || "",
-      phone_number: data.phone_number || "",
-      fullName: data.fullName || "",
-      email: data.email || "",
-      addressLine1: data.addressLine1 || "",
-      addressLine2: data.addressLine2 || "",
-      phone: data.phone || "",
-      zipCode: data.zipCode || "",
-      postalCode: data.postalCode || "",
-      firstName: data.firstName || "",
-      lastName: data.lastName || "",
-    }));
-  }, [data]);
-
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setBillingAddress((prev) => ({
       ...prev,
@@ -80,72 +39,15 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({
     onUpdate({ [name]: value });
   };
 
-  const handlePaymentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-
-    setPaymentDetails((prevData) => {
-      if (name === "expiryMonth" || name === "expiryYear") {
-        return {
-          ...prevData,
-          expiryDate: {
-            ...prevData.expiryDate,
-            [name === "expiryMonth" ? "month" : "year"]: value,
-          },
-        };
-      } else {
-        return {
-          ...prevData,
-          [name]: value,
-        };
-      }
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // Dispatch the validated billing address
     dispatch(saveBillingAddress(billingAddress));
-
-    setLoading(true);
-    setError(null);
-
-    const token = await securePaymentTokenization();
-
-    if (token) {
-      onNext();
-    } else {
-      setError("Failed to tokenize payment. Please try again.");
-    }
-
-    setLoading(false);
-  };
-
-  const securePaymentTokenization = async () => {
-    try {
-      const response = await fetch("http://localhost:8013/api/tokenize-card", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(paymentDetails),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to connect to the payment service.");
-      }
-
-      const result = await response.json();
-      return result.token;
-    } catch (error) {
-      console.error("Error tokenizing payment:", error);
-      setError("An error occurred during payment tokenization.");
-      return null;
-    }
+    onNext();
   };
 
   return (
     <form onSubmit={handleSubmit} className="billing-form">
       <h2>Billing Address</h2>
-
       <div className="form-group">
         <label>Full Name</label>
         <input
@@ -156,7 +58,6 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({
           placeholder="Full Name"
         />
       </div>
-
       <div className="form-group">
         <label>Email</label>
         <input
@@ -167,18 +68,26 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({
           placeholder="Email"
         />
       </div>
-
       <div className="form-group">
-        <label>Phone</label>
+        <label>Phone Number</label>
         <input
           type="tel"
-          name="phone"
-          value={billingAddress.phone}
+          name="phoneNumber"
+          value={billingAddress.phoneNumber}
           onChange={handleAddressChange}
-          placeholder="Phone"
+          placeholder="Phone Number"
         />
       </div>
-
+      <div className="form-group">
+        <label>Street</label>
+        <input
+          type="text"
+          name="street"
+          value={billingAddress.street}
+          onChange={handleAddressChange}
+          placeholder="Street"
+        />
+      </div>
       <div className="form-group">
         <label>Address Line 1</label>
         <input
@@ -189,18 +98,16 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({
           placeholder="Address Line 1"
         />
       </div>
-
       <div className="form-group">
-        <label>Address Line 2</label>
+        <label>Address Line 2 (Optional)</label>
         <input
           type="text"
           name="addressLine2"
           value={billingAddress.addressLine2}
           onChange={handleAddressChange}
-          placeholder="Address Line 2 (Optional)"
+          placeholder="Address Line 2"
         />
       </div>
-
       <div className="form-group">
         <label>City</label>
         <input
@@ -211,7 +118,6 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({
           placeholder="City"
         />
       </div>
-
       <div className="form-group">
         <label>State</label>
         <input
@@ -222,7 +128,6 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({
           placeholder="State"
         />
       </div>
-
       <div className="form-group">
         <label>Postal Code</label>
         <input
@@ -233,26 +138,24 @@ const BillingInformationForm: React.FC<BillingInformationFormProps> = ({
           placeholder="Postal Code"
         />
       </div>
-
       <div className="form-group">
         <label>Country</label>
-        <input
-          type="text"
+        <select
           name="country"
           value={billingAddress.country}
           onChange={handleAddressChange}
-          placeholder="Country"
-        />
+        >
+          <option value="">Select Country</option>
+          <option value="US">United States</option>
+          <option value="CA">Canada</option>
+          <option value="GB">United Kingdom</option>
+          <option value="AU">Australia</option>
+          {/* Add more countries as needed */}
+        </select>
       </div>
-
-      {error && <p className="error-message">{error}</p>}
-      {loading ? (
-        <p>Processing...</p>
-      ) : (
-        <button type="submit" className="submit-btn">
-          Next
-        </button>
-      )}
+      <button type="submit" className="next-button">
+        Next
+      </button>
     </form>
   );
 };

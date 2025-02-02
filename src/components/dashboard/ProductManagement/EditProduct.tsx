@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import Button from "components/buttons/Button";
-import Card from "components/Card";
-import DropZone from "components/DropZone";
-import Grid from "components/grid/Grid";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
-import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
-import Select from "components/Select";
-import TextField from "components/text-field/TextField";
+import Button from "../../../components/buttons/Button";
+import Card from "../../../components/Card";
+import DropZone from "../../../components/DropZone";
+import Grid from "../../../components/grid/Grid";
+import DashboardPageHeader from "../../../components/layout/DashboardPageHeader";
+import SellerDashboardLayout from "../../../components/layout/SellerDashboardLayout";
+import Select from "../../../components/Select";
+import TextField from "../../../components/text-field/TextField";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Formik } from "formik";
@@ -15,10 +15,10 @@ import * as yup from "yup";
 import { fetchTags, fetchProductDetails, updateProduct } from "../../../redux/slices/products/productSlice";
 import { fetchCategories } from "../../../redux/slices/products/categorySlice";
 import { useParams, useNavigate } from "react-router-dom";
-import { AppDispatch } from "redux/store";
+import { AppDispatch } from "../../../redux/store";
 import { useDispatch } from "react-redux";
 import { MultiValue, SingleValue } from "react-select";
-import { SelectOption } from "@/types/selectOption";
+import { SelectOption } from "../../../types/selectOption";
 import { getLocalizedText } from "../../../utils/localizationUtils";
 import { unwrapResult } from "@reduxjs/toolkit";
 
@@ -161,7 +161,7 @@ const EditProduct = () => {
       await dispatch(updateProduct({ productId, productData })).then(unwrapResult);
 
       alert("Product updated successfully!");
-      navigate("/vendor/products");
+      navigate("/seller/products");
     } catch (error) {
       console.error("Error updating product:", error);
       alert("Failed to update product.");
@@ -186,7 +186,7 @@ const EditProduct = () => {
             bg="primary.light"
             px="2rem"
             as="a"
-            href="/vendor/products"
+            href="/seller/products"
           >
             {getLocalizedText("editProduct.backButton", "product")}
           </Button>
@@ -424,7 +424,7 @@ const EditProduct = () => {
       </Card>
     </StyledWrapper>
   );
-};
+}; 
 
 // Validation Schema
 const checkoutSchema = yup.object().shape({
@@ -495,9 +495,9 @@ const checkoutSchema = yup.object().shape({
       typeof transactionType === "string" && transactionType === "C2C"
         ? schema.required("Simple description is required")
         : schema.nullable()
-    ),
-});
-
-EditProduct.layout = VendorDashboardLayout;
+    ), 
+}); 
+            
+EditProduct.layout = SellerDashboardLayout; 
 
 export default EditProduct;

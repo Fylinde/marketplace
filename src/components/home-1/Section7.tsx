@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "redux/store"; // Adjust based on your project structure
-import LazyImage from "components/LazyImage";
+import { RootState, AppDispatch } from "../../redux/store"; // Adjust based on your project structure
+import LazyImage from "../../components/LazyImage";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
 import Container from "../Container";
@@ -40,9 +40,9 @@ const Section7: React.FC = () => {
     } else if (categoryType === "shops" && !shops.length) {
       dispatch(fetchShops());
     }
-    dispatch(fetchProductsByCategory({ categoryType, category: selectedCategory }));
+    dispatch(fetchProductsByCategory({ categoryType, category: selectedCategory || "" }));
   }, [dispatch, categoryType, selectedCategory, brands.length, shops.length]);
-
+  
   return (
     <Container mb="70px">
       <FlexBox>
@@ -131,39 +131,39 @@ const Section7: React.FC = () => {
         </Hidden>
 
         {/* Product Grid */}
-        <Box flex="1 1 0" minWidth="0px">
+            <Box flex="1 1 0" minWidth="0px">
           <CategorySectionHeader title="Mobile Phones" seeMoreLink="#" />
           {loadingProducts ? (
             <p>Loading Products...</p>
           ) : (
-          <Grid container spacing={6}>
-            {products.slice(0, 9).map((item) => (
-              <Grid item lg={4} sm={6} xs={12} key={item.id}>
-                <ProductCard1
-                  hoverEffect
-                  id={item.id}
-                  imgUrl={item.imgUrl || "/assets/images/default-product.png"}
-                  title={item.title || "No Title Available"}
-                  sellerPrice={item.sellerPrice || 0}
-                  buyerPrice={item.buyerPrice || 0}
-                  sellerCurrency={item.sellerCurrency || "USD"}
-                  buyerCurrency={item.buyerCurrency || "USD"}
-                  exchangeRates={
-                    currentRates || {
-                      baseCurrency: "USD",
-                      rates: {},
-                    }
-                  } // Provide default ExchangeRate object if currentRates is null
-                />
-              </Grid>
-            ))}
-          </Grid>
+            <Grid container spacing={6}>
+              {products.slice(0, 9).map((item) => (
+                <Grid item lg={4} sm={6} xs={12} key={item.id}>
+                  <ProductCard1
+                    hoverEffect
+                    id={item.id}
+                    imgUrl={item.imgUrl || "/assets/images/default-product.png"}
+                    title={item.title || "No Title Available"}
+                    sellerPrice={item.sellerPrice || 0}
+                    buyerPrice={item.buyerPrice || 0}
+                    sellerCurrency={item.sellerCurrency || "USD"}
+                    buyerCurrency={item.buyerCurrency || "USD"}
+                    exchangeRates={
+                      currentRates || {
+                        baseCurrency: "USD",
+                        rates: {},
+                      }
+                    } // Provide default ExchangeRate object if currentRates is null
+                  />
+                </Grid>
+              ))}
+            </Grid>
 
-          )}
+          )} 
         </Box>
-      </FlexBox>
+      </FlexBox> 
     </Container>
-  );
+  ); 
 };
 
 export default Section7;

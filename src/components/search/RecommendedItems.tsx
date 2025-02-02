@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "redux/store";
 import {
   fetchPersonalizedRecommendations,
   fetchProductRecommendations,
@@ -14,7 +13,7 @@ import FlexBox from "../FlexBox";
 import Typography from "../Typography";
 import ProductCard1 from "../product-cards/ProductCard1";
 import RecommendationService from "../../services/RecommendationService";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 
 interface RecommendedItemsProps {
   context: "personalized" | "product" | "search" | "ai-personalized" | "cross-selling" | "upselling";

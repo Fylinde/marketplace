@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { Table, Alert, Spin } from 'antd';
-import { useAppDispatch, useAppSelector } from '@/redux/reduxHooks';
-import { fetchTaxRates } from '@/redux/slices/logistics/taxSlice';
+import { useAppDispatch, useAppSelector } from '../../../redux/reduxHooks';
+import { fetchTaxRates } from '../../../redux/slices/logistics/taxSlice';
 import { getLocalizedText } from '../../../utils/localizationUtils';
 
 const ComplianceContainer = styled.div`

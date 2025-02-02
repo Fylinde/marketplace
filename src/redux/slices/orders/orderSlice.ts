@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
-import { Order } from "types/order";
-import orderService from "services/orderService";
+import { Order } from "../../../types/order";
+import orderService from "../../../services/orderService";
 
 // Selector to get an order by its ID
 export const selectOrderById = (state: RootState, orderId: string): Order | undefined =>

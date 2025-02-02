@@ -9,7 +9,7 @@ const Signout: React.FC = () => {
   return (
     <div className="signout-container">
       <div className="signout-logo">
-        <img src="Logo/fylind_logo_5.png" alt="Fylinde" />                        
+        <img src="Logo/fylind_logo_5.png" alt="Fylinde" />
       </div>
       <div className="signout-box">
         <div className="signout-status">

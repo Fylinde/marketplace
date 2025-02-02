@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Alert, Form } from "antd";
 import { applyPromoCode, clearPromoCode } from "../../redux/slices/marketing/promoSlice";
-import { RootState } from "../../redux/store";
 import {
   PromoContainer,
   PromoText,
@@ -11,7 +10,7 @@ import {
   PromoInput,
   PromoButton,
 } from "./styles/PromoCodeForm.styles";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 
 const PromoCodeForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

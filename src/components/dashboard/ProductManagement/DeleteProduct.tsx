@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import Button from "components/buttons/Button";
+import Button from "../../../components/buttons/Button";
 import Modal from "../../../components/modal/Modal";
 import { useDispatch } from "react-redux";
-import { deleteProduct } from "services/productService";
-import { AppDispatch } from "redux/store";
-import { getLocalizedText } from "utils/localizationUtils";
+import { deleteProduct } from "../../../redux/slices/products/productSlice";
+import { AppDispatch } from "../../../redux/store";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 import { useNavigate } from 'react-router-dom';
 
 
@@ -45,7 +45,7 @@ const DeleteProduct: React.FC<DeleteProductProps> = ({ productId, productName, o
     try {
       await deleteProduct(productId);
       alert(getLocalizedText("deleteProduct.successMessage", "product", { name: productName }));
-      navigate("/vendor/products");
+      navigate("/seller/products");
       onClose();
     } catch (error) {
       console.error("Error deleting product:", error);

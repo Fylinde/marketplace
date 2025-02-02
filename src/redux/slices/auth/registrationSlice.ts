@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { getUserAddresses, addUserAddress, setDefaultAddress } from 'services/addressService';
+import axios, { AxiosError } from "axios";
+import { RootState } from '../../../redux/store';
+import { getUserAddresses, addUserAddress, setDefaultAddress } from '../../../services/addressService';
 import {
   FileMetadata,
   AccountDetails,
@@ -8,14 +9,11 @@ import {
   ContactDetails,
   BillingAddress,
   PaymentDetails,
-  ShopDetails,
   VerificationDetails,
   SellerData,
-  StoreData,
   BusinessInformation,
   CompanyInformation,
   SellerInformation,
-  StoreInformation,
   SellerVerification,
   IdentityVerification,
   BusinessDocumentation,
@@ -23,7 +21,21 @@ import {
   ContactPersonVerification,
 
 
- } from '@/types/sharedTypes';
+} from '../../../types/sharedTypes';
+import { StoreInformation, StoreData, ShopDetails } from '../../../types/shop';
+import { ThunkAction } from '@reduxjs/toolkit';
+import { AnyAction } from 'redux';
+import { AddressData } from '../../../types/address';
+import { registerSeller, verifySellerCode } from "../../../services/registrationService";
+
+
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  AnyAction
+>;
+
 const API_URL = 'http://localhost:8000/auth';
 
 
@@ -31,6 +43,10 @@ const API_URL = 'http://localhost:8000/auth';
 interface DocumentDetails {
   documents: File[];
 }
+
+export type ValidationResponse = {
+  valid: boolean;
+};
 
 
 
@@ -41,6 +57,12 @@ interface DocumentUploadType {
   uploadError: string | null;   // Any error message
 }
 
+interface RegisterSellerParams {
+  full_name: string;
+  email: string;
+  password: string;
+  seller_type: string;
+}
 
 
 
@@ -51,64 +73,366 @@ export interface Acknowledgment {
 
 
 export interface RegistrationState {
+  isVerified: boolean;
+  seller: object | null;
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  sellerId: string | null; // Add sellerId
+  email: string | null;
+  verificationCode: string, // Ensure this is updated from the backend response
+  verificationError: null,
+  currentStep: string;
+  emailLinkExpiration: number | null; // Timestamp in milliseconds
+  lastActivityTimestamp: number | null;
+  // Account and Personal Details
   accountDetails: AccountDetails;
-  companyDetails: CompanyDetails;
   contactDetails: ContactDetails;
-  paymentDetails: PaymentDetails;
-  shopDetails: ShopDetails;
-  verificationDetails: VerificationDetails;
-  documentDetails: DocumentDetails;
-  billingAddress: BillingAddress;
-  registrationStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
-  error: string | null;
-  userAddresses: any[];
-  addressError: string | null;
-  companyData?: CompanyDetails;
-  sellerData?: SellerData;
-  storeData?: StoreData;
-  contactDetailsData?: ContactDetails;
-  shopSetupData?: ShopDetails;
-  verificationData?: VerificationDetails;
-  sellerType: 'individual' | 'professional';
-  businessInformation: BusinessInformation;
+  paymentDetails: Partial<PaymentDetails>;
+
+  // Company and Seller Details
+  companyDetails: CompanyDetails;
   companyInformation: CompanyInformation;
+  businessInformation: BusinessInformation;
   sellerInformation: SellerInformation;
+
+  // Store Details
+  shopDetails: ShopDetails;
+  storeDetails: StoreInformation;
   storeInformation: StoreInformation;
+
+  // Verification Details
   sellerVerification: SellerVerification;
   identityVerification: IdentityVerification;
   businessDocumentation: BusinessDocumentation;
   bankAccountVerification: BankAccountVerification;
   contactPersonVerification: ContactPersonVerification;
-  acknowledgment: Acknowledgment;
-  
-  
-  // Optional fields to align with previous structure, now cleaned up
+  verificationDetails?: VerificationDetails; // Assuming a similar structure to `verificationData`
 
+  // Billing and Addresses
+  billingAddress: Partial<BillingAddress>;
+  userAddresses: any[];
+  addressError: string | null;
+
+  // Registration Flow Control
+  registrationStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null;
+  sellerType: 'individual' | 'professional';
+
+  // Optional Data for Compatibility
+  documentDetails: DocumentDetails;
+  ValidationResponse: ValidationResponse;
+  shopSetupData?: ShopDetails;
+  verificationData?: VerificationDetails;
+  contactDetailsData?: ContactDetails;
+  companyData?: CompanyDetails;
+  sellerData?: SellerData;
+  storeData?: StoreData;
+  
+
+  // Duplicated or Aligned Data (optional, clean as needed)
+  billingInfo: BillingAddress;
+  identityVerificationData: IdentityVerification;
+  businessDocumentationData: BusinessDocumentation;
+  bankAccountVerificationData: BankAccountVerification;
+  contactPersonVerificationData: ContactPersonVerification;
+  acknowledgment: Acknowledgment;
+  acknowledgmentData: Acknowledgment;
 }
+
+// Initial State
+const initialState: RegistrationState = {
+  isVerified: false,
+  seller: null,
+  status: 'idle',
+  sellerId: null, // Initialize sellerId as null
+  email: null,
+  verificationCode: "", // Ensure this is updated from the backend response
+  verificationError: null,
+  currentStep: "create_account",
+  emailLinkExpiration: null,
+  lastActivityTimestamp: null,
+  verificationDetails: undefined,
+
+  // Account and Personal Details
+  accountDetails: { full_name: '', email: '', password: '' },
+  contactDetails: {
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    residentialAddress: '',
+    countryOfCitizenship: '',
+    countryOfResidence: '',
+    postalCode: '',
+    building: '',
+    state: '',
+    dateOfBirth: { day: '', month: '', year: '' },
+    phoneNumber: '',
+    additionalAddressInfo: {
+      secondaryAddress: '',
+      secondaryPostalCode: '',
+      secondaryBuilding: '',
+      secondaryState: '',
+    },
+    passportInfo: {
+      passportNumber: '',
+      countryOfIssue: '',
+      expiryDate: { day: '', month: '', year: '' },
+    },
+  },
+  paymentDetails: {
+    cardNumber: '',
+    cardholderName: '',
+    expiryDate: { month: '', year: '' },
+    cvv: '',
+    currency: 'USD',
+  },
+
+  // Company and Seller Details
+  companyDetails: {
+    country: '',
+    companyType: '',
+    companyName: '',
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    companyRegistrationNumber: '',
+    taxId: '',
+    countryOfIncorporation: '',
+    businessAddress: '',
+  },
+  companyInformation: {
+    companyName: '',
+    companyRegistrationNumber: '',
+    taxId: '',
+    countryOfIncorporation: '',
+    businessAddress: '',
+    phoneNumber: '',
+    contactPersonFirstName: '',
+    contactPersonMiddleName: '',
+    contactPersonLastName: '',
+    businessInformation: {
+      businessLocation: '',
+      businessType: '',
+      businessName: '',
+      businessWebsite: '',
+      industryType: '',
+      numberOfEmployees: '',
+    },
+  },
+  businessInformation: {
+    businessLocation: '',
+    businessType: '',
+    businessName: '',
+    businessWebsite: '',
+    industryType: '',
+    numberOfEmployees: '',
+  },
+  sellerInformation: {
+    companyRegistrationNumber: '',
+    businessAddress: '',
+    phoneNumber: '',
+    contactPersonFirstName: '',
+    contactPersonMiddleName: '',
+    contactPersonLastName: '',
+    smsVerificationLanguage: '',
+    verificationMethod: '',
+    
+  },
+
+  // Store Details
+  shopDetails: {
+    storeName: '',
+    productCategories: [],
+    businessAddress: '',
+    shippingDetails: '',
+    returnPolicy: '',
+    upc: "",
+    manufacturerBrandOwner: "",
+    trademarkOwnership: "",
+  },
+  storeDetails: {
+    storeName: '',
+    upc: '',
+    manufacturerBrandOwner: '',
+    trademarkOwnership: '',
+  },
+  storeInformation: {
+    storeName: '',
+    upc: '',
+    manufacturerBrandOwner: '',
+    trademarkOwnership: '',
+  },
+
+  sellerVerification: {
+    email: '',
+    verificationCode: '',
+    isVerified: false,
+    verificationMethod: '',
+    verificationStatus: '', // Assuming this is a string type
+    verificationError: null, // Assuming null is valid for no error
+    expirationTime: null, // Correctly initialized as null
+    businessIndustry: "",
+    yearsInOperation: 0,
+    businessWebsite: "",
+    altPhoneNumber: "",
+},
+
+  identityVerification: {
+    idType: '',
+    idNumber: '',
+    expiryDate: '',
+    issuingCountry: '',
+    idDocument: undefined,
+    selfieDocument: undefined,
+  },
+  businessDocumentation: {
+    documentNumber: '',
+    issuingAuthority: '',
+    taxIdNumber: '',
+    taxCountryOfResidence: '',
+    businessRegistrationDocument: undefined,
+    taxDocument: undefined,
+  },
+  bankAccountVerification: {
+    accountNumber: '',
+    bankName: '',
+    routingCode: '',
+    proofOfBankOwnership: undefined,
+  },
+  contactPersonVerification: {
+    fullName: '',
+    position: '',
+    contactEmail: '',
+    contactPhoneNumber: '',
+    authorizationLetter: undefined,
+    companyStampOrSeal: undefined,
+  },
+
+  // Billing and Addresses
+  billingAddress: {
+    id: '',
+    firstName: '',
+    lastName: '',
+    fullName: '',
+    email: '',
+    addressLine1: '',
+    addressLine2: '',
+    street: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: '',
+    phoneNumber: '',
+  },
+  userAddresses: [],
+  addressError: null,
+
+  // Registration Flow Control
+  registrationStatus: 'idle',
+  error: null,
+  sellerType: 'individual',
+
+  // Optional Data for Compatibility
+  documentDetails: { documents: [] },
+  ValidationResponse: {valid: false}, 
+  shopSetupData: undefined,
+  verificationData: undefined,
+  contactDetailsData: undefined,
+  companyData: undefined,
+  sellerData: undefined,
+  storeData: undefined,
+
+  // Duplicated or Aligned Data
+  billingInfo: {
+    id: '',
+    firstName: '',
+    lastName: '',
+    fullName: '',
+    email: '',
+    addressLine1: '',
+    addressLine2: '',
+    street: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: '',
+    phoneNumber: '',
+  },
+  identityVerificationData: {
+    idType: '',
+    idNumber: '',
+    expiryDate: '',
+    issuingCountry: '',
+    idDocument: undefined,
+    selfieDocument: undefined,
+  },
+  businessDocumentationData: {
+    documentNumber: '',
+    issuingAuthority: '',
+    taxIdNumber: '',
+    taxCountryOfResidence: '',
+    businessRegistrationDocument: undefined,
+    taxDocument: undefined,
+  },
+  bankAccountVerificationData: {
+    accountNumber: '',
+    bankName: '',
+    routingCode: '',
+    proofOfBankOwnership: undefined,
+  },
+  contactPersonVerificationData: {
+    fullName: '',
+    position: '',
+    contactEmail: '',
+    contactPhoneNumber: '',
+    authorizationLetter: undefined,
+    companyStampOrSeal: undefined,
+  },
+  acknowledgment: { consentGiven: false },
+  acknowledgmentData: { consentGiven: false },
+};
+
+const createAddressWithDefaults = (address: Partial<AddressData>): AddressData => ({
+  ...address,
+  phoneNumber: address.phoneNumber || "N/A", // Default for phoneNumber
+  postalCode: address.postalCode || "",     // Default for postalCode
+  street: address.street || "",             // Default for street
+  city: address.city || "",                 // Default for city
+  state: address.state || "",               // Default for state
+  country: address.country || "",           // Default for country
+});
+
+
+
+
+
 
 // Thunks for user registration
 export const registerUser = createAsyncThunk(
-  'registration/registerUser',
+  "registration/registerUser",
   async (registrationData: RegistrationState, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/register`, registrationData);
       const billingAddress = registrationData.billingAddress;
 
-      const addressWithPhoneNumber = {
-        ...billingAddress,
-        phone_number: billingAddress.phone_number || 'N/A',
-      };
+      // Ensure all required fields in AddressData have valid values
+      const addressWithPhoneNumber: AddressData = createAddressWithDefaults(
+        billingAddress as Partial<AddressData>
+      );
 
       const addedAddress = await addUserAddress(addressWithPhoneNumber);
       if (addedAddress?.id) {
         await setDefaultAddress(addedAddress.id);
       }
+
+      const response = await axios.post(`${API_URL}/register`, registrationData);
       return response.data;
     } catch (err) {
       return rejectWithValue((err as any).response?.data);
     }
   }
 );
+
+
+
 
 export const fetchUserAddressList = createAsyncThunk(
   'registration/fetchUserAddressList',
@@ -212,230 +536,192 @@ export const uploadDocument = createAsyncThunk<FileMetadata, File, { rejectValue
   }
 );
 
+export const sendRegistrationEmail = createAsyncThunk(
+  "registration/sendEmail",
+  async (step: string, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const email = state.registration.sellerVerification.email;
+      const stepLink = `${window.location.origin}/register/seller/${step}`;
+      const now = Date.now();
+      const lastActivity = state.registration.lastActivityTimestamp || 0;
+      const threshold = 5 * 60 * 1000; // 5 minutes inactivity threshold
+
+      console.log(`Preparing to send email for step: ${step}, email: ${email}`);
+
+      // Ensure the email exists
+      if (!email) {
+        console.error("Email not set in Redux state. Cannot send email.");
+        throw new Error("Email not found in Redux state.");
+      }
+
+      // Check inactivity threshold
+      if (now - lastActivity < threshold) {
+        console.log(
+          `Skipped sending email. Activity threshold of ${
+            threshold / 1000
+          } seconds not met.`
+        );
+        return { skipped: true }; // Skip sending email
+      }
+
+      // Send the email
+      const response = await axios.post(
+        "http://localhost:8000/sellers/send-registration-email",
+        { email, stepLink }
+      );
+
+      console.log(
+        `Registration email sent successfully to ${email} for step: ${step}`
+      );
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error:", error.response?.data || error.message);
+      } else if (error instanceof Error) {
+        console.error("General error:", error.message);
+      } else {
+        console.error("Unexpected error:", error);
+      }
+      return rejectWithValue("Failed to send registration email.");
+    }
+  }
+);
+
+// export const validateVerificationCode = createAsyncThunk(
+//   "registration/validateVerificationCode",
+//   async ({ code, email }: { code: string; email: string }, thunkAPI) => {
+//     try {
+//       const response = await axios.post("http://localhost:8000/auth/verify-code", { code, email });
+//       const { isValid, message } = response.data;
+//       if (isValid) {
+//         return { valid: true };
+//       }
+//       return thunkAPI.rejectWithValue(message || "Invalid verification code");
+//     } catch (error) {
+//       // Check if the error is an AxiosError
+//       if (axios.isAxiosError(error)) {
+//         const errorMessage =
+//           error.response?.data?.detail || "An unexpected error occurred during verification";
+//         return thunkAPI.rejectWithValue(errorMessage);
+//       }
+//       // Handle non-Axios errors
+//       return thunkAPI.rejectWithValue("An unexpected error occurred.");
+//     }
+//   }
+// );
+
+// export const registerSeller = createAsyncThunk(
+//   "registration/registerSeller",
+//   async (
+//     {
+//       full_name,
+//       email,
+//       password,
+//       seller_type,
+//     }: {
+//       full_name: string;
+//       email: string;
+//       password: string;
+//       seller_type: "individual" | "professional";
+//     },
+//     { rejectWithValue }
+//   ) => {
+//     try {
+//       // Delegate backend communication to the service
+//       const response = await registerSeller({
+//         full_name,
+//         email,
+//         password,
+//         seller_type,
+//       });
+//       return response; // Return seller data
+//     } catch (error) {
+//       return rejectWithValue(error);
+//     }
+//   }
+// );
+
+
+export const registerSellerThunk = createAsyncThunk(
+  'registration/registerSeller',
+  async ({ full_name, email, password, seller_type }: RegisterSellerParams, { rejectWithValue }) => {
+      try {
+          console.log("Dispatching seller registration request...");
+          const response = await registerSeller({ full_name, email, password, seller_type });
+          console.log("Seller registered successfully:", response);
+          return response;
+      } catch (error: any) {
+          console.error("Seller registration failed:", error);
+          return rejectWithValue(error.response?.data || "Registration failed");
+      }
+  }
+);
+
+/**
+ * Async Thunk: Verifies the seller's verification code
+ */
+export const verifySellerCodeThunk = createAsyncThunk(
+  "registration/verifySellerCode",
+  async ({ email, code }: { email: string; code: string }, { rejectWithValue }) => {
+    try {
+      const isVerified: boolean = await verifySellerCode(email, code);
+      return { isVerified, email }; // ✅ Correct return structure
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Verification failed");
+    }
+  }
+);
 
 
 
-const initialState: RegistrationState = {
-  accountDetails: { full_name: '', email: '', password: '' },
-  companyDetails: {
-    country: '',
-    companyType: '',
-    companyName: '',
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    companyRegistrationNumber: '',
-    taxId: '',
-    countryOfIncorporation: '',
-    businessAddress: '',
-  },
-  contactDetails: {
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    residentialAddress: '',
-    countryOfCitizenship: '',
-    countryOfResidence: '',
-    postalCode: '',
-    building: '',
-    state: '',
-    dateOfBirth: { day: '', month: '', year: '' },
-    phoneNumber: '',
-    additionalAddressInfo: {
-      secondaryAddress: '',
-      secondaryPostalCode: '',
-      secondaryBuilding: '',
-      secondaryState: '',
-    },
-    passportInfo: {
-      passportNumber: '',
-      countryOfIssue: '',
-      expiryDate: { day: '', month: '', year: '' },
-    },
-  },
-  paymentDetails: {
-    cardNumber: '',
-    cardholderName: '',
-    expiryDate: {
-      month: '',
-      year: '',
-    },
-    cvv: '',
-    billingAddress: {
-      id: '',
-      firstName: '',
-      lastName: '',
-      fullName: '', // Derived or set directly
-      email: '',
-      phone: '',
-      addressLine1: '',
-      addressLine2: '',
-      street: '',
-      city: '',
-      state: '',
-      postal_code: '',
-      postalCode: '', // Optional alias
-      zipCode: '', // Optional alias
-      country: '',
-      phone_number: '', // Optional
-    },
-    
-    
-    currency: 'USD',  // Default currency
-  },
-  shopDetails: {
-    storeName: '',
-    productCategories: [],
-    businessAddress: '',
-    shippingDetails: '',
-    returnPolicy: '',
-  },
-  verificationDetails: {
-    identityDocument: null,
-    businessDocument: null,
-    additionalComments: '',
-    verificationMethod: '',
-    phoneNumber: '',
-    verificationLanguage: '',
-    primaryContactFirstName: '',
-    primaryContactMiddleName: '',
-    primaryContactLastName: '',
-  },
-  documentDetails: {
-    documents: [],
-  },
-  billingAddress: {
-    id: '',
-    firstName: '',
-    lastName: '',
-    fullName: '', // Derived or set directly
-    email: '',
-    phone: '',
-    addressLine1: '',
-    addressLine2: '',
-    street: '',
-    city: '',
-    state: '',
-    postal_code: '',
-    postalCode: '', // Optional alias
-    zipCode: '', // Optional alias
-    country: '',
-    phone_number: '', // Optional
-  },
-  
-  registrationStatus: 'idle',
-  error: null,
-  userAddresses: [],
-  addressError: null,
-  sellerData: {
-    companyRegistrationNumber: '',
-    businessAddress: '',
-    phoneNumber: '',
-    contactPersonFirstName: '',
-    contactPersonMiddleName: '',
-    contactPersonLastName: '',
-    smsVerificationLanguage: '',
-    verificationMethod: '',
-  },
-  storeData: {
-    storeName: '',
-    upc: '',
-    manufacturerBrandOwner: '',
-    trademarkOwnership: '',
-  },
-  contactDetailsData: undefined,
-  shopSetupData: undefined,
-  verificationData: undefined,
-  sellerType: 'individual',
 
-  // Optional data structures for professional seller
-  businessInformation: {
-    businessLocation: '',
-    businessType: '',
-    businessName: '',
-    businessWebsite: '',
-    industryType: '',
-    numberOfEmployees: '',
-  },
-  companyInformation: {
-    companyName: '',
-    companyRegistrationNumber: '',
-    taxId: '',
-    countryOfIncorporation: '',
-    businessAddress: '',
-    phoneNumber: '',
-    contactPersonFirstName: '',
-    contactPersonMiddleName: '', // Optional
-    contactPersonLastName: ''
-  },
-  sellerInformation: {
-    companyRegistrationNumber: '',
-    businessAddress: '',
-    phoneNumber: '',
-    contactPersonFirstName: '',
-    contactPersonMiddleName: '', // Optional field
-    contactPersonLastName: '',
-    smsVerificationLanguage: '',
-    verificationMethod: '',
-  },
-  
-  storeInformation: {
-    storeName: '',
-    upc: '',
-    manufacturerBrandOwner: '',
-    trademarkOwnership: '',
-  },
-  sellerVerification: {
-    email: '',
-    verificationCode: '',
-    isVerified: false,
-    verificationMethod: '',
-    verificationStatus: '',
-    verificationError: null,
-  },
-  identityVerification: {
-    idType: '', // Default empty string for selection
-    idNumber: '',
-    expiryDate: '',
-    issuingCountry: '',
-    idDocument: undefined as FileMetadata | undefined, // Expecting file metadata
-    selfieDocument: undefined as FileMetadata | undefined, // Expecting file metadata
-  },
-  
-  businessDocumentation: {
-    documentNumber: '',
-    issuingAuthority: '',
-    taxIdNumber: '',
-    taxCountryOfResidence: '',
-    businessRegistrationDocument: undefined as FileMetadata | undefined, // Expecting file metadata
-    taxDocument: undefined as FileMetadata | undefined, // Expecting file metadata
-  },
-  
-  bankAccountVerification: {
-    accountNumber: '',
-    bankName: '',
-    routingCode: '',
-    proofOfBankOwnership: undefined as FileMetadata | undefined, // Expecting file metadata
-  },
-  
-  contactPersonVerification: {
-    fullName: '',
-    position: '',
-    contactEmail: '',
-    contactPhoneNumber: '',
-    authorizationLetter: undefined as FileMetadata | undefined, // Expecting file metadata
-    companyStampOrSeal: undefined as FileMetadata | undefined, // Expecting file metadata
-  },
-  
-  acknowledgment: {
-    consentGiven: false, // Set as a boolean
-  },
-};
+
 
 const registrationSlice = createSlice({
   name: 'registration',
   initialState,
   reducers: {
+    resetRegistrationState: (state) => {
+      state.seller = null;
+      state.status = 'idle';
+      state.error = null;
+  },
+    setSellerId(state, action: PayloadAction<string>) {
+      state.sellerId = action.payload; // Set sellerId in the state
+    },
+    updateRegistrationData: (
+      state,
+      action: PayloadAction<Partial<RegistrationState['sellerVerification']>>
+    ) => {
+      state.sellerVerification = {
+        ...state.sellerVerification,
+        ...action.payload, // Merge the new data
+      };
+    },
+    clearRegistrationData(state) {
+      state.billingAddress = {};
+      state.paymentDetails = {};
+    },
+    saveDocumentUploads: (state, action: PayloadAction<DocumentUploadType[]>) => {
+      // Map DocumentUploadType[] to File[] while filtering out null values
+      state.documentDetails.documents = action.payload
+        .map((doc) => doc.file)
+        .filter((file): file is File => !!file); // Ensure only non-null files are included
+    },
+       
+    setCurrentStep: (state, action: PayloadAction<string>) => {
+      state.currentStep = action.payload;
+      state.lastActivityTimestamp = new Date().getTime(); // Update activity timestamp
+    },
+    
+    validateLinkExpiration: (state) => {
+      const now = new Date().getTime();
+      if (state.emailLinkExpiration && now > state.emailLinkExpiration) {
+        state.currentStep = "create_account"; // Reset step to the beginning
+        state.emailLinkExpiration = new Date().getTime() + 60 * 60 * 1000; // Example: 1-hour expiration
+      }
+    },
     
     
     setSellerType(state, action: PayloadAction<'individual' | 'professional'>) {
@@ -456,9 +742,9 @@ const registrationSlice = createSlice({
     setAcknowledgment(state, action: PayloadAction<Acknowledgment>) {
       state.acknowledgment = action.payload;
     },
-    saveBillingAddress(state, action: PayloadAction<BillingAddress>) {
-      state.billingAddress = action.payload;
-    }, 
+    saveBillingAddress(state, action: PayloadAction<Partial<BillingAddress>>) {
+      state.billingAddress = { ...state.billingAddress, ...action.payload };
+    },
     saveIdentityVerification(state, action: PayloadAction<IdentityVerification>) {
       state.identityVerification = action.payload;
     },
@@ -524,17 +810,19 @@ const registrationSlice = createSlice({
     saveStoreInformation(state, action: PayloadAction<typeof initialState.storeInformation>) {
       state.storeInformation = action.payload;
     },
-    saveAccountDetails(state, action: PayloadAction<AccountDetails>) {
+    saveAccountDetails: (state, action: PayloadAction<AccountDetails>) => {
+      console.log("[Redux] Saving account details:", action.payload);
       state.accountDetails = action.payload;
-    },
+  },
+  
     saveCompanyDetails(state, action: PayloadAction<CompanyDetails>) {
       state.companyDetails = action.payload;
     },
     saveContactDetails(state, action: PayloadAction<ContactDetails>) {
       state.contactDetails = action.payload;
     },
-    savePaymentDetails(state, action: PayloadAction<PaymentDetails>) {
-      state.paymentDetails = action.payload;
+    savePaymentDetails(state, action: PayloadAction<Partial<PaymentDetails>>) {
+      state.paymentDetails = { ...state.paymentDetails, ...action.payload };
     },
     saveShopDetails(state, action: PayloadAction<ShopDetails>) {
       state.shopDetails = action.payload;
@@ -551,21 +839,75 @@ const registrationSlice = createSlice({
     saveSellerVerification(state, action: PayloadAction<SellerVerification>) {
       state.sellerVerification = action.payload;
     },
-    setSellerVerificationEmail: (state, action: PayloadAction<string>) => {
+    setSellerVerificationEmail: (state, action) => {
+      console.log("[Redux] Set Seller Verification Email:", action.payload);
+  
+      // Ensure sellerVerification is initialized with required properties
+      if (!state.sellerVerification) {
+          state.sellerVerification = {
+            email: "",                // Default empty string
+            verificationCode: "",
+            verificationError: null,
+            verificationStatus: '',// Default empty string
+            isVerified: false,        // Default false
+            verificationMethod: "",   // Default empty string
+            expirationTime: null,     // Default null
+          };
+      }
+  
+      // Set the email in sellerVerification
       state.sellerVerification.email = action.payload;
-    },
-    setSellerVerificationCode: (state, action: PayloadAction<string>) => {
+  },
+  
+  
+    setSellerVerificationCode: (state, action) => {
+      console.log("[Redux] Set Verification Code:", action.payload);
       state.sellerVerification.verificationCode = action.payload;
     },
-    setVerificationStatus: (state, action: PayloadAction<boolean>) => {
+    setVerificationStatus: (state, action) => {
+      console.log("[Redux] Set Verification Status:", action.payload);
       state.sellerVerification.isVerified = action.payload;
     },
-    setVerificationError: (state, action: PayloadAction<string | null>) => {
+    setVerificationError: (state, action) => {
+      console.log("[Redux] Set Verification Error:", action.payload);
       state.sellerVerification.verificationError = action.payload;
     },
+    setEmailLinkExpiration: (state, action) => {
+      state.emailLinkExpiration = action.payload;
+    },
+    saveVerificationCode(state, action: PayloadAction<string>) {
+      state.verificationCode = action.payload;
+    },
+    // updateRegistrationData(state, action: PayloadAction<Partial<RegistrationState["accountDetails"]>>) {
+    //   state.accountDetails = {
+    //     ...state.accountDetails,
+    //     ...action.payload, // ✅ Merge new data without removing existing values
+    //   };
+    // },
+  
+
   },
   
   extraReducers: (builder) => {
+    builder
+    .addCase(verifySellerCodeThunk.fulfilled, (state, action) => {
+      state.sellerVerification.isVerified = action.payload.isVerified;
+      state.sellerVerification.verificationError = null;
+  
+      // ✅ Ensure the email is always stored
+      if (action.payload.email) {
+        state.accountDetails.email = action.payload.email;
+        localStorage.setItem("registeredEmail", action.payload.email); // ✅ Save as backup
+      }
+    })
+    .addCase(verifySellerCodeThunk.rejected, (state, action) => {
+      state.sellerVerification.isVerified = false;
+      state.sellerVerification.verificationError = action.payload as string;
+    });
+  
+  
+  
+
     builder
        // Document upload cases
        .addCase(uploadDocument.fulfilled, (state, action: PayloadAction<FileMetadata>) => {
@@ -667,12 +1009,45 @@ const registrationSlice = createSlice({
       state.registrationStatus = 'failed';
       state.error = action.payload as string;
     });
+    builder
+    .addCase(sendRegistrationEmail.pending, (state) => {
+      console.log("Sending registration email...");
+    })
+    .addCase(sendRegistrationEmail.fulfilled, (state, action) => {
+      console.log("Registration email sent successfully:", action.payload);
+    })
+    .addCase(sendRegistrationEmail.rejected, (state, action) => {
+      console.error("Failed to send registration email:", action.payload);
+    });
+    
+    builder
+    .addCase(registerSellerThunk.pending, (state) => {
+        console.log("Seller registration request in progress...");
+        state.status = 'loading';
+    })
+    .addCase(registerSellerThunk.fulfilled, (state, action: PayloadAction<object>) => {
+        console.log("Seller registration successful:", action.payload);
+        state.status = 'succeeded';
+        state.seller = action.payload;
+    })
+    .addCase(registerSellerThunk.rejected, (state, action: PayloadAction<any>) => {
+        console.error("Seller registration failed:", action.payload);
+        state.status = 'failed';
+        state.error = action.payload as string;
+    });
+    
 
   },
 });
 
 // Selectors to extract specific parts of the state
-export const selectAccountDetails = (state: { registration: RegistrationState }) => state.registration.accountDetails;
+export const selectEmailLinkExpiration = (state: RootState): number | null =>
+  state.registration.emailLinkExpiration;
+
+
+export const selectSellerVerificationEmail = (state: RootState) => state.registration.sellerVerification.email;
+
+export const selectAccountDetails = (state: RootState) => state.registration.accountDetails;
 export const selectCompanyDetails = (state: { registration: RegistrationState }) => state.registration.companyDetails;
 export const selectContactDetails = (state: { registration: RegistrationState }) => state.registration.contactDetails;
 export const selectPaymentDetails = (state: { registration: RegistrationState }) => state.registration.paymentDetails;
@@ -695,6 +1070,9 @@ export const selectContactPersonVerification = (state: { registration: Registrat
 export const selectAcknowledgment = (state: { registration: RegistrationState }) => state.registration.acknowledgment;
 
 export const {
+  saveVerificationCode,
+  updateRegistrationData,
+  clearRegistrationData,
   saveAccountDetails,
   saveCompanyDetails,
   saveContactDetails,
@@ -725,6 +1103,12 @@ export const {
   updateContactPersonVerification,
   updateIdentityVerification,
   updateBankAccountVerification,
+  setCurrentStep,
+  validateLinkExpiration,
+  saveDocumentUploads,
+  setEmailLinkExpiration,
+  setSellerId ,
+  
 
 } = registrationSlice.actions;
 

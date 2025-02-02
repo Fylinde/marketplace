@@ -1,7 +1,7 @@
 // src/layouts/UserRegistrationLayout.tsx
 import React from "react";
-import Header from "components/header/Header"; // Adjust path if needed
-import Footer from "components/footer/Footer"; // Adjust path if needed
+import Header from "../../components/header/Header"; // Adjust path if needed
+import Footer from "../../components/footer/Footer"; // Adjust path if needed
 import StyledUserRegistrationLayout from "./StyledUserRegistrationLayout";
 
 

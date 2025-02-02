@@ -1,8 +1,8 @@
-import Card from "components/Card";
+import Card from "../../components/Card";
 import React from "react";
-import  Typography  from "components/Typography";
+import  Typography  from "../../components/Typography";
 import styled from "styled-components";
-import { getTheme } from "utils/utils";
+import { getTheme } from "../../utils/utils";
 
 export interface CarouselCard2Props {
   text?: string; // Dynamic content

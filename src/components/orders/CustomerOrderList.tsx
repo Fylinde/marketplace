@@ -7,9 +7,8 @@ import Pagination from "../pagination/Pagination";
 import TableRow from "../TableRow";
 import { H5 } from "../Typography";
 import OrderRow from "./OrderRow";
-import { RootState } from "../../redux/store";
 import { fetchOrders, setFilters, setSort } from "../../redux/slices/orders/orderSlice";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 
 
 const CustomerOrderList: React.FC = () => {

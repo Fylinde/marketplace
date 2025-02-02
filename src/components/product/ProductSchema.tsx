@@ -1,5 +1,5 @@
 import React from "react";
-import { Product } from "@/types/Product";
+import { Product } from "../../types/Product";
 
 const ProductSchema: React.FC<{ product: Product }> = ({ product }) => {
   const schema = {

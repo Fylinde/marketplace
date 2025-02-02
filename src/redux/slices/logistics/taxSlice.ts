@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import taxService from 'services/taxService';
+import taxService from '../../../services/taxService';
 
 interface TaxRate {
   id: string;
@@ -65,6 +65,18 @@ export const fetchSupportedCountries = createAsyncThunk(
     }
   }
 );
+
+export const saveSellerTaxInformation = createAsyncThunk(
+  'tax/saveSellerTaxInformation',
+  async (params: { sellerId: string; taxInfo: { taxId: string; vatNumber?: string; country: string } }, thunkAPI) => {
+    try {
+      return await taxService.saveSellerTaxInformation(params.sellerId, params.taxInfo);
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+
 
 const taxSlice = createSlice({
   name: 'tax',

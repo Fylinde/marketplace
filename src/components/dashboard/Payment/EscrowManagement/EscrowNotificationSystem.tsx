@@ -5,7 +5,8 @@ import React, { useEffect } from "react";
 
 const EscrowNotificationSystem = () => {
   useEffect(() => {
-    const ws = new WebSocket("wss://your-backend.com/escrow-notifications");
+    //const ws = new WebSocket("wss://your-backend.com/escrow-notifications"); // ('ws://mock-server', true)
+    const ws = new WebSocket("wss:///mock-server/escrow-notifications");
     ws.onmessage = (message) => {
       const notification = JSON.parse(message.data);
       toast.info(`Escrow Update: ${notification.message}`);

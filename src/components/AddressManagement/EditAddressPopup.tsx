@@ -23,7 +23,7 @@ const EditAddressPopup: React.FC<EditAddressPopupProps> = ({ address, onConfirm,
   return (
     <div className="edit-address-popup">
       <h3>Edit Address</h3>
-      <p>{address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country}</p>
+      <p>{address.street}, {address.city}, {address.state}, {address.postalCode}, {address.country}</p>
 
       <div className="actions">
         <button onClick={handleConfirm}>Save Changes</button>

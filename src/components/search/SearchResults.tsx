@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "redux/store";
 import {
   fetchSearchResults,
   fetchMoreSearchResults,
@@ -16,7 +15,7 @@ import Spinner from "../Spinner";
 import { useInView } from "react-intersection-observer";
 import ARViewer from "./ARViewer"; // Import the ARViewer component
 import RecommendedItems from "./RecommendedItems";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 
 const SearchResults: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import marketingService from "services/marketingService";
+import marketingService from "../../../services/marketingService";
 
 interface MarketingStrategy {
   strategyId: string;

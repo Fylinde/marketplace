@@ -7,10 +7,10 @@ import { Card, RateList, RateItem } from "./Styles/StyledExchangeRateCard"; // A
 
 
 interface ExchangeRateCardProps {
-    rates: Record<string, number>;
-    baseCurrency: string;
+  rates: Record<string, number>;
+  baseCurrency: string;
 }
-  
+
 const ExchangeRateCard: React.FC<ExchangeRateCardProps> = ({ rates, baseCurrency }) => {
   const dispatch = useDispatch();
   const { currentRates, loading, error } = useSelector(

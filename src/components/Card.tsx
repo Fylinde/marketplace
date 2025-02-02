@@ -10,7 +10,7 @@ import {
   space,
   SpaceProps,
 } from "styled-system";
-import { getTheme } from "utils/utils";
+import { getTheme } from "../utils/utils";
 import Box from "./Box";
 
 export interface CardProps {

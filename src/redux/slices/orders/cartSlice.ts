@@ -3,16 +3,17 @@ import cartService from "../../../services/cartService";
 import { fetchProductDetails } from "../products/productSlice";
 import type { AppDispatch } from "../../store";
 import { Product } from "../../../types/Product";
-import { CartItem } from "@/types/cartItem";
+import { CartItem } from "../../../types/cartItem";
 import { validateDiscount } from "../../../utils/validationUtils";
+import { ExchangeRate } from "../../../types/ExchangeRate";
 
-// Cart State Interface
+// Updated `CartState` interface
 interface CartState {
   cartList: CartItem[];
-  escrowItems: CartItem[]; // Escrow-specific items
-  totalSellerPrice: number; // Total price in seller's currency
-  totalBuyerPrice: number; // Total price in buyer's currency
-  totalItems: number; // Total number of items in the cart
+  escrowItems: CartItem[];
+  totalSellerPrice: number;
+  totalBuyerPrice: number;
+  totalItems: number;
   discount: number;
   lockedExchangeRate: Record<string, number> | null;
   couponCode?: string;
@@ -20,10 +21,13 @@ interface CartState {
   recommendations: CartItem[];
   loading: boolean;
   error: string | null;
+  sellerCurrency?: string; // Nullable to ensure fallback to USD
+  buyerCurrency?: string; // Nullable to ensure fallback
+  exchangeRate: ExchangeRate[];
   currency: string;
 }
 
-// Initial State
+// Initial state with default fallbacks
 const initialState: CartState = {
   cartList: [],
   escrowItems: [],
@@ -37,8 +41,16 @@ const initialState: CartState = {
   recommendations: [],
   loading: false,
   error: null,
-  currency: "USD",
+  sellerCurrency: "USD", // Default fallback
+  buyerCurrency: "EUR", // Default fallback
+  exchangeRate: [],
+  currency: '',
 };
+
+// Utility to get the default currency
+const getBuyerCurrency = (state: CartState) => state.buyerCurrency || "USD";
+const getSellerCurrency = (state: CartState) => state.sellerCurrency || "USD";
+
 
 function calculateCartTotals(cartList: CartItem[]): {
   totalBuyerPrice: number;
@@ -62,12 +74,18 @@ function calculateCartTotals(cartList: CartItem[]): {
   };
 }
 
+export interface FetchCartItemsResponse {
+  cartItems: CartItem[];
+  buyerCurrency?: string; // Optional in API response
+  sellerCurrency?: string; // Optional in API response
+}
+
 
 // Async Thunks
 export const fetchCartItems = createAsyncThunk<
-  { cartItems: CartItem[] }, // Return type
-  void, // Argument type
-  { state: { cart: CartState } } // ThunkAPI type
+  FetchCartItemsResponse,
+  void,
+  { state: { cart: CartState } }
 >("cart/fetchCartItems", async (_, thunkAPI) => {
   try {
     return await cartService.fetchCartItems();
@@ -75,8 +93,6 @@ export const fetchCartItems = createAsyncThunk<
     return thunkAPI.rejectWithValue(error.message || "Failed to fetch cart items");
   }
 });
-
-
 
 
 export const convertPrices = createAsyncThunk(
@@ -194,45 +210,40 @@ const cartSlice = createSlice({
     lockExchangeRate(state, action: PayloadAction<Record<string, number>>) {
       state.lockedExchangeRate = action.payload;
     },
-    changeCartAmount: (
-      state,
-      action: PayloadAction<{ id: string; amount: number }>
-    ) => {
+    // Changes to `changeCartAmount`
+    changeCartAmount: (state, action: PayloadAction<{ id: string; amount: number }>) => {
       const { id, amount } = action.payload;
       const existingItem = state.cartList.find((item) => item.id === id);
-    
+
       if (existingItem) {
-        // Update quantity for existing items
         existingItem.quantity = Math.max(amount, 0);
       } else if (amount > 0) {
-        // Add placeholder item with default values
         state.cartList.push({
-          productId: id, // Use `id` as the placeholder productId
-          id, // Set the same ID for consistency
-          name: "Loading...", // Placeholder name
-          buyerPrice: 0, // Placeholder buyer price
-          sellerPrice: 0, // Placeholder seller price
-          totalBuyerPrice: 0, // Placeholder total buyer price
-          totalSellerPrice: 0, // Placeholder total seller price
-          buyerCurrency: state.currency, // Default to current cart currency
-          sellerCurrency: "USD", // Default seller currency (can be updated later)
-          image: "/assets/images/loading-placeholder.png", // Placeholder image
-          stock: 0, // Placeholder stock
-          quantity: amount, // Initial quantity
+          productId: id,
+          id,
+          name: "Loading...",
+          buyerPrice: 0,
+          sellerPrice: 0,
+          totalBuyerPrice: 0,
+          totalSellerPrice: 0,
+          buyerCurrency: getBuyerCurrency(state), // Fallback to default buyer currency
+          sellerCurrency: getSellerCurrency(state), // Fallback to default seller currency
+          image: "/assets/images/loading-placeholder.png",
+          stock: 0,
+          quantity: amount,
         });
       }
 
-      // Recalculate cart totals for both buyer and seller prices
-    const { totalBuyerPrice, totalSellerPrice, totalItems } = calculateCartTotals(
-      state.cartList
-    );
-    state.totalBuyerPrice = totalBuyerPrice;
-    state.totalSellerPrice = totalSellerPrice;
-    state.totalItems = totalItems;
+      const { totalBuyerPrice, totalSellerPrice, totalItems } = calculateCartTotals(
+        state.cartList
+      );
+      state.totalBuyerPrice = totalBuyerPrice;
+      state.totalSellerPrice = totalSellerPrice;
+      state.totalItems = totalItems;
     },
 
 
-
+    // Changes to `updateCartItem`
     updateCartItem: (
       state,
       action: PayloadAction<{
@@ -254,37 +265,35 @@ const cartSlice = createSlice({
         stock,
         quantity,
       } = action.payload;
+
       const existingItem = state.cartList.find((item) => item.id === productId);
-    
+
       if (existingItem) {
-        // Update existing item
         existingItem.name = name;
         existingItem.buyerPrice = buyerPrice;
         existingItem.sellerPrice = sellerPrice;
-        existingItem.totalBuyerPrice = buyerPrice * quantity; // Update total buyer price
-        existingItem.totalSellerPrice = sellerPrice * quantity; // Update total seller price
+        existingItem.totalBuyerPrice = buyerPrice * quantity;
+        existingItem.totalSellerPrice = sellerPrice * quantity;
         existingItem.image = image;
         existingItem.stock = stock;
         existingItem.quantity = quantity;
       } else {
-        // Add new item with default values for currency
         state.cartList.push({
-          productId, // Required field
-          id: productId, // Use productId as the cart item's id
+          productId,
+          id: productId,
           name,
           buyerPrice,
           sellerPrice,
           totalBuyerPrice: buyerPrice * quantity,
           totalSellerPrice: sellerPrice * quantity,
-          buyerCurrency: state.currency,
-          sellerCurrency: "USD", // Default seller currency
+          buyerCurrency: getBuyerCurrency(state), // Fallback to default buyer currency
+          sellerCurrency: getSellerCurrency(state), // Fallback to default seller currency
           image,
           stock,
           quantity,
         });
       }
-    
-      // Recalculate cart totals
+
       const { totalBuyerPrice, totalSellerPrice, totalItems } = calculateCartTotals(
         state.cartList
       );
@@ -292,17 +301,12 @@ const cartSlice = createSlice({
       state.totalSellerPrice = totalSellerPrice;
       state.totalItems = totalItems;
     },
-    
-
-
-
-
+    // Changes to `addItem`
     addItem: (state, action: PayloadAction<CartItem>) => {
       const item = action.payload;
       const existingItem = state.cartList.find((i) => i.id === item.id);
-    
+
       if (existingItem) {
-        // Update quantity for existing items
         existingItem.quantity = Math.min(
           existingItem.quantity + item.quantity,
           item.stock
@@ -312,18 +316,16 @@ const cartSlice = createSlice({
         existingItem.totalSellerPrice =
           existingItem.sellerPrice * existingItem.quantity;
       } else {
-        // Add new item
         state.cartList.push({
           ...item,
           totalBuyerPrice: item.buyerPrice * item.quantity,
           totalSellerPrice: item.sellerPrice * item.quantity,
-          buyerCurrency: state.currency, // Set default buyer currency
-          sellerCurrency: "USD", // Set default seller currency
-          quantity: Math.min(item.quantity, item.stock), // Ensure quantity doesn't exceed stock
+          buyerCurrency: getBuyerCurrency(state), // Fallback to default buyer currency
+          sellerCurrency: getSellerCurrency(state), // Fallback to default seller currency
+          quantity: Math.min(item.quantity, item.stock),
         });
       }
-    
-      // Recalculate cart totals
+
       const { totalSellerPrice, totalBuyerPrice, totalItems } = calculateCartTotals(
         state.cartList
       );
@@ -331,7 +333,7 @@ const cartSlice = createSlice({
       state.totalBuyerPrice = totalBuyerPrice;
       state.totalItems = totalItems;
     },
-    
+
     removeItem: (state, action: PayloadAction<string>) => {
       state.cartList = state.cartList.filter((item) => item.id !== action.payload);
       const { totalSellerPrice, totalBuyerPrice, totalItems } = calculateCartTotals(state.cartList);
@@ -363,17 +365,26 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchCartItems.fulfilled, (state, action) => {
-        state.cartList = action.payload.cartItems;
-        const { totalSellerPrice, totalBuyerPrice, totalItems } = calculateCartTotals(state.cartList);
+        const payload = action.payload;
+        state.cartList = payload.cartItems;
+
+        // Use fallback logic for buyerCurrency and sellerCurrency
+        state.buyerCurrency = payload.buyerCurrency || getBuyerCurrency(state);
+        state.sellerCurrency = payload.sellerCurrency || getSellerCurrency(state);
+
+        const { totalSellerPrice, totalBuyerPrice, totalItems } = calculateCartTotals(
+          state.cartList
+        );
         state.totalSellerPrice = totalSellerPrice;
         state.totalBuyerPrice = totalBuyerPrice;
         state.totalItems = totalItems;
+
+        state.loading = false;
       })
       .addCase(fetchCartItems.rejected, (state, action) => {
         state.error = action.payload as string;
         state.loading = false;
       })
-
       .addCase(convertPrices.fulfilled, (state, action) => {
         const conversionRates = action.payload;
         state.cartList.forEach((item) => {
@@ -398,5 +409,5 @@ const cartSlice = createSlice({
 
 
 
-export const { changeCartAmount, removeItem, applyDiscount, lockExchangeRate  } = cartSlice.actions;
+export const { changeCartAmount, removeItem, applyDiscount, lockExchangeRate } = cartSlice.actions;
 export default cartSlice.reducer;

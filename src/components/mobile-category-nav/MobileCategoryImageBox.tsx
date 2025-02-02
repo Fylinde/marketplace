@@ -1,5 +1,5 @@
-import Icon from "components/icon/Icon";
-import LazyImage from "components/LazyImage";
+import Icon from "../../components/icon/Icon";
+import LazyImage from "../../components/LazyImage";
 import React from "react";
 import FlexBox from "../FlexBox";
 import Typography from "../Typography";

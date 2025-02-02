@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import rewardsService from "services/rewardsService";
+import rewardsService from "../../../services/rewardsService";
 
 export interface Reward {
   id: string;

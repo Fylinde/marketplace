@@ -1,7 +1,7 @@
 // src/redux/slices/serviceSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import serviceService from '@/services/serviceService';
-import { Service } from '@/types/Service';
+import serviceService from '../../../services/serviceService';
+import { Service } from '../../../types/Service';
 
 // Define the initial state for services
 interface ServiceState {

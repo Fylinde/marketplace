@@ -1,10 +1,13 @@
 
 
 import axios, { AxiosError } from "axios";
-import { getBrands as fetchBrandsAPI } from "services/brandService";
+import { getBrands as fetchBrandsAPI } from "../../../services/brandService";
 import { WritableDraft } from "immer";
-import { Brand } from "types/brand";
-import { createSlice, createAsyncThunk, PayloadAction  } from "@reduxjs/toolkit";
+import { Brand } from "../../../types/brand";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../../store"; // Ensure this path is correct
+
+
 // Define Brand Interface
 
 
@@ -118,20 +121,30 @@ export const deleteBrand = createAsyncThunk(
 );
 
 export const fetchFeaturedBrands = createAsyncThunk<
-  Brand[], // Fulfilled payload type
-  void, // Argument type
-  { rejectValue: string } // Rejected value type
->(
-  "products/fetchFeaturedBrands",
-  async (_, thunkAPI) => {
-    try {
-      const response = await fetchBrandsAPI(); // Replace with your API call
-      return response.data.brands; // Adjust based on your API structure
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
+  Brand[],
+  void,
+  { rejectValue: string }
+>("brands/fetchFeaturedBrands", async (_, thunkAPI) => {
+  try {
+    const response = await fetch(`/api/brands?featured=true`);
+    if (!response.ok) {
+      throw new Error(`Backend API returned ${response.status}`);
     }
+    const data = await response.json();
+
+    if (data.brands.length === 0) {
+      console.warn("Backend returned empty featured brands, falling back to mock data.");
+      const { mockFeaturedBrands } = await import("../../../mock/data/mockFeaturedBrands");
+      return mockFeaturedBrands;
+    }
+
+    return data.brands;
+  } catch (error) {
+    console.error("Error fetching Featured Brands:", error);
+    const { mockFeaturedBrands } = await import("../../../mock/data/mockFeaturedBrands");
+    return mockFeaturedBrands;
   }
-);
+});
 
 
 
@@ -142,6 +155,19 @@ const brandSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    builder
+      .addCase(fetchFeaturedBrands.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFeaturedBrands.fulfilled, (state, action) => {
+        state.loading = false;
+        state.featuredBrands = action.payload;
+      })
+      .addCase(fetchFeaturedBrands.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch featured brands";
+      });
     builder
       .addCase(fetchBrands.pending, (state) => {
         state.loading = true;
@@ -184,28 +210,16 @@ const brandSlice = createSlice({
       .addCase(deleteBrand.fulfilled, (state, action: PayloadAction<string>) => {
         state.brands = state.brands.filter((b) => b.id !== action.payload);
       })
-    
-  
-
-      .addCase(fetchFeaturedBrands.pending, (state: WritableDraft<BrandState>) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(
-        fetchFeaturedBrands.fulfilled,
-        (state: WritableDraft<BrandState>, action: PayloadAction<Brand[]>) => {
-          state.loading = false;
-          state.featuredBrands = action.payload;
-        }
-      )
-      .addCase(
-        fetchFeaturedBrands.rejected,
-        (state: WritableDraft<BrandState>, action: PayloadAction<string | undefined>) => {
-          state.loading = false;
-          state.error = action.payload || "Failed to fetch featured brands";
-        }
-      );
   },
 });
+
+
+
+export const selectFeaturedBrands = (state: RootState) => ({
+  featuredBrands: state.brands.featuredBrands,
+  loading: state.brands.loading,
+  error: state.brands.error,
+});
+
 
 export default brandSlice.reducer;

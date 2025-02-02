@@ -2,10 +2,18 @@ export class WebSocketService {
     private socket: WebSocket | null = null;
     private url: string;
     private subscribers: Record<string, ((data: any) => void)[]> = {};
+    private isMock: boolean;
 
-    constructor(url: string) {
+    constructor(url: string, isMock: boolean = false) {
         this.url = url;
-        this.connect();
+        this.isMock = isMock;
+
+        if (this.isMock) {
+            console.log("[Mock WebSocket] Running in mock mode");
+            this.simulateMockServer();
+        } else {
+            this.connect();
+        }
     }
 
     // Establish the WebSocket connection
@@ -24,10 +32,16 @@ export class WebSocketService {
 
         this.socket.onclose = (event) => {
             console.warn("[WebSocket] Connection closed", event);
+
+            // Attempt to reconnect after a delay
+            setTimeout(() => this.connect(), 5000);
         };
 
         this.socket.onerror = (error) => {
             console.error("[WebSocket] Error occurred", error);
+
+            // Attempt to reconnect after an error
+            setTimeout(() => this.connect(), 5000);
         };
     }
 
@@ -47,13 +61,32 @@ export class WebSocketService {
         }
     }
 
+    // Mock server simulation
+    private simulateMockServer() {
+        setTimeout(() => {
+            console.log("[Mock WebSocket] Mock server connected");
+            this.emit("welcome", { message: "Mock WebSocket connected" });
+        }, 1000);
+
+        setInterval(() => {
+            this.emit("product-update", { productId: 1, status: "available" });
+        }, 5000);
+    }
+
+    // Emit event for mock
+    private emit(event: string, payload: any) {
+        if (this.subscribers[event]) {
+            this.subscribers[event].forEach((callback) => callback(payload));
+        }
+    }
+
     // Subscribe to an event with a callback
     subscribe(event: string, callback: (data: any) => void) {
         if (!this.subscribers[event]) {
             this.subscribers[event] = [];
         }
         this.subscribers[event].push(callback);
-        console.log(`[WebSocket] Subscribed to event: ${event}`);
+        console.log(`[${this.isMock ? "Mock" : "Real"} WebSocket] Subscribed to event: ${event}`);
     }
 
     // Unsubscribe from an event
@@ -64,13 +97,12 @@ export class WebSocketService {
             } else {
                 delete this.subscribers[event];
             }
-            console.log(`[WebSocket] Unsubscribed from event: ${event}`);
+            console.log(`[${this.isMock ? "Mock" : "Real"} WebSocket] Unsubscribed from event: ${event}`);
         }
     }
 
     // Simplified onMessage interface
     onMessage(callback: (data: string) => void) {
-        // Generic listener for all incoming messages
         this.subscribe("message", (data) => {
             callback(data);
         });
@@ -78,7 +110,10 @@ export class WebSocketService {
 
     // Send a message through the WebSocket
     sendMessage(message: string) {
-        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        if (this.isMock) {
+            console.log(`[Mock WebSocket] Message sent: ${message}`);
+            setTimeout(() => this.emit("message", { message: `Echo: ${message}` }), 500);
+        } else if (this.socket && this.socket.readyState === WebSocket.OPEN) {
             this.socket.send(message);
             console.log("[WebSocket] Message sent:", message);
         } else {
@@ -88,7 +123,9 @@ export class WebSocketService {
 
     // Close the WebSocket connection
     closeConnection() {
-        if (this.socket) {
+        if (this.isMock) {
+            console.log("[Mock WebSocket] Connection closed by client");
+        } else if (this.socket) {
             this.socket.close();
             console.log("[WebSocket] Connection closed by client");
         }

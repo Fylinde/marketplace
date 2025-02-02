@@ -6,7 +6,7 @@ import Header from "../header/Header";
 import MobileNavigationBar from "../mobile-navigation/MobileNavigationBar";
 import SaleNavbar from "../navbar/SaleNavbar";
 import Sticky from "../sticky/Sticky";
-import Topbar from "../topbar/Topbar";
+// import Topbar from "../topbar/Topbar";
 import StyledAppLayout from "./AppLayoutStyle";
 
 interface SaleLayout2Props {
@@ -15,13 +15,13 @@ interface SaleLayout2Props {
   metaKeywords?: string;
   saleCategoryList?: { icon: string; title: string; segment: "B2C" | "B2B" | "C2C" }[];
   children: React.ReactNode;
-  showTopbar?: boolean;
+  //showTopbar?: boolean;
   showFooter?: boolean;
 }
 
 const SaleLayout2: React.FC<SaleLayout2Props> = ({
   children,
-  title = "Multivendor Ecommerce | Sale",
+  title = "Multiseller Ecommerce | Sale",
   metaDescription = "Shop the best deals on various categories including fashion, electronics, and more.",
   metaKeywords = "ecommerce, sale, fashion, electronics, furniture, beauty products",
   saleCategoryList = [
@@ -31,7 +31,7 @@ const SaleLayout2: React.FC<SaleLayout2Props> = ({
     { icon: "sofa", title: "Furniture", segment: "B2C" },
     { icon: "basket-ball", title: "Sport", segment: "C2C" },
   ],
-  showTopbar = true,
+  //showTopbar = true,
   showFooter = true,
 }) => {
   const [currentSegment, setCurrentSegment] = useState<"B2C" | "B2B" | "C2C">("B2C");
@@ -50,7 +50,7 @@ const SaleLayout2: React.FC<SaleLayout2Props> = ({
         <meta name="keywords" content={metaKeywords} />
       </Helmet>
 
-      {showTopbar && <Topbar />}
+      {/*showTopbar && <Topbar />*/}
 
       <Header />
       <Divider />

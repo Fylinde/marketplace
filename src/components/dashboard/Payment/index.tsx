@@ -23,9 +23,9 @@ import PayoutPreferencesPage from "./PayoutPreferences/PayoutPreferencesPage";
 import TransactionDetails from "./TransactionHistory/TransactionDetails";
 import TransactionHistoryPage from "./TransactionHistory/TransactionHistoryPage";
 
-import { RootState, AppDispatch } from "@/redux/store";
-import { fetchTransactionDetails } from "@/redux/slices/orders/transactionSlice";
-import { submitEvidence } from "@/redux/slices/orders/escrowSlice";
+import { RootState, AppDispatch } from "../../../redux/store";
+import { fetchTransactionDetails } from "../../../redux/slices/orders/transactionSlice";
+import { submitEvidence } from "../../../redux/slices/orders/escrowSlice";
 
 const Payment: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

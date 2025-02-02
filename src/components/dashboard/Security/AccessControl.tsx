@@ -2,9 +2,9 @@ import React, { useEffect } from "react";
 import { Table, Switch, Spin, Alert } from "antd";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAccessControlList, updateAccessStatus } from "@/redux/slices/security/securitySlice";
-import { RootState, AppDispatch } from "@/redux/store";
-import { getLocalizedText } from "utils/localizationUtils";
+import { fetchAccessControlList, updateAccessStatus } from "../../../redux/slices/security/securitySlice";
+import { RootState, AppDispatch } from "../../../redux/store";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 
 const Container = styled.div`
   padding: 20px;

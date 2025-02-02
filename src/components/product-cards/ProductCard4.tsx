@@ -1,9 +1,9 @@
 import React from "react";
 import { CSSProperties } from "styled-components";
-import Box from "components/Box";
-import HoverBox from "components/HoverBox";
-import LazyImage from "components/LazyImage";
-import { H4, Small } from "components/Typography";
+import Box from "../../components/Box";
+import HoverBox from "../../components/HoverBox";
+import LazyImage from "../../components/LazyImage";
+import { H4, Small } from "../../components/Typography";
 import FlexBox from "../FlexBox";
 import Rating from "../rating/Rating";
 import Button from "../buttons/Button";

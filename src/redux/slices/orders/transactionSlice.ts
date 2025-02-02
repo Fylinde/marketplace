@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import transactionService from "../../../services/transactionService";
 import { RootState } from "../../store";
-import { useSelector, useDispatch } from "react-redux";
+
 
 
 interface Transaction {
@@ -101,9 +101,8 @@ const transactionSlice = createSlice({
   },
 });
 
-export const selectedTransaction = useSelector(
-  (state: RootState) => state.transaction?.selectedTransaction // Match the actual state property
-);
+export const selectedTransaction = (state: RootState) => state.transaction?.selectedTransaction;
+
 
 
 export default transactionSlice.reducer;

@@ -1,6 +1,6 @@
 // src/services/serviceService.ts
 import axios from 'axios';
-import { Service } from '@/types/Service'; // Define a type for services
+import { Service } from '../types/Service'; // Define a type for services
 
 const API_URL = '/api/services'; // Replace with your HandyMan microservice API endpoint
 

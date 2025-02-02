@@ -4,8 +4,8 @@ import {
   fetchEscrowTransactions,
   fetchDisputeInfo,
   fetchTimeline,
-} from "@/redux/slices/orders/escrowSlice";
-import { getLocalizedText } from "utils/localizationUtils";
+} from "../../../../redux/slices/orders/escrowSlice";
+import { getLocalizedText } from "../../../../utils/localizationUtils";
 import EscrowTimeline from "./EscrowTimeline";
 import DeliveryTimeline from "./DeliveryTimeline";
 import Notifications from "./Notifications";

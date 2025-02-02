@@ -1,26 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useTranslation } from 'react-i18next';
 import {
   sendMessage,
   fetchConversationHistory,
   fetchSuggestedResponses,
   escalateConversation,
   fetchChatbotPerformance,
-} from '@/redux/slices/communication/chatbotSlice ';
-
-import { RootState, AppDispatch } from 'redux/store';
+} from '../../redux/slices/communication/chatbotSlice ';
+import { RootState, AppDispatch } from '../../redux/store';
 import styled from 'styled-components';
+import { ChatbotMessage } from '../../redux/slices/communication/chatbotSlice ';
+import { getLocalizedText } from '../../utils/localizationUtils';
 
 interface ChatbotProps {
   sessionId: string;
-  language: string; // Add the language prop here
-}
-
-interface ChatMessage {
-  sender: 'user' | 'bot'; // Explicitly define sender type
-  message: string;
-  timestamp: string;
 }
 
 const ChatContainer = styled.div`
@@ -103,17 +96,15 @@ const PerformanceContainer = styled.div`
   background-color: #f9f9f9;
 `;
 
-const Chatbot: React.FC<ChatbotProps> = ({ sessionId, language }) => {
+const Chatbot: React.FC<ChatbotProps> = ({ sessionId }) => {
   const dispatch: AppDispatch = useDispatch();
-  const { t } = useTranslation();
-  const { suggestedResponses, loading, error, performance } = useSelector(
-    (state: RootState) => state.chatbot
-  );
-
-  const messages: ChatMessage[] = [
-    { sender: 'user', message: 'Hello', timestamp: '2024-01-01T12:00:00Z' },
-    { sender: 'bot', message: 'Hi, how can I help you?', timestamp: '2024-01-01T12:01:00Z' },
-  ];
+  const {
+    suggestedResponses,
+    loading,
+    error,
+    performance,
+    messages,
+  } = useSelector((state: RootState) => state.chatbot);
 
   const [input, setInput] = useState('');
 
@@ -124,16 +115,12 @@ const Chatbot: React.FC<ChatbotProps> = ({ sessionId, language }) => {
 
   useEffect(() => {
     dispatch(fetchSuggestedResponses({ sessionId }));
-  }, [dispatch, sessionId, messages]);
+  }, [dispatch, sessionId]);
 
   const sendMessageToBot = () => {
     if (!input.trim()) return;
     dispatch(sendMessage({ message: input, context: { sessionId } }));
     setInput('');
-  };
-
-  const handleSuggestedResponseClick = (response: string) => {
-    setInput(response);
   };
 
   const escalateToHuman = () => {
@@ -142,40 +129,40 @@ const Chatbot: React.FC<ChatbotProps> = ({ sessionId, language }) => {
 
   return (
     <ChatContainer>
-      <h3>{t('chatbotTitle')}</h3>
+      <h3>{getLocalizedText('chatbotTitle', 'chatbot')}</h3>
       <MessageList>
-        {messages.map((message) => (
-          <Message key={message.timestamp} sender={message.sender}>
-            {message.message}
+        {messages?.map((message: ChatbotMessage, index: number) => (
+          <Message key={index} sender={message.sender === 'seller' ? 'bot' : message.sender}>
+            {message.text}
           </Message>
         ))}
       </MessageList>
       <SuggestedResponsesContainer>
-        {suggestedResponses.map((response: string, index: number) => (
-          <SuggestedResponse key={index} onClick={() => handleSuggestedResponseClick(response)}>
+        {suggestedResponses?.map((response: string, index: number) => (
+          <SuggestedResponse key={index} onClick={() => setInput(response)}>
             {response}
           </SuggestedResponse>
         ))}
       </SuggestedResponsesContainer>
-      {loading && <div>{t('chatbotLoading')}</div>}
-      {error && <div style={{ color: 'red' }}>{error}</div>}
+      {loading && <div>{getLocalizedText('chatbotLoading', 'chatbot')}</div>}
+      {error && <div style={{ color: 'red' }}>{getLocalizedText('chatbotError', 'chatbot')}</div>}
       <InputContainer>
         <Input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={t('chatbotPlaceholder')}
+          placeholder={getLocalizedText('chatbotPlaceholder', 'chatbot')}
         />
-        <Button onClick={sendMessageToBot}>{t('chatbotSendButton')}</Button>
+        <Button onClick={sendMessageToBot}>{getLocalizedText('chatbotSendButton', 'chatbot')}</Button>
       </InputContainer>
-      <Button onClick={escalateToHuman}>{t('chatbotEscalateButton')}</Button>
+      <Button onClick={escalateToHuman}>{getLocalizedText('chatbotEscalateButton', 'chatbot')}</Button>
       {performance && (
         <PerformanceContainer>
-          <h4>{t('performanceMetrics')}</h4>
-          <p>{t('totalConversations')}: {performance.totalConversations}</p>
-          <p>{t('resolvedByChatbot')}: {performance.resolvedByChatbot}</p>
-          <p>{t('escalatedToHuman')}: {performance.escalatedToHuman}</p>
-          <p>{t('averageResponseTime')}: {performance.avgResponseTime}ms</p>
+          <h4>{getLocalizedText('performanceMetrics', 'chatbot')}</h4>
+          <p>{getLocalizedText('totalConversations', 'chatbot')}: {performance.totalConversations}</p>
+          <p>{getLocalizedText('resolvedByChatbot', 'chatbot')}: {performance.resolvedByChatbot}</p>
+          <p>{getLocalizedText('escalatedToHuman', 'chatbot')}: {performance.escalatedToHuman}</p>
+          <p>{getLocalizedText('averageResponseTime', 'chatbot')}: {performance.avgResponseTime}ms</p>
         </PerformanceContainer>
       )}
     </ChatContainer>

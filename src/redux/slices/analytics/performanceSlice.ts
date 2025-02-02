@@ -52,19 +52,19 @@ const performanceSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-    // Fetch Performance Metrics
-    .addCase(fetchPerformance.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(fetchPerformance.fulfilled, (state, action: PayloadAction<PerformanceMetrics>) => {
-      state.metrics = action.payload; // Assign to metrics
-      state.loading = false;
-    })
-    .addCase(fetchPerformance.rejected, (state, action) => {
-      state.error = action.payload as string;
-      state.loading = false;
-    })
+      // Fetch Performance Metrics
+      .addCase(fetchPerformance.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPerformance.fulfilled, (state, action: PayloadAction<PerformanceMetrics>) => {
+        state.metrics = action.payload; // Assign to metrics
+        state.loading = false;
+      })
+      .addCase(fetchPerformance.rejected, (state, action) => {
+        state.error = action.payload as string;
+        state.loading = false;
+      })
       .addCase(fetchRevenueBreakdown.pending, (state) => {
         state.loading = true;
         state.error = null;

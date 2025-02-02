@@ -3,14 +3,14 @@ import styled from 'styled-components';
 import { Spin, Table, DatePicker, Select, Alert, Button, Modal, Form, Input } from 'antd';
 import { Line } from 'react-chartjs-2';
 import { getLocalizedText } from '../../../utils/localizationUtils';
-import slaService from 'services/slaService'; // Hypothetical SLA-related API service
-import { WebSocketService } from 'services/websocketService';
-import { exportToCSV } from '@/utils/exportUtils';
+import slaService from '../../../services/slaService'; // Hypothetical SLA-related API service
+import { WebSocketService } from '../../../services/websocketService';
+import { exportToCSV } from '../../../utils/exportUtils';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
-const webSocketService = new WebSocketService('wss://your-websocket-url');
+const webSocketService = new WebSocketService('ws://mock-server', true);
 
 const TrackerContainer = styled.div`
   padding: 20px;

@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTryOnData } from "@/redux/slices/products/productSlice";
-import { RootState } from "@/redux/store";
-import type { AppDispatch } from "../../redux/store";
+import { fetchTryOnData } from "../../redux/slices/utils/tryOnSlice";
+import type { AppDispatch, RootState } from "../../redux/store";
 import ProductTryOnContainer from "./styles/ProductTryOn.styles";
 
 

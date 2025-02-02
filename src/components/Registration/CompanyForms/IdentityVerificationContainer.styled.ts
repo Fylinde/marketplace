@@ -1,29 +1,84 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const IdentityVerificationContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  gap: 16px;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto;
 `;
 
 export const StyledSelect = styled.select`
-  padding: 8px;
-  margin-bottom: 12px;
-  font-size: 1rem;
+  padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 100%;
+  border-radius: 5px;
+  font-size: 14px;
 `;
 
-export const StyledInput = styled.input`
-  padding: 8px;
-  margin-bottom: 12px;
-  font-size: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+export const UploadButton = styled.button`
+  background: #0073e6;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background: #005bb5;
+  }
+`;
+
+export const CaptureButton = styled.button`
+  background: #28a745;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background: #1e7e34;
+  }
+`;
+
+export const StyledVideo = styled.video`
   width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+`;
+
+export const StyledCanvas = styled.canvas`
+  display: none; /* Display when capturing */
+`;
+
+export const StatusMessage = styled.p`
+  color: #ff5722;
+`;
+
+export const ActionButtons = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+export const NextButton = styled.button`
+  background: #0073e6;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: #005bb5;
+  }
+
+  &:disabled {
+    background: #ddd;
+    cursor: not-allowed;
+  }
 `;

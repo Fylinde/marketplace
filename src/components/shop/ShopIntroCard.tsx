@@ -93,7 +93,7 @@ const ShopIntroCard: React.FC<ShopIntroCardProps> = () => {
 
             <a href="mailto:scarletbeauty@xmail.com">
               <Button variant="outlined" color="primary" my="12px">
-                Contact Vendor
+                Contact Seller
               </Button>
             </a>
           </FlexBox>

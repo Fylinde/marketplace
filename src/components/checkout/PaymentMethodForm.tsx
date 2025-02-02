@@ -7,7 +7,6 @@ import {
   deletePaymentMethod,
   toggleCryptoAcceptance,
 } from "../../redux/slices/orders/paymentSlice";
-import { RootState } from "../../redux/store";
 import { PaymentMethod } from "@/types/sharedTypes";
 import {
   validateString,
@@ -22,7 +21,7 @@ import {
   ErrorAlert,
   SpinContainer,
 } from "./styles/PaymentMethodForm.styles";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 import { CheckboxChangeEvent } from "antd/lib/checkbox"; // Correct import for CheckboxChangeEvent
 
 const { Option } = Select;

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import Box from "components/Box";
-import Button from "components/buttons/Button";
-import Modal from "components/modal/Modal";
-import Input from "components/input/Input";
-import Table from "components/table/Table";
-import Pagination from "components/pagination/Pagination";
-import Chart from "components/chart/Chart";
-import { validateString, validateNumeric } from "services/validationService";
+import Box from "../../../components/Box";
+import Button from "../../../components/buttons/Button";
+import Modal from "../../../components/modal/Modal";
+import Input from "../../../components/input/Input";
+import Table from "../../../components/table/Table";
+import Pagination from "../../../components/pagination/Pagination";
+import Chart from "../../../components/chart/Chart";
+import { validateString, validateNumeric } from "../../../services/validationService";
 
 
 interface AdCampaignManagerProps {

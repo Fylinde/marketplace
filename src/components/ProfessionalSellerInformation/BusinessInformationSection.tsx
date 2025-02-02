@@ -13,7 +13,7 @@ const BusinessInformationSection: React.FC = () => {
   return (
     <SectionContainer>
       <h3>Business Information</h3>
-          <p>Business Location: {businessInfo?.businessLocation ?? 'N/A'}</p>
+      <p>Business Location: {businessInfo?.businessLocation ?? 'N/A'}</p>
       <p>Business Type: {businessInfo?.businessType ?? 'N/A'}</p>
       <p>Business Name: {businessInfo?.businessName ?? 'N/A'}</p>
     </SectionContainer>

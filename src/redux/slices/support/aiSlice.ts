@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import aiService from 'services/aiService';
-import priceService from 'services/priceService';
-import discountService from 'services/discountService';
-import marketingService from 'services/marketingService';
-import { Recommendation } from '@/types/Recommendation';
+import aiService from '../../../services/aiService';
+import priceService from '../../../services/priceService';
+import discountService from '../../../services/discountService';
+import marketingService from '../../../services/marketingService';
+import { Recommendation } from '../../../types/Recommendation';
 
 
   

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import c2cService from "services/c2cService";
-import { RootState } from "redux/store";
+import c2cService from "../../../services/c2cService";
+import { RootState } from "../../store";
 
 // Async Thunks
 export const fetchC2CListings = createAsyncThunk(
@@ -35,7 +35,7 @@ export const updateC2CListing = createAsyncThunk(
 const c2cSlice = createSlice({
   name: "c2c",
   initialState: {
-    listings: [] as { id: string; [key: string]: any }[], // Type includes `id`
+    listings: [] as { id: string;[key: string]: any }[], // Type includes `id`
     loading: false,
     error: null as string | null, // Explicitly type error
   },

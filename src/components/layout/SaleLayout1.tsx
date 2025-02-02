@@ -4,7 +4,7 @@ import Footer from "../footer/Footer";
 import Header from "../header/Header";
 import MobileNavigationBar from "../mobile-navigation/MobileNavigationBar";
 import Navbar from "../navbar/Navbar";
-import Topbar from "../topbar/Topbar";
+// import Topbar from "../topbar/Topbar";
 import StyledAppLayout from "./AppLayoutStyle";
 
 interface SaleLayout1Props {
@@ -20,9 +20,9 @@ interface SaleLayout1Props {
 
 const SaleLayout1: React.FC<SaleLayout1Props> = ({
   children,
-  title = "Multivendor Ecommerce | Sale",
-  metaDescription = "Discover amazing deals and discounts on our multivendor ecommerce platform.",
-  metaKeywords = ["ecommerce", "sale", "multivendor", "shopping"],
+  title = "Multiseller Ecommerce | Sale",
+  metaDescription = "Discover amazing deals and discounts on our multiseller ecommerce platform.",
+  metaKeywords = ["ecommerce", "sale", "multiseller", "shopping"],
   showNavbar = true,
   showFooter = true,
   showMobileNav = true,
@@ -37,8 +37,8 @@ const SaleLayout1: React.FC<SaleLayout1Props> = ({
       <meta name="keywords" content={metaKeywords.join(", ")} />
     </Helmet>
 
-    {/* Topbar */}
-    <Topbar />
+    {/* Topbar 
+    <Topbar /> */}
 
     {/* Header */}
     <Header />

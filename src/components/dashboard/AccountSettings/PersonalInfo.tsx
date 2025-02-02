@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import TextField from 'components/text-field/TextField';
-import Alert from 'components/Alert';
-import CircularProgress from 'components/CircularProgress';
-import Box from 'components/Box';
-import Grid from 'components/grid/Grid';
-import Button from 'components/buttons/Button';
+import TextField from '../../../components/text-field/TextField';
+import Alert from '../../../components/Alert';
+import CircularProgress from '../../../components/CircularProgress';
+import Box from '../../../components/Box';
+import Grid from '../../../components/grid/Grid';
+import Button from '../../../components/buttons/Button';
 import { useAppDispatch, useAppSelector } from '../../../redux/reduxHooks';
 import { fetchAccountInfo, updateAccountInfo } from '../../../redux/slices/auth/accountSlice';
 import * as yup from 'yup';
@@ -15,13 +15,13 @@ interface PersonalInfoProps {
     firstName: string;
     lastName: string;
     email: string;
-    phone: string;
+    phoneNumber: string;
   };
   onUpdate: (updatedData: {
     firstName: string;
     lastName: string;
     email: string;
-    phone: string;
+    phoneNumber: string;
   }) => void;
 }
 
@@ -29,7 +29,7 @@ const validationSchema = yup.object({
   firstName: yup.string().required('First Name is required'),
   lastName: yup.string().required('Last Name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
-  phone: yup
+  phoneNumber: yup
     .string()
     .matches(/^[0-9]+$/, 'Phone must be numeric')
     .required('Phone is required'),
@@ -50,7 +50,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ data, onUpdate }) => {
       firstName: data?.firstName || '',
       lastName: data?.lastName || '',
       email: data?.email || '',
-      phone: data?.phone || '',
+      phoneNumber: data?.phoneNumber || '',
     },
     validationSchema,
     enableReinitialize: true,
@@ -106,12 +106,12 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ data, onUpdate }) => {
           </Grid>
           <Grid item md={6} xs={12}>
             <TextField
-              label="Phone"
-              name="phone"
-              value={formik.values.phone}
+              label="phoneNumber"
+              name="phoneNumber"
+              value={formik.values.phoneNumber}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              errorText={formik.touched.phone && formik.errors.phone}
+              errorText={formik.touched.phoneNumber && formik.errors.phoneNumber}
             />
           </Grid>
         </Grid>

@@ -7,8 +7,7 @@ import ProductCard9 from "../product-cards/ProductCard9";
 import { SemiSpan } from "../Typography";
 import { fetchProducts } from "../../redux/slices/products/productSlice";
 import { updateFilters } from "../../redux/slices/support/filterSlice";
-import { RootState } from "../../redux/store";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 import { Product } from "../../types/Product";
 
 export interface ProductCard9ListProps {
@@ -24,10 +23,59 @@ const ProductCard9List: React.FC<ProductCard9ListProps> = ({ sellerId }) => {
   const [sortOption, setSortOption] = useState<string>("popularity");
 
   useEffect(() => {
-    const updatedFilters = { ...filters, ...(sellerId ? { sellerId } : {}) };
-    dispatch(updateFilters(updatedFilters)); // Dispatch updated filters to Redux
-    dispatch(fetchProducts({ page: currentPage + 1, filters: updatedFilters, sort: sortOption }));
+    // Helper function to validate and transform rating
+    const validateRating = (rating: any): [number, number] => {
+      if (
+        Array.isArray(rating) &&
+        rating.length === 2 &&
+        typeof rating[0] === "number" &&
+        typeof rating[1] === "number"
+      ) {
+        return [rating[0], rating[1]];
+      }
+      return [0, 5]; // Default rating range
+    };
+  
+    // Helper function to validate brand
+    const validateBrand = (brand: any): string[] | undefined => {
+      if (Array.isArray(brand)) {
+        return brand;
+      }
+      if (typeof brand === "string") {
+        return [brand]; // Convert single string to array
+      }
+      return undefined;
+    };
+  
+    // Helper function to validate color
+    const validateColor = (color: any): string[] | undefined => {
+      if (Array.isArray(color)) {
+        return color;
+      }
+      if (typeof color === "string") {
+        return [color]; // Convert single string to array
+      }
+      return undefined;
+    };
+  
+    const transformedFilters = {
+      ...filters,
+      rating: validateRating(filters.rating), // Validate rating
+      brand: validateBrand(filters.brand), // Validate brand
+      color: validateColor(filters.color), // Validate color
+      sort: sortOption, // Include sort inside filters
+      ...(sellerId ? { sellerId } : {}),
+    };
+  
+    // Dispatch fetchProducts with validated filters
+    dispatch(fetchProducts({ page: currentPage + 1, filters: transformedFilters }));
   }, [currentPage, sellerId, dispatch, filters, sortOption]);
+  
+  
+  
+  
+  
+  
 
   const handlePageChange = (selectedPage: number) => {
     setCurrentPage(selectedPage);

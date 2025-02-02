@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { List, Divider, Button, Alert } from "antd";
-import { RootState } from "../../redux/store";
 import { setCurrentStep } from "../../redux/slices/orders/checkoutSlice";
 import { placeOrder } from "../../redux/slices/orders/orderSlice";
 import priceCalculation from "../../utils/priceCalculations";
 import shippingCalculator from "../../utils/shippingCalculator";
 import taxService from "../../services/taxService";
+import { getLocalizedText, formatCurrency } from "../../utils/localizationUtils";
 import {
   OrderReviewCard,
   SectionTitle,
@@ -15,8 +15,9 @@ import {
   PriceDetails,
   ButtonContainer,
 } from "./styles/OrderReview.styles";
-import { AppDispatch } from "../../redux/store";
-
+import { AppDispatch, RootState } from "../../redux/store";
+import { CartItem } from "../../types/cartItem";
+import { ExchangeRate } from "../../types/ExchangeRate";
 
 const OrderReview: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -28,7 +29,8 @@ const OrderReview: React.FC = () => {
     paymentMethod,
     discount,
     deliveryOption,
-    currency,
+    buyerCurrency,
+    sellerCurrency,
   } = useSelector((state: RootState) => state.checkout);
 
   const error = useSelector((state: RootState) => state.orders.error);
@@ -46,14 +48,27 @@ const OrderReview: React.FC = () => {
 
   const calculateOrderSummary = async () => {
     try {
+      const exchangeRate: ExchangeRate | null =
+        cartItems[0]?.exchangeRate || null;
+
+      if (!exchangeRate) {
+        console.error("No valid exchange rate found");
+        return;
+      }
+
       const priceResult = priceCalculation.calculate({
-        items: cartItems.map((item) => ({
-          buyerPrice: item.buyerPrice,
-          sellerPrice: item.sellerPrice,
-          quantity: item.quantity,
+        items: cartItems.map((item: CartItem) => ({
+          buyerPrice: item.buyerPrice || 0,
+          sellerPrice: item.sellerPrice || 0,
+          quantity: item.quantity || 1,
           discount: item.discount || 0,
           taxRate: 0,
+          lockedExchangeRate: item.lockedExchangeRate ?? undefined,
         })),
+        shippingCost: totalShippingCost || 0,
+        exchangeRate: exchangeRate,
+        buyerCurrency: buyerCurrency || "USD",
+        sellerCurrency: sellerCurrency || "USD",
       });
 
       setTotalBuyerPrice(priceResult.totalBuyerPrice);
@@ -73,12 +88,13 @@ const OrderReview: React.FC = () => {
         country: shippingAddress?.country || "",
         region: shippingAddress?.state || "",
       });
-
       setTotalTax(taxData.taxAmount);
 
       const grandTotalPrice =
-        priceResult.totalBuyerPrice + totalShippingCost + taxData.taxAmount - priceResult.totalDiscount;
-
+        priceResult.totalBuyerPrice +
+        totalShippingCost +
+        taxData.taxAmount -
+        priceResult.totalDiscount;
       setGrandTotal(grandTotalPrice);
     } catch (error) {
       console.error("Error calculating order summary:", error);
@@ -102,14 +118,13 @@ const OrderReview: React.FC = () => {
             {
               fullName: shippingAddress.fullName || "Default Name",
               email: shippingAddress.email || "default@example.com",
-              phone: shippingAddress.phone || "000-000-0000",
-              addressLine1: shippingAddress.addressLine1 || shippingAddress.street,
+              phoneNumber: shippingAddress.phoneNumber || "000-000-0000",
+              addressLine1: shippingAddress.addressLine1 || "",
               addressLine2: shippingAddress.addressLine2 || "",
-              city: shippingAddress.city,
-              state: shippingAddress.state,
-              postalCode: shippingAddress.postalCode,
-              country: shippingAddress.country,
-              zipCode: shippingAddress.postalCode, // Map `postalCode` to `zipCode`
+              city: shippingAddress.city || "",
+              state: shippingAddress.state || "",
+              postalCode: shippingAddress.postalCode || "",
+              country: shippingAddress.country || "",
               street: shippingAddress.street || "Default Street",
               firstName: shippingAddress.firstName || "Default First Name",
               lastName: shippingAddress.lastName || "Default Last Name",
@@ -121,19 +136,16 @@ const OrderReview: React.FC = () => {
             {
               fullName: billingAddress.fullName || "Default Name",
               email: billingAddress.email || "default@example.com",
-              phone: billingAddress.phone || "000-000-0000",
-              addressLine1: billingAddress.addressLine1 || billingAddress.street,
+              phoneNumber: billingAddress.phoneNumber || "000-000-0000",
+              addressLine1: billingAddress.addressLine1 || "",
               addressLine2: billingAddress.addressLine2 || "",
-              city: billingAddress.city,
-              state: billingAddress.state,
-              postal_code: billingAddress.postalCode,
-              country: billingAddress.country,
-              phone_number: billingAddress.phone || undefined,
-              zipCode: billingAddress.postalCode,
+              city: billingAddress.city || "",
+              state: billingAddress.state || "",
+              postalCode: billingAddress.postalCode || "",
+              country: billingAddress.country || "",
               street: billingAddress.street || "Default Street",
               firstName: billingAddress.firstName || "Default First Name",
               lastName: billingAddress.lastName || "Default Last Name",
-              postalCode: billingAddress.postalCode,
             },
           ]
           : [],
@@ -146,69 +158,31 @@ const OrderReview: React.FC = () => {
   };
 
 
-
-
   const goToStep = (step: number) => {
     dispatch(setCurrentStep(step));
   };
 
   return (
     <OrderReviewCard>
-      <SectionTitle>Order Review</SectionTitle>
+      <SectionTitle>{getLocalizedText("orderReview", "checkout")}</SectionTitle>
       <Divider />
 
       {error && <Alert message={error} type="error" showIcon style={{ marginBottom: "20px" }} />}
 
-      <SectionTitle>Shipping Address</SectionTitle>
+      <SectionTitle>{getLocalizedText("shippingAddress", "checkout")}</SectionTitle>
       <AddressDetails>
         <p>
           {shippingAddress
             ? `${shippingAddress.firstName || ""} ${shippingAddress.lastName || ""}, ${shippingAddress.street || ""
             }, ${shippingAddress.city || ""}, ${shippingAddress.state || ""}, ${shippingAddress.postalCode || ""
             }, ${shippingAddress.country || ""}`
-            : "No shipping address provided."}
+            : getLocalizedText("noShippingAddress", "checkout")}
         </p>
-
-        <a onClick={() => goToStep(1)}>Edit</a>
+        <a onClick={() => goToStep(1)}>{getLocalizedText("edit", "checkout")}</a>
       </AddressDetails>
       <Divider />
 
-      <SectionTitle>Billing Address</SectionTitle>
-      <AddressDetails>
-        <p>
-          {billingAddress
-            ? `${billingAddress.firstName || ""} ${billingAddress.lastName || ""}, ${billingAddress.street || ""
-            }, ${billingAddress.city || ""}, ${billingAddress.state || ""}, ${billingAddress.postalCode || billingAddress.zip || ""
-            }, ${billingAddress.country || ""}`
-            : "No billing address provided."}
-        </p>
-        <a onClick={() => goToStep(1)}>Edit</a>
-      </AddressDetails>
-      <Divider />
-
-      <SectionTitle>Payment Method</SectionTitle>
-      <AddressDetails>
-        <p>
-          {paymentMethod
-            ? `${paymentMethod.cardType} ending in ${paymentMethod.cardNumber.slice(-4)}`
-            : "No payment method provided."}
-        </p>
-        <a onClick={() => goToStep(2)}>Edit</a>
-      </AddressDetails>
-      <Divider />
-
-      <SectionTitle>Delivery Option</SectionTitle>
-      <AddressDetails>
-        <p>
-          {deliveryOption
-            ? `${deliveryOption.date}, ${deliveryOption.time} (${deliveryOption.price} ${currency})`
-            : "No delivery option selected."}
-        </p>
-        <a onClick={() => goToStep(3)}>Edit</a>
-      </AddressDetails>
-      <Divider />
-
-      <SectionTitle>Order Summary</SectionTitle>
+      <SectionTitle>{getLocalizedText("orderSummary", "checkout")}</SectionTitle>
       <SummaryList>
         <List
           itemLayout="horizontal"
@@ -219,9 +193,15 @@ const OrderReview: React.FC = () => {
                 title={item.name}
                 description={
                   <>
-                    <span>{`Quantity: ${item.quantity}`}</span>
-                    <span>{`Seller Price: ${item.sellerPrice.toFixed(2)} USD`}</span>
-                    <span>{`Buyer Price: ${item.buyerPrice.toFixed(2)} ${currency}`}</span>
+                    <span>{`${getLocalizedText("quantity", "checkout")}: ${item.quantity}`}</span>
+                    <span>{`${getLocalizedText("sellerPrice", "checkout")}: ${formatCurrency(
+                      item.sellerPrice,
+                      sellerCurrency || "USD"
+                    )}`}</span>
+                    <span>{`${getLocalizedText("buyerPrice", "checkout")}: ${formatCurrency(
+                      item.buyerPrice,
+                      buyerCurrency || "USD"
+                    )}`}</span>
                   </>
                 }
               />
@@ -232,32 +212,38 @@ const OrderReview: React.FC = () => {
       <Divider />
       <PriceDetails>
         <span>
-          <strong>Shipping Cost:</strong> {totalShippingCost.toFixed(2)} {currency}
+          <strong>{getLocalizedText("totalSellerPrice", "checkout")}:</strong>{" "}
+          {formatCurrency(totalSellerPrice, sellerCurrency || "USD")}
         </span>
         <span>
-          <strong>Tax:</strong> {totalTax.toFixed(2)} {currency}
+          <strong>{getLocalizedText("totalBuyerPrice", "checkout")}:</strong>{" "}
+          {formatCurrency(totalBuyerPrice, buyerCurrency || "USD")}
         </span>
         <span>
-          <strong>Discount:</strong> -{discount.toFixed(2)} {currency}
+          <strong>{getLocalizedText("shippingCost", "checkout")}:</strong>{" "}
+          {formatCurrency(totalShippingCost, buyerCurrency || "USD")}
         </span>
         <span>
-          <strong>Grand Total:</strong> {grandTotal.toFixed(2)} {currency}
+          <strong>{getLocalizedText("tax", "checkout")}:</strong>{" "}
+          {formatCurrency(totalTax, buyerCurrency || "USD")}
+        </span>
+        <span>
+          <strong>{getLocalizedText("grandTotal", "checkout")}:</strong>{" "}
+          {formatCurrency(grandTotal, buyerCurrency || "USD")}
         </span>
       </PriceDetails>
       <Divider />
 
       <ButtonContainer>
         <Button type="default" onClick={() => goToStep(0)}>
-          Back to Cart
+          {getLocalizedText("backToCart", "checkout")}
         </Button>
         <Button type="primary" loading={loading} onClick={handlePlaceOrder}>
-          Place Order
+          {getLocalizedText("placeOrder", "checkout")}
         </Button>
       </ButtonContainer>
-
     </OrderReviewCard>
   );
 };
 
 export default OrderReview;
-

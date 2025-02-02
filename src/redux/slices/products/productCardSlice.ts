@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { WebSocketService } from "services/websocketService";
+import { WebSocketService } from "../../../services/websocketService";
 import axiosInstance from "../utils/axiosSetup";
-import { Product } from "@/types/Product";
+import { Product } from "../../../types/Product";
 
-const webSocketService = new WebSocketService("wss://your-websocket-url");
+const webSocketService = new WebSocketService('ws://mock-server', true);
 
 
 interface ProductCardState {
@@ -95,9 +95,6 @@ const productCardSlice = createSlice({
   name: "productCard",
   initialState,
   reducers: {
-    updateLocalizedPrices: (state, action) => {
-      state.localizedPrices = action.payload;
-    },
     setHoverEffect: (state, action) => {
       state.hoverEffect = action.payload;
     },
@@ -147,11 +144,17 @@ const productCardSlice = createSlice({
         state.error = action.error.message || "Failed to fetch product details.";
         state.loading = false;
       })
-      .addCase(fetchPersonalizedRecommendations.fulfilled, (state, action) => {
-        state.recommendations = action.payload;
+      .addCase(fetchPersonalizedRecommendations.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(fetchPersonalizedRecommendations.fulfilled, (state, action) => {
         state.recommendations = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchPersonalizedRecommendations.rejected, (state, action) => {
+        state.error = action.error.message || "Failed to fetch recommendations.";
+        state.loading = false;
       })
       .addCase(fetchPriceHistory.fulfilled, (state, action) => {
         const { productId, history } = action.payload;

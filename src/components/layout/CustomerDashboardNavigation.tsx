@@ -1,4 +1,4 @@
-import Box from "components/Box";
+import Box from "../../components/Box";
 import { useLocation } from "react-router-dom"; // Replace useRouter with useLocation
 import React, { Fragment } from "react";
 import FlexBox from "../FlexBox";

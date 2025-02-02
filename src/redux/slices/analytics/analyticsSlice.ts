@@ -1,7 +1,6 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
 import axios, { AxiosResponse, AxiosError } from "axios";
 import api from "../utils/axiosSetup"; // Ensure this path is correct
-import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
 import { getSegmentAnalytics } from "../../../services/analyticService";
 

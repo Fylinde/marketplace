@@ -1,38 +1,44 @@
-// CombinedInformationForm.styles.tsx
 import styled from "styled-components";
 
-const CombinedInformationFormWrapper = styled.div`
-  width: 100%;
-  max-width: 600px;
+export const CombinedFormWrapper = styled.div`
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
   background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+`;
 
-  h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: #333;
+export const FormTitle = styled.h2`
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  color: #333;
+  text-align: center;
+`;
+
+export const FormGroup = styled.div`
+  margin-bottom: 15px;
+
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #555;
   }
 
-  .form-group {
-    margin-bottom: 1.5rem;
-    display: flex;
-    flex-direction: column;
+  input,
+  select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
 
-    label {
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-      color: #555;
-    }
-
-    input,
-    select {
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 1rem;
+    &:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 3px #007bff;
     }
   }
 
@@ -44,76 +50,26 @@ const CombinedInformationFormWrapper = styled.div`
       flex: 1;
     }
   }
-
-  .form-navigation {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
-
-    .next-button,
-    .submit-btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    .next-button {
-      background-color: #007bff;
-      color: #fff;
-    }
-
-    .submit-btn {
-      background-color: #28a745;
-      color: #fff;
-    }
-  }
-
-  @media only screen and (max-width: 768px) {
-    padding: 15px;
-
-    h2 {
-      font-size: 1.25rem;
-    }
-
-    .form-navigation {
-      flex-direction: column;
-      gap: 10px;
-
-      .next-button,
-      .submit-btn {
-        width: 100%;
-        padding: 0.75rem;
-      }
-    }
-  }
-
-  @media only screen and (max-width: 425px) {
-    padding: 10px;
-
-    .form-group {
-      label {
-        font-size: 0.9rem;
-      }
-
-      input,
-      select {
-        font-size: 0.9rem;
-      }
-    }
-
-    .form-navigation {
-      flex-direction: column;
-      gap: 10px;
-
-      .next-button,
-      .submit-btn {
-        width: 100%;
-        padding: 0.6rem;
-      }
-    }
-  }
 `;
 
-export default CombinedInformationFormWrapper;
+export const SubmitButton = styled.button`
+  width: 100%;
+  padding: 10px 15px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+`;

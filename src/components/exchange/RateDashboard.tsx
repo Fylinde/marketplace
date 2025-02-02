@@ -43,9 +43,9 @@ const RateDashboard: React.FC = () => {
   const filteredRates = selectedCurrency === "all"
     ? historicalRates
     : historicalRates.map((rate) => ({
-        date: rate.date,
-        rates: { [selectedCurrency]: rate.rates[selectedCurrency] },
-      }));
+      date: rate.date,
+      rates: { [selectedCurrency]: rate.rates[selectedCurrency] },
+    }));
 
   const data = {
     labels: filteredRates.map((rate: { date: string }) => rate.date),

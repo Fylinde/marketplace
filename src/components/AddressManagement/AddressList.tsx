@@ -27,8 +27,8 @@ const AddressList: React.FC = () => {
   // Simplified handleAddAddress function
   const handleAddAddress = () => {
     console.log("Navigating to addresses page");
-     handleNavigation('/address-management');
-   // window.location.href = '/addresses';
+    handleNavigation('/address-management');
+    // window.location.href = '/addresses';
   };
 
   useEffect(() => {
@@ -95,8 +95,8 @@ const AddressList: React.FC = () => {
       <div className="address-list">
         {addresses.map((address) => (
           <div key={address.id} className={`address-card ${address.is_default ? 'default' : ''}`}>
-            <p>{address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country}</p>
-            <p>Phone number: {address.phone_number}</p>
+            <p>{address.street}, {address.city}, {address.state}, {address.postalCode}, {address.country}</p>
+            <p>Phone number: {address.phoneNumber}</p>
             {address.is_default && <span>Default</span>}
             <div className="address-actions">
               <button>Edit</button>

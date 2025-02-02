@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { List, Divider, Spin, Alert } from "antd";
 import { fetchOrderDetails, selectOrderById } from "../../redux/slices/orders/orderSlice";
-import { RootState } from "../../redux/store";
 import priceCalculation from "../../utils/priceCalculations";
 import shippingCalculator from "../../utils/shippingCalculator";
 import taxService from "../../services/taxService";
@@ -13,7 +12,7 @@ import {
   SummaryList,
   PriceDetails,
 } from "./styles/OrderConfirmation.styles";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 import { Order } from "@/types/order";
 
 const OrderConfirmation: React.FC<{ orderId: string }> = ({ orderId }) => {
@@ -43,16 +42,31 @@ const OrderConfirmation: React.FC<{ orderId: string }> = ({ orderId }) => {
     if (!order) return;
 
     try {
+      // Extract `ExchangeRate` object
+      const exchangeRate = Array.isArray(order.exchangeRates) && order.exchangeRates.length > 0
+        ? order.exchangeRates[0]
+        : null;
+
+      if (!exchangeRate) {
+        console.error("No valid exchange rate found");
+        return;
+      }
+
       const calculatedPrices = priceCalculation.calculate({
         items: order.items.map((item) => ({
-          buyerPrice: item.buyerPrice || item.price,
-          sellerPrice: item.sellerPrice || item.price,
+          buyerPrice: item.buyerPrice ?? item.price ?? 0, // Fallback to 0 if undefined
+          sellerPrice: item.sellerPrice ?? item.price ?? 0, // Fallback to 0 if undefined
           quantity: item.quantity,
           discount: item.discount || 0,
           taxRate: item.taxRate || 0,
         })),
         shippingCost: totalShippingCost || 0,
+        exchangeRate: exchangeRate, // Ensure a valid ExchangeRate is passed
+        buyerCurrency: order.buyerCurrency, // Pass buyerCurrency
+        sellerCurrency: order.sellerCurrency, // Pass sellerCurrency
       });
+
+
       setPriceResult(calculatedPrices);
 
       const shippingAddress = Array.isArray(order.shippingAddress)
@@ -76,12 +90,16 @@ const OrderConfirmation: React.FC<{ orderId: string }> = ({ orderId }) => {
       setTotalTax(taxData.taxAmount);
 
       const grandTotalPrice =
-        calculatedPrices.totalBuyerPrice + totalShippingCost + taxData.taxAmount - calculatedPrices.totalDiscount;
+        calculatedPrices.totalBuyerPrice +
+        totalShippingCost +
+        taxData.taxAmount -
+        calculatedPrices.totalDiscount;
       setGrandTotal(grandTotalPrice);
     } catch (error) {
       console.error("Error calculating order summary:", error);
     }
   };
+
 
   if (loading) return <Spin size="large" />;
   if (error) return <Alert message={error} type="error" showIcon />;
@@ -109,14 +127,15 @@ const OrderConfirmation: React.FC<{ orderId: string }> = ({ orderId }) => {
                 description={
                   <>
                     <span>{`Quantity: ${item.quantity}`}</span>
-                    <span>{`Seller Price: ${item.sellerPrice} USD`}</span>
-                    <span>{`Buyer Price: ${item.buyerPrice} ${order.currency}`}</span>
+                    <span>{`Seller Price: ${item.sellerPrice ?? 0} ${order.sellerCurrency || order.currency}`}</span>
+                    <span>{`Buyer Price: ${item.buyerPrice ?? 0} ${order.buyerCurrency || order.currency}`}</span>
                   </>
                 }
               />
             </List.Item>
           )}
         />
+
       </SummaryList>
       <Divider />
       {priceResult && (

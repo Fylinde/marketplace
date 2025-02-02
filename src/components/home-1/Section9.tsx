@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import LazyImage from "components/LazyImage";
+import LazyImage from "../../components/LazyImage";
 import Box from "../Box";
 import CategorySectionHeader from "../CategorySectionHeader";
 import Container from "../Container";
@@ -11,10 +11,10 @@ import ProductCard1 from "../product-cards/ProductCard1";
 import Typography from "../Typography";
 import StyledProductCategory from "./ProductCategoryStyle";
 import { fetchShops, fetchProductsByType } from "../../redux/slices/products/productSlice";
-import { RootState, AppDispatch } from "redux/store";
+import { RootState, AppDispatch } from "../../redux/store";
 import { fetchBrands } from "../../redux/slices/products/brandSlice";
-import { Shop } from "types/shop";
-import { Brand } from "types/brand";
+import { Shop } from "../../types/shop";
+import { Brand } from "../../types/brand";
 import { convertCurrency } from "../../utils/currencyConversion";
 
 const Section9: React.FC = () => {
@@ -134,36 +134,36 @@ const Section9: React.FC = () => {
           {loadingProducts ? (
             <p>Loading Products...</p>
           ) : (
-          <Grid container spacing={6}>
-            {products.map((item, ind) => {
-              const convertedBuyerPrice = currentRates
-                ? convertCurrency(
+            <Grid container spacing={6}>
+              {products.map((item, ind) => {
+                const convertedBuyerPrice = currentRates
+                  ? convertCurrency(
                     item.sellerPrice,
                     item.sellerCurrency,
                     item.buyerCurrency,
                     currentRates // Pass the complete currentRates object
                   )
-                : item.sellerPrice; // Fallback to seller price if rates are unavailable
+                  : item.sellerPrice; // Fallback to seller price if rates are unavailable
 
-              return (
-                <Grid item lg={4} sm={6} xs={12} key={item.id || ind}>
-                  <ProductCard1
-                    hoverEffect
-                    id={item.id}
-                    imgUrl={item.imgUrl || "/assets/images/default-product.png"}
-                    title={item.title || "No Title Available"}
-                    sellerPrice={item.sellerPrice}
-                    buyerPrice={convertedBuyerPrice}
-                    sellerCurrency={item.sellerCurrency}
-                    buyerCurrency={item.buyerCurrency}
-                    exchangeRates={
-                      currentRates || { baseCurrency: "USD", rates: {} } // Provide full fallback ExchangeRate
-                    }
-                  />
-                </Grid>
-              );
-            })}
-          </Grid>
+                return (
+                  <Grid item lg={4} sm={6} xs={12} key={item.id || ind}>
+                    <ProductCard1
+                      hoverEffect
+                      id={item.id}
+                      imgUrl={item.imgUrl || "/assets/images/default-product.png"}
+                      title={item.title || "No Title Available"}
+                      sellerPrice={item.sellerPrice}
+                      buyerPrice={convertedBuyerPrice}
+                      sellerCurrency={item.sellerCurrency}
+                      buyerCurrency={item.buyerCurrency}
+                      exchangeRates={
+                        currentRates || { baseCurrency: "USD", rates: {} } // Provide full fallback ExchangeRate
+                      }
+                    />
+                  </Grid>
+                );
+              })}
+            </Grid>
 
           )}
         </Box>

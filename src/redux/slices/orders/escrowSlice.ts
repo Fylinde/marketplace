@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import escrowService from "services/escrowService";
+import escrowService from "../../../services/escrowService";
 import axios, { AxiosResponse } from "axios";
 import { extractErrorMessage } from "../../../types/extractErrorMessage";
 // import { submitEvidence as submitEvidenceService } from "services/escrowService";

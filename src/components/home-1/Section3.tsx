@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import Card from 'components/Card';
-import Carousel from 'components/carousel/Carousel';
-import useWindowSize from 'hooks/useWindowSize';
-import CategorySectionCreator from '../CategorySectionCreator';
-import ProductCard6 from '../product-cards/ProductCard6';
-import { fetchCategories, selectCategories } from '../../redux/slices/products/categorySlice';
-import { AppDispatch, RootState } from '../../redux/store';
-import { Category } from '../../types/category';
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import Card from "../../components/Card";
+import Carousel from "../../components/carousel/Carousel";
+import useWindowSize from "../../hooks/useWindowSize";
+import CategorySectionCreator from "../CategorySectionCreator";
+import ProductCard6 from "../product-cards/ProductCard6";
+import { fetchCategories, selectCategories } from "../../redux/slices/products/categorySlice";
+import { AppDispatch, RootState } from "../../redux/store";
+import { Category } from "../../types/category";
 
 const Section3: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -41,13 +41,9 @@ const Section3: React.FC = () => {
       ) : (
         <Carousel totalSlides={categories.length} visibleSlides={visibleSlides}>
           {categories.map((item: Category, ind: number) => (
-            <Link to={item.categoryUrl || '/'} key={ind}>
+            <Link to={item.categoryUrl || "/"} key={ind}>
               <Card p="1rem">
-                <ProductCard6
-                  title={item.title}
-                  subtitle={item.subtitle || ''}
-                  imgUrl={item.imgUrl}
-                />
+                <ProductCard6 title={item.title} subtitle={item.subtitle || ""} imgUrl={item.imgUrl} />
               </Card>
             </Link>
           ))}

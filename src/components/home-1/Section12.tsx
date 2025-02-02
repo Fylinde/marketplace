@@ -7,7 +7,7 @@ import Grid from "../grid/Grid";
 import Icon from "../icon/Icon";
 import { H4, SemiSpan } from "../Typography";
 import { fetchFeatures } from "../../redux/slices/marketing/featureSlice"; // Redux action for fetching features
-import { RootState, AppDispatch } from "redux/store"; // Adjust the import path based on your project structure
+import { RootState, AppDispatch } from "../../redux/store"; // Adjust the import path based on your project structure
 
 const Section12: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

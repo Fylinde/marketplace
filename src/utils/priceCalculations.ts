@@ -1,12 +1,18 @@
+import { convertCurrency } from "./currencyConversion";
+import { ExchangeRate } from "../types/ExchangeRate";
+
 interface PriceCalculationParams {
   items: Array<{
     sellerPrice: number; // Price in seller's currency
     quantity: number; // Number of units purchased
     discount?: number; // Percentage discount (e.g., 10 for 10%)
     taxRate?: number; // Tax percentage
-    lockedExchangeRate?: number; // Locked exchange rate for this item's currency
+    lockedExchangeRate?: number; // Optional locked exchange rate for this item's currency
   }>;
   shippingCost?: number; // Shipping cost for the order
+  exchangeRate: ExchangeRate | null; // Exchange rate data for conversion
+  buyerCurrency: string; // Target currency for buyer
+  sellerCurrency: string; // Source currency for seller
 }
 
 interface PriceCalculationResult {
@@ -19,7 +25,7 @@ interface PriceCalculationResult {
 
 const priceCalculation = {
   calculate(params: PriceCalculationParams): PriceCalculationResult {
-    const { items, shippingCost = 0 } = params;
+    const { items, shippingCost = 0, exchangeRate, buyerCurrency, sellerCurrency } = params;
 
     let totalBuyerPrice = 0;
     let totalSellerPrice = 0;
@@ -27,12 +33,14 @@ const priceCalculation = {
     let totalTax = 0;
 
     items.forEach((item) => {
-      // Use locked exchange rate or default to 1 if unavailable
-      const exchangeRate = item.lockedExchangeRate || 1;
+      // Use locked exchange rate or calculate dynamically
+      const exchangeRateForItem =
+        item.lockedExchangeRate ??
+        convertCurrency(1, sellerCurrency, buyerCurrency, exchangeRate);
 
       // Calculate seller and buyer prices
       const sellerPrice = item.sellerPrice * item.quantity;
-      const buyerPrice = sellerPrice * exchangeRate;
+      const buyerPrice = sellerPrice * exchangeRateForItem;
 
       // Calculate discounts and taxes
       const discount = item.discount ? (buyerPrice * item.discount) / 100 : 0;

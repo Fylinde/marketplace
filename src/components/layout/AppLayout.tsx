@@ -1,8 +1,8 @@
-import Footer from "components/footer/Footer";
-import Header from "components/header/Header";
-import MobileNavigationBar from "components/mobile-navigation/MobileNavigationBar";
-import Sticky from "components/sticky/Sticky";
-import Topbar from "components/topbar/Topbar";
+import Footer from "../../components/footer/Footer";
+import Header from "../../components/header/Header";
+import MobileNavigationBar from "../../components/mobile-navigation/MobileNavigationBar";
+import Sticky from "../../components/sticky/Sticky";
+// import Topbar from "../../components/topbar/Topbar";
 import { Helmet } from "react-helmet-async";
 import React from "react";
 import StyledAppLayout from "./AppLayoutStyle";
@@ -26,19 +26,19 @@ const AppLayout: React.FC<Props> = ({
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     </Helmet>
 
-    <Topbar />
+  {/*   <Topbar /> */}
 
     <Sticky fixedOn={0}>
       <Header />
     </Sticky>
-
+   <main>
     {navbar && <div className="section-after-sticky">{navbar}</div>}
     {!navbar ? (
       <div className="section-after-sticky">{children}</div>
     ) : (
       children
     )}
-
+   </main>
     <MobileNavigationBar />
     <Footer />
   </StyledAppLayout>

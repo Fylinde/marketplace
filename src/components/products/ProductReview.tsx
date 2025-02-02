@@ -11,8 +11,7 @@ import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { fetchComments, addComment } from "../../redux/slices/communication/commentSlice";
-import { RootState } from "../../redux/store";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 import type { ReviewComment } from "../../redux/slices/communication/commentSlice";
 
 interface FormValues {

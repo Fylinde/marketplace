@@ -7,6 +7,6 @@ export interface Category {
     categoryUrl?: string; // Optional URL for category navigation
     description?: string;
     status?: 'active' | 'inactive';
-
+    tag?: string[];
 }
   

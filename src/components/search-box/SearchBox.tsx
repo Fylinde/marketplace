@@ -1,6 +1,6 @@
 
-import Card from "components/Card";
-import { Span } from "components/Typography";
+import Card from "../../components/Card";
+import { Span } from "../../components/Typography";
 import { debounce } from "lodash";
 import { Link } from "react-router-dom";
 import React, { useCallback, useEffect, useState } from "react";

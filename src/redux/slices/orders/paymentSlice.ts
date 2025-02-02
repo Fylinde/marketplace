@@ -3,8 +3,12 @@ import paymentService from "../../../services/paymentService";
 import { PaymentMethod } from "../../../types/sharedTypes";
 import { EscrowTransaction } from "../../../types/sharedTypes";
 import { BillingAddress, PaymentDetails } from "../../../types/sharedTypes";
-import { RootState } from "../../../redux/store";
+import { RootState } from "../../store";
 import { useSelector, useDispatch } from "react-redux";
+import { tokenizePaymentDetails } from "../../../services/paymentService";
+import { saveBankAccountDetails } from "../../../services/paymentService";
+import { BankAccountVerification as BankAccountVerificationType } from "../../../types/sharedTypes";
+import { resendVerificationCode } from "../../../services/paymentService";
 
 interface RefundStatus {
   id: string;
@@ -27,55 +31,59 @@ export interface PaymentRecord {
 
 // Types
 interface Transaction {
-    orderId: string;
-    buyerCurrency: string;
-    buyerAmount: number;
-    sellerCurrency: string;
-    sellerAmount: number;
-    paymentBreakdown: {
-        method: string;
-        amount: number;
-    }[];
-    exchangeFee: number;
-    paymentMethod: string;
+  orderId: string;
+  buyerCurrency: string;
+  buyerAmount: number;
+  sellerCurrency: string;
+  sellerAmount: number;
+  paymentBreakdown: {
+    method: string;
+    amount: number;
+  }[];
+  exchangeFee: number;
+  paymentMethod: string;
 }
 
 interface PaymentState {
-    history: PaymentRecord[];
-    billingHistory: any[];
-    escrowTransactions: EscrowTransaction[]; // Add this
-    sellerCurrency: string; // Add this
-    cryptoAcceptance: boolean; // Add this
-    paymentData: any;
-    paymentMethods: PaymentMethod[];
-    transactions: Transaction[];
-    transaction: Transaction | null;
-    loading: boolean;
-    error: string | null;
-    defaultPayoutMethod: PaymentMethod | null; // Added
-    cryptoAccepted: boolean; // New property
-    refundStatuses: RefundStatus[];
-    currentPaymentMethodId: string;
-    selectedPaymentMethod: string;
+  history: PaymentRecord[];
+  billingHistory: any[];
+  escrowTransactions: EscrowTransaction[]; // Add this
+  sellerCurrency: string; // Add this
+  cryptoAcceptance: boolean; // Add this
+  paymentData: any;
+  paymentMethods: PaymentMethod[];
+  transactions: Transaction[];
+  transaction: Transaction | null;
+  loading: boolean;
+  error: string | null;
+  defaultPayoutMethod: PaymentMethod | null; // Added
+  cryptoAccepted: boolean; // New property
+  refundStatuses: RefundStatus[];
+  currentPaymentMethodId: string;
+  selectedPaymentMethod: string;
+  token: string | null;
+  bankAccountStatus: string | null;
 }
 
 const initialState: PaymentState = {
-    history: [],
-    billingHistory: [],
-    escrowTransactions: [], // Add this
-    sellerCurrency: "USD", // Default value
-    cryptoAcceptance: false, // Default value
-    paymentData: null,
-    paymentMethods: [],
-    transactions: [],
-    transaction: null,
-    loading: false,
-    error: null,
-    defaultPayoutMethod: null, // Added
-    cryptoAccepted: false, // Default value
-    refundStatuses: [],
-    currentPaymentMethodId: '',
-    selectedPaymentMethod : '',
+  history: [],
+  billingHistory: [],
+  escrowTransactions: [], // Add this
+  sellerCurrency: "USD", // Default value
+  cryptoAcceptance: false, // Default value
+  paymentData: null,
+  paymentMethods: [],
+  transactions: [],
+  transaction: null,
+  loading: false,
+  error: null,
+  defaultPayoutMethod: null, // Added
+  cryptoAccepted: false, // Default value
+  refundStatuses: [],
+  currentPaymentMethodId: '',
+  selectedPaymentMethod: '',
+  token: null,
+  bankAccountStatus: null,
 };
 
 
@@ -182,7 +190,7 @@ export const createPaymentMethod = createAsyncThunk<
 >("payment/createPaymentMethod", async (method, thunkAPI) => {
   try {
     // Add `details` field dynamically if required
-    const methodWithDetails = { ...method, details: method.details || {} }; 
+    const methodWithDetails = { ...method, details: method.details || {} };
     const response = await paymentService.createPaymentMethod(methodWithDetails);
     return response;
   } catch (error: any) {
@@ -231,124 +239,179 @@ export const toggleCryptoAcceptance = createAsyncThunk<
 
 
 export const setDefaultPayoutMethod = createAsyncThunk(
-    "payments/setDefaultPayoutMethod",
-    async (methodId: string, thunkAPI) => {
-      try {
-        const response = await paymentService.setDefaultPayoutMethod(methodId);
-        return response; // Assume the API returns the updated default method
-      } catch (error) {
-        return thunkAPI.rejectWithValue("Failed to set default payout method.");
-      }
+  "payments/setDefaultPayoutMethod",
+  async (methodId: string, thunkAPI) => {
+    try {
+      const response = await paymentService.setDefaultPayoutMethod(methodId);
+      return response; // Assume the API returns the updated default method
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to set default payout method.");
     }
-  );
-  
+  }
+);
+
 
 export const updatePaymentMethod = createAsyncThunk(
-    "payments/updatePaymentMethod",
-    async ({ id, updates }: { id: string; updates: Partial<PaymentMethod> }, thunkAPI) => {
-      try {
-        const response = await paymentService.updatePaymentMethod({ id, updates });
-        return response;
-      } catch (error) {
-        return thunkAPI.rejectWithValue("Failed to update the payment method.");
-      }
+  "payments/updatePaymentMethod",
+  async ({ id, updates }: { id: string; updates: Partial<PaymentMethod> }, thunkAPI) => {
+    try {
+      const response = await paymentService.updatePaymentMethod({ id, updates });
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to update the payment method.");
     }
-  );
-  
+  }
+);
+
 
 // Fetch all payment methods
 export const fetchPaymentMethods = createAsyncThunk(
-    "payment/fetchPaymentMethods",
-    async (_, thunkAPI) => {
-        try {
-            return await paymentService.getPaymentMethods();
-        } catch (error) {
-            return thunkAPI.rejectWithValue("Failed to fetch payment methods.");
-        }
+  "payment/fetchPaymentMethods",
+  async (_, thunkAPI) => {
+    try {
+      return await paymentService.getPaymentMethods();
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to fetch payment methods.");
     }
+  }
 );
 
 export const setDefaultPaymentMethod = createAsyncThunk(
-    "payments/setDefaultPaymentMethod",
-    async (id: string, thunkAPI) => {
-      try {
-        const response = await paymentService.setDefaultPaymentMethod(id);
-        return response;
-      } catch (error) {
-        return thunkAPI.rejectWithValue("Failed to set default payment method.");
-      }
+  "payments/setDefaultPaymentMethod",
+  async (id: string, thunkAPI) => {
+    try {
+      const response = await paymentService.setDefaultPaymentMethod(id);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to set default payment method.");
     }
-  );
-  
-  export const reorderPaymentMethods = createAsyncThunk(
-    "payments/reorderPaymentMethods",
-    async (updatedOrder: string[], thunkAPI) => {
-      try {
-        const response = await paymentService.reorderPaymentMethods(updatedOrder);
-        return response;
-      } catch (error) {
-        return thunkAPI.rejectWithValue("Failed to reorder payment methods.");
-      }
+  }
+);
+
+export const reorderPaymentMethods = createAsyncThunk(
+  "payments/reorderPaymentMethods",
+  async (updatedOrder: string[], thunkAPI) => {
+    try {
+      const response = await paymentService.reorderPaymentMethods(updatedOrder);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to reorder payment methods.");
     }
-  );
+  }
+);
 
 // Add or update a payment method
 export const savePaymentMethod = createAsyncThunk<PaymentMethod, PaymentMethod>(
-    "payment/savePaymentMethod",
-    async (method, thunkAPI) => {
-        try {
-            if (method.id) {
-                return await paymentService.updatePaymentMethod({ id: method.id, updates: method });
-            } else {
-                return await paymentService.createPaymentMethod(method);
-            }
-        } catch (error) {
-            return thunkAPI.rejectWithValue("Failed to save payment method.");
-        }
+  "payment/savePaymentMethod",
+  async (method, thunkAPI) => {
+    try {
+      if (method.id) {
+        return await paymentService.updatePaymentMethod({ id: method.id, updates: method });
+      } else {
+        return await paymentService.createPaymentMethod(method);
+      }
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to save payment method.");
     }
+  }
 );
 
 // Delete a payment method
 export const deletePaymentMethod = createAsyncThunk(
-    "payment/deletePaymentMethod",
-    async (id: string, thunkAPI) => {
-        try {
-            await paymentService.deletePaymentMethod(id);
-            return id;
-        } catch (error) {
-            return thunkAPI.rejectWithValue("Failed to delete payment method.");
-        }
+  "payment/deletePaymentMethod",
+  async (id: string, thunkAPI) => {
+    try {
+      await paymentService.deletePaymentMethod(id);
+      return id;
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to delete payment method.");
     }
+  }
+);
+
+export const saveBankAccountDetailsThunk = createAsyncThunk<
+  string, // The resolved payload type
+  { data: BankAccountVerificationType; proofFile: File }, // The argument type
+  { rejectValue: string } // The reject value type
+>(
+  "payment/saveBankAccountDetails",
+  async ({ data, proofFile }, { rejectWithValue }) => {
+    try {
+      const status = await saveBankAccountDetails(data, proofFile);
+      console.log("Backend status:", status);
+      return status;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
 );
 
 // Create a transaction with partial payment
 export const createTransaction = createAsyncThunk(
-    "payment/createTransaction",
-    async (
-        {
-            orderId,
-            buyerCurrency,
-            paymentBreakdown,
-        }: {
-            orderId: string;
-            buyerCurrency: string;
-            paymentBreakdown: { method: string; amount: number }[];
-        },
-        thunkAPI
-    ) => {
-        try {
-            return await paymentService.createTransaction(orderId, buyerCurrency, paymentBreakdown);
-        } catch (error) {
-            return thunkAPI.rejectWithValue("Failed to create transaction.");
-        }
+  "payment/createTransaction",
+  async (
+    {
+      orderId,
+      buyerCurrency,
+      paymentBreakdown,
+    }: {
+      orderId: string;
+      buyerCurrency: string;
+      paymentBreakdown: { method: string; amount: number }[];
+    },
+    thunkAPI
+  ) => {
+    try {
+      return await paymentService.createTransaction(orderId, buyerCurrency, paymentBreakdown);
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to create transaction.");
     }
+  }
 );
+
+// Async thunk for tokenizing payment details
+export const tokenizePaymentDetailsThunk = createAsyncThunk(
+  "payment/tokenizePaymentDetails",
+  async (details: PaymentDetails, { rejectWithValue }) => {
+    try {
+      const token = await tokenizePaymentDetails(details);
+      return token;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+
+/**
+ * Thunk to resend verification code for a seller via vendor-service.
+ */
+export const resendVerificationCodeThunk = createAsyncThunk<
+  string, // Resolved payload type
+  string, // Email as input type
+  { rejectValue: string } // Reject value type
+>(
+  "auth/resendVerificationCode",
+  async (email: string, { rejectWithValue }) => {
+    try {
+      const message = await resendVerificationCode(email);
+      return message;
+    } catch (error: any) {
+      console.error("Error resending verification code:", error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to resend verification code. Please try again."
+      );
+    }
+  }
+);
+
 
 // Slice
 const paymentSlice = createSlice({
-    name: "payment",
-    initialState,
-    reducers: {},
+  name: "payment",
+  initialState,
+  reducers: {},
   extraReducers: (builder) => {
 
     builder
@@ -365,53 +428,53 @@ const paymentSlice = createSlice({
         state.loading = false;
       });
     builder
-    .addCase(fetchBillingHistory.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(fetchBillingHistory.fulfilled, (state, action: PayloadAction<any[]>) => {
-      state.billingHistory = action.payload;
-      state.loading = false;
-    })
-    .addCase(fetchBillingHistory.rejected, (state, action) => {
-      state.error = action.payload as string;
-      state.loading = false;
-    })
-    .addCase(processPayment.pending, (state) => {
-      state.loading = true;
-    })
-    .addCase(processPayment.fulfilled, (state) => {
-      state.loading = false;
-    })
-    .addCase(processPayment.rejected, (state, action) => {
-      state.error = action.payload as string;
-      state.loading = false;
-    });
+      .addCase(fetchBillingHistory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchBillingHistory.fulfilled, (state, action: PayloadAction<any[]>) => {
+        state.billingHistory = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchBillingHistory.rejected, (state, action) => {
+        state.error = action.payload as string;
+        state.loading = false;
+      })
+      .addCase(processPayment.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(processPayment.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(processPayment.rejected, (state, action) => {
+        state.error = action.payload as string;
+        state.loading = false;
+      });
     builder
-    .addCase(fetchTransactionHistory.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(fetchTransactionHistory.fulfilled, (state, action) => {
-      state.loading = false;
-      state.transactions = action.payload;
-    })
-    .addCase(fetchTransactionHistory.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string; // Cast to string
-    })
-    .addCase(fetchTransactionDetails.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(fetchTransactionDetails.fulfilled, (state, action) => {
-      state.loading = false;
-      state.transaction = action.payload;
-    })
-    .addCase(fetchTransactionDetails.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string; // Cast to string
-    });
+      .addCase(fetchTransactionHistory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTransactionHistory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.transactions = action.payload;
+      })
+      .addCase(fetchTransactionHistory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string; // Cast to string
+      })
+      .addCase(fetchTransactionDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTransactionDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.transaction = action.payload;
+      })
+      .addCase(fetchTransactionDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string; // Cast to string
+      });
     builder
       .addCase(fetchRefundStatuses.pending, (state) => {
         state.loading = true;
@@ -425,121 +488,147 @@ const paymentSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       });
-      
-        builder
-        .addCase(fetchPaymentData.pending, (state) => {
-          state.loading = true;
-          state.error = null;
-        })
-        .addCase(fetchPaymentData.fulfilled, (state, action) => {
-          state.loading = false;
-          state.paymentData = action.payload;
-        })
-        .addCase(fetchPaymentData.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload || "Unknown error occurred while fetching payment data.";
-          })
-          .addCase(createPaymentMethod.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-          })
-          .addCase(createPaymentMethod.fulfilled, (state, action) => {
-            state.loading = false;
-            state.paymentMethods.push(action.payload);
-          })
-        .addCase(createPaymentMethod.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload || "Unknown error occurred while creating payment method.";
-          });
 
-        builder
-        // Handle refund payment actions
-        .addCase(refundPaymentThunk.pending, (state) => {
-          state.loading = true;
-          state.error = null;
-        })
-        .addCase(refundPaymentThunk.fulfilled, (state, action) => {
-          state.loading = false;
-          // Optionally, update the state if needed based on action.payload
-          console.log("Refund successful:", action.payload.message);
-        })
-        .addCase(refundPaymentThunk.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.payload as string;
-        })
+    builder
+      .addCase(fetchPaymentData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPaymentData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.paymentData = action.payload;
+      })
+      .addCase(fetchPaymentData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Unknown error occurred while fetching payment data.";
+      })
+      .addCase(createPaymentMethod.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createPaymentMethod.fulfilled, (state, action) => {
+        state.loading = false;
+        state.paymentMethods.push(action.payload);
+      })
+      .addCase(createPaymentMethod.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Unknown error occurred while creating payment method.";
+      });
 
-        builder
-        .addCase(toggleCryptoAcceptance.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(toggleCryptoAcceptance.fulfilled, (state, action) => {
-            state.loading = false;
-            state.cryptoAccepted = action.payload.success; // Update crypto acceptance status
-        })
-        .addCase(toggleCryptoAcceptance.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload as string;
-        })
+    builder
+      // Handle refund payment actions
+      .addCase(refundPaymentThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(refundPaymentThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        // Optionally, update the state if needed based on action.payload
+        console.log("Refund successful:", action.payload.message);
+      })
+      .addCase(refundPaymentThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
 
-        builder
-            .addCase(setDefaultPayoutMethod.fulfilled, (state, action) => {
-            state.defaultPayoutMethod = action.payload;
-          });
-          
-        builder
-            .addCase(updatePaymentMethod.fulfilled, (state, action) => {
-            const index = state.paymentMethods.findIndex((m) => m.id === action.payload.id);
-            if (index > -1) {
-              state.paymentMethods[index] = action.payload;
-            }
-          });
-          
-        builder
-            // Fetch Payment Methods
-            .addCase(fetchPaymentMethods.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchPaymentMethods.fulfilled, (state, action) => {
-                state.paymentMethods = action.payload;
-                state.loading = false;
-            })
-            .addCase(fetchPaymentMethods.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
-            // Save Payment Method
-            .addCase(savePaymentMethod.fulfilled, (state, action: PayloadAction<PaymentMethod>) => {
-                const index = state.paymentMethods.findIndex((m) => m.id === action.payload.id);
-                if (index > -1) {
-                    state.paymentMethods[index] = action.payload;
-                } else {
-                    state.paymentMethods.push(action.payload);
-                }
-            })
-            // Delete Payment Method
-            .addCase(deletePaymentMethod.fulfilled, (state, action) => {
-                state.paymentMethods = state.paymentMethods.filter((m) => m.id !== action.payload);
-            })
-            // Create Transaction
-            .addCase(createTransaction.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(createTransaction.fulfilled, (state, action) => {
-                state.transactions.push(action.payload);
-                state.loading = false;
-            })
-            .addCase(createTransaction.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            });
-    },
+    builder
+      .addCase(toggleCryptoAcceptance.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(toggleCryptoAcceptance.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cryptoAccepted = action.payload.success; // Update crypto acceptance status
+      })
+      .addCase(toggleCryptoAcceptance.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+    builder
+      .addCase(setDefaultPayoutMethod.fulfilled, (state, action) => {
+        state.defaultPayoutMethod = action.payload;
+      });
+
+    builder
+      .addCase(updatePaymentMethod.fulfilled, (state, action) => {
+        const index = state.paymentMethods.findIndex((m) => m.id === action.payload.id);
+        if (index > -1) {
+          state.paymentMethods[index] = action.payload;
+        }
+      });
+
+    builder
+      // Fetch Payment Methods
+      .addCase(fetchPaymentMethods.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchPaymentMethods.fulfilled, (state, action) => {
+        state.paymentMethods = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchPaymentMethods.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Save Payment Method
+      .addCase(savePaymentMethod.fulfilled, (state, action: PayloadAction<PaymentMethod>) => {
+        const index = state.paymentMethods.findIndex((m) => m.id === action.payload.id);
+        if (index > -1) {
+          state.paymentMethods[index] = action.payload;
+        } else {
+          state.paymentMethods.push(action.payload);
+        }
+      })
+      // Delete Payment Method
+      .addCase(deletePaymentMethod.fulfilled, (state, action) => {
+        state.paymentMethods = state.paymentMethods.filter((m) => m.id !== action.payload);
+      })
+      // Create Transaction
+      .addCase(createTransaction.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(createTransaction.fulfilled, (state, action) => {
+        state.transactions.push(action.payload);
+        state.loading = false;
+      })
+      .addCase(createTransaction.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+      builder
+      .addCase(tokenizePaymentDetailsThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(tokenizePaymentDetailsThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload;
+      })
+      .addCase(tokenizePaymentDetailsThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+      builder
+      .addCase(saveBankAccountDetailsThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(saveBankAccountDetailsThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bankAccountStatus = action.payload; // Save the status
+      })
+      .addCase(saveBankAccountDetailsThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to save bank account details.";
+      });
+  },
 });
 
 
-export const selectedPaymentMethodId = useSelector(
-  (state: RootState) => state.payments?.currentPaymentMethodId // Match Redux state
-);
 
+
+// Remove the hook and export a selector function instead
+export const selectPaymentMethodId = (state: RootState) => state.payments?.currentPaymentMethodId;
 
 export default paymentSlice.reducer;

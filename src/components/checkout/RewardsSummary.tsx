@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Alert, Button, List } from "antd";
-import { RootState } from "../../redux/store";
 import { fetchRewards, removeReward } from "../../redux/slices/marketing/rewardsSlice";
 import {
   RewardsContainer,
@@ -10,7 +9,7 @@ import {
   RewardsTotal,
   RewardsAlert,
 } from "./styles/RewardsSummary.styles";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 
 const RewardsSummary: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

@@ -1,146 +1,281 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { saveAccountDetails, selectAccountDetails, setSellerVerificationEmail } from '../../redux/slices/auth/registrationSlice';
-import { AccountDetails } from '../../types/sharedTypes';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  saveAccountDetails,
+  setSellerVerificationEmail,
+  setCurrentStep,
+  selectEmailLinkExpiration,
+  registerSellerThunk,
+  setSellerId,
+  verifySellerCodeThunk,
+  setSellerVerificationCode,
+} from "../../redux/slices/auth/registrationSlice";
+import { AccountDetails } from "../../types/sharedTypes";
+import { AppDispatch, RootState } from "../../redux/store"; // Adjust the path if needed
+import styled from "styled-components";
+import { getLocalizedText } from "../../utils/localizationUtils";
+import {
+  Container,
+  Title,
+  Form,
+  Button,
+  FormGroup,
+  Link,
+  Label,
+  Input,
+  SmallText,
+  ErrorMessage,
+  InfoText, StyledLink
+} from "./CreateSellerAccountStyled";
 
-import './CreateSellerAccount.css';
+
+
 
 interface CreateSellerAccountProps {
   data: AccountDetails;
   onUpdate: (updatedData: Partial<AccountDetails>) => void;
   onNext: () => void;
+  onSubmit?: (accountDetailsData: AccountDetails) => void;
 }
 
-const CreateSellerAccount: React.FC<CreateSellerAccountProps> = ({ data, onUpdate, onNext }) => {
-  const dispatch = useDispatch();
+const CreateSellerAccount: React.FC<CreateSellerAccountProps> = ({
+  data,
+  onUpdate,
+  onNext,
+  onSubmit,
+}) => {
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
-  const accountDetails = useSelector(selectAccountDetails); // Use `useSelector` at the top level, not inside `useEffect`
+  const location = useLocation();
 
-  const [full_name, setName] = useState(data.full_name || '');
-  const [email, setEmail] = useState(data.email || '');
-  const [password, setPassword] = useState(data.password || '');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const emailLinkExpiration = useSelector(selectEmailLinkExpiration);
+  const sellerType = useSelector((state: RootState) => state.registration.sellerType);
+  const storedEmail = useSelector((state: RootState) => state.registration.email);
 
-  // Log the account details outside of useEffect
-  console.log('Redux Account Details:', accountDetails);
+  const [full_name, setName] = useState(data.full_name || "");
+  const [email, setEmail] = useState(data.email || "");
+  const [password, setPassword] = useState(data.password || "");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitRef = useRef(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Update local state if `data` prop changes
+  console.log("[CreateSellerAccount] Component Mounted.");
+  console.log("[Redux State] Initial Values: ", { sellerType, storedEmail });
+
   useEffect(() => {
-    setName(data.full_name || '');
-    setEmail(data.email || '');
-    setPassword(data.password || '');
-  }, [data]);
+    const params = new URLSearchParams(location.search);
+    const code = params.get("code");
 
-  // ... rest of the component
+    console.log("[CreateSellerAccount] useEffect Triggered.");
+    console.log("[URL Query Params] Code:", code);
+    console.log("[Current Pathname]", location.pathname);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
+    if (!code || location.pathname !== "/register/seller/professional/seller-verification") {
+      console.log("[CreateSellerAccount] No verification code or invalid path.");
       return;
     }
 
-    // Save account details in Redux
-    dispatch(saveAccountDetails({ full_name, email, password }));
+    const validateCode = async () => {
+      try {
+        const emailToUse = storedEmail ?? "";
+        console.log("[CreateSellerAccount] Validating verification code:", { code, email: emailToUse });
 
-    // Explicitly set email in `sellerVerification` if not automatically set
-    dispatch(setSellerVerificationEmail(email));
+        const response = await dispatch(verifySellerCodeThunk({ code, email: emailToUse })).unwrap();
+        console.log("[Verification API Response]", response);
 
-    try {
-      await sendVerificationEmail(full_name, email, password);
-      onNext();
-      navigate('/register/seller/seller-verification');
-    } catch (err) {
-      console.error('Failed to send verification email:', err);
-      setError('Failed to send verification email. Please try again later.');
-    }
-  };
+        if (response.isVerified) {
 
+          console.log("[Verification] Success. Saving verification data to Redux.");
+          dispatch(setSellerVerificationCode(code));
+          dispatch(setSellerVerificationEmail(email));
 
-  // API call function to register vendor and send verification email
-  const sendVerificationEmail = async (full_name: string, email: string, password: string) => {
-    try {
-      const response = await axios.post('http://localhost:8012/vendors/register_vendor', {
-        full_name,
-        email,
-        password
-      });
-      return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error('Error details:', error.response?.data || error.message);
-      } else {
-        console.error('Unexpected error:', error);
+          dispatch(setCurrentStep("Combined Information"));
+          navigate("/register/seller/professional/combined-information");
+        } else {
+          console.warn("[Verification] Invalid verification code.");
+          setErrorMessage(getLocalizedText("invalid_verification_code", "auth"));
+        }
+      } catch (error) {
+        console.error("[Verification] Error validating code:", error);
+        setErrorMessage(getLocalizedText("error_validating_code", "auth"));
       }
-      throw new Error('Error sending verification email');
+    };
+
+    validateCode();
+  }, [dispatch, location, navigate, storedEmail]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("[CreateSellerAccount] Form Submission Attempt.");
+  
+    if (password !== confirmPassword) {
+      setErrorMessage(getLocalizedText("passwords_do_not_match", "auth"));
+      return;
+    }
+  
+    if (!sellerType) {
+      setErrorMessage(getLocalizedText("seller_type_missing", "auth"));
+      return;
+    }
+  
+    if (isSubmitting || submitRef.current) {
+      console.warn("[Submission] Duplicate form submission prevented.");
+      return;
+    }
+  
+    submitRef.current = true;
+    setIsSubmitting(true);
+    setErrorMessage(null);
+  
+    try {
+      console.log("[CreateSellerAccount] Dispatching account registration.");
+      const accountDetailsData: AccountDetails = { full_name, email, password };
+  
+      if (onSubmit) {
+        onSubmit(accountDetailsData);
+      }
+  
+      const resultAction = await dispatch(
+        registerSellerThunk({ full_name, email, password, seller_type: sellerType })
+      ).unwrap();
+  
+      console.log("[Registration API Response]", resultAction);
+  
+      // Ensure registration was successful before proceeding
+      if (!resultAction || !resultAction.sellerId) {
+        console.error("[Registration Failed] Seller ID missing or API returned an error.");
+        setErrorMessage(getLocalizedText("registration_failed", "auth"));
+        return; // 🚨 Stops navigation
+      }
+  
+      console.log("[Success] Saving registration details to Redux.");
+      dispatch(setSellerId(resultAction.sellerId));
+      dispatch(saveAccountDetails(accountDetailsData));
+      dispatch(setSellerVerificationEmail(email));
+  
+      setSuccessMessage(getLocalizedText("account_created_success", "auth"));
+  
+      // ✅ Ensure navigation ONLY happens when successful
+      setTimeout(() => {
+        onNext();
+      }, 2000);
+    } catch (error: any) {
+      console.error("[CreateSellerAccount] Error during registration:", error);
+  
+      // ✅ Ensure we correctly stop execution on errors
+      setIsSubmitting(false);
+      submitRef.current = false;
+  
+      let errorMessage = "An unexpected error occurred.";
+  
+      // **Safely check for error response from backend**
+      if (error?.response) {
+        console.error("[Backend Error] Response received:", error.response.data);
+        errorMessage = error.response.data?.message || "Failed to register seller.";
+      }
+      // **Handle network errors (no response from server)**
+      else if (error?.request) {
+        console.error("[Network Error] No response received from server.");
+        errorMessage = "Unable to connect to the server. Please try again later.";
+      }
+      // **Handle unexpected cases**
+      else if (error?.message) {
+        errorMessage = error.message;
+      }
+  
+      // Prevent undefined `.includes()` crash
+      if (typeof errorMessage === "string" && errorMessage.includes("already exists")) {
+        setErrorMessage("This email is already registered. Try logging in.");
+      } else {
+        setErrorMessage(errorMessage);
+      }
+    } finally {
+      setIsSubmitting(false);
+      submitRef.current = false;
     }
   };
+  
+  
 
   return (
-    <div className="create-seller-account">
-      <form onSubmit={handleSubmit}>
-        {error && <p className="error">{error}</p>}
+    <Container>
+      <Form onSubmit={handleSubmit}>
+        <Title>{getLocalizedText("Create Seller Account", "auth")}</Title>
+        {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
 
-        <label htmlFor="full_name">Your Full Name</label>
-        <input
-          type="text"
-          id="name"
-          placeholder="Enter your first and last name"
-          value={full_name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+        <FormGroup>
+          <Label htmlFor="full_name">{getLocalizedText("Your Full Name", "auth")}</Label>
+          <Input
+            type="text"
+            id="full_name"
+            placeholder={getLocalizedText("enter_name", "auth")}
+            value={full_name}
+            onChange={(e) => {
+              setName(e.target.value);
+              onUpdate({ full_name: e.target.value });
+            }}
+            required
+          />
+        </FormGroup>
 
-        <label htmlFor="email">E-mail</label>
-        <input
-          type="email"
-          id="email"
-          placeholder="Enter your email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <FormGroup>
+          <Label htmlFor="email">{getLocalizedText("Email", "auth")}</Label>
+          <Input
+            type="email"
+            id="email"
+            placeholder={getLocalizedText("enter_email", "auth")}
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              onUpdate({ email: e.target.value });
+            }}
+            required
+          />
+        </FormGroup>
 
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          placeholder="At least 6 characters"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <small>Passwords must be at least 6 characters long.</small>
+        <FormGroup>
+          <Label htmlFor="password">{getLocalizedText("Password", "auth")}</Label>
+          <Input
+            type="password"
+            id="password"
+            placeholder={getLocalizedText("password_placeholder", "auth")}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <SmallText>{getLocalizedText("password_hint", "auth")}</SmallText>
+        </FormGroup>
 
-        <label htmlFor="confirmPassword">Re-enter Password</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          placeholder="Confirm your password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        />
+        <FormGroup>
+          <Label htmlFor="confirmPassword">{getLocalizedText("Reenter Password", "auth")}</Label>
+          <Input
+            type="password"
+            id="confirmPassword"
+            placeholder={getLocalizedText("confirm_password_placeholder", "auth")}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+        </FormGroup>
 
-        <button type="submit" className="submit-button">Next</button>
-      </form>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? getLocalizedText("Submitting", "auth") : getLocalizedText("Next", "auth")}
+        </Button>
+      </Form>
 
-      <p>
-        By creating an account, you agree to Fylinde's{" "}
-        <a href="#">Terms and Conditions</a>. Please review our{" "}
-        <a href="#">Privacy Notice</a>,{" "}
-        <a href="#">Cookie Statement</a>, and{" "}
-        <a href="#">Interest-Based Ads Policy</a>.
-      </p>
+      <InfoText>
+        {getLocalizedText("terms_conditions", "auth")}{" "}
+        <Link href="#">{getLocalizedText("privacy_policy", "auth")}</Link>.
+      </InfoText>
 
-      <p>
-        Already have an account? <a href="#" onClick={() => navigate('/sign-in')}>Sign in</a>
-      </p>
-    </div>
+      <InfoText>
+        {getLocalizedText("already_have_account", "auth")}{" "}
+        <Link onClick={() => navigate("/sign-in")}>{getLocalizedText("sign_in", "auth")}</Link>
+      </InfoText>
+    </Container>
   );
 };
 

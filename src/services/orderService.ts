@@ -1,6 +1,6 @@
 
 import axios from "axios";
-import { Order } from "types/order";
+import { Order } from "../types/order";
 
 const BASE_API_URL = "/api/orders";
 

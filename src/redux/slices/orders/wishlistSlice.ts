@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { Product } from "@/types/Product";
+import { Product } from "../../../types/Product";
 import axios from "axios";
 
 // Define Wishlist Item Interface

@@ -1,45 +1,53 @@
 
+
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
-import { WebSocketService } from "../../../services/websocketService";
 import {
   getProducts,
-  createProduct,
-  deleteProduct,
-  getProductRating,
-  addProductRating,
-  getProductsByCategory,
+  createProduct as serviceCreateProduct,
+  deleteProduct as serviceDeleteProduct,
+  getProductRating as serviceGetProductRating,
+  addProductRating as serviceAddProductRating,
+  getProductsByCategory as serviceGetProductsByCategory,
   fetchPersonalizedRecommendationsAPI,
-  getRelatedProducts as fetchRelatedProductsAPI,
-  fetchTags as fetchTagsAPI,
-  fetchColors as fetchColorsAPI,
-  fetchShops as fetchShopsAPI,
+  fetchRelatedProductsAPI,
+  fetchTagsAPI,
+  fetchColorsAPI,
+  fetchShopsAPI,
   getLocalizedPricing,
-  updateProduct as apiUpdateProduct,
+  apiUpdateProduct,
+  fetchFeaturedProductsAPI,
+  fetchFlashDealsAPI,
+  fetchProductsByTypeAPI,
+  fetchProductsByTagAPI,
+  fetchTopRatedProductsAPI,
+  fetchNewArrivalsAPI,
+  fetchProductsByBrandAPI,
+  fetchProductsByCategoryAPI,
+  fetchProductDetailsAPI,
+  removeProductAPI ,
 } from "../../../services/productService";
-import { Product } from "../../../types/Product";
+import { Product, ProductResponse } from "../../../types/Product";
+import { Review } from "../../../types/review";
+import { RootState } from "../../../redux/store";
 import { Brand } from "../../../types/brand";
 import { Shop } from "../../../types/shop";
-import { RootState } from "../../store";
-import { Review } from "../../../types/review";
+import { ProductFilters } from "../../../types/Product";
 import { extractErrorMessage } from "../../../types/extractErrorMessage";
+import axios, { AxiosError } from "axios";
+import { Rating } from "../../../types/rating";
+import { mockProducts } from "../../../mock/data/products";
 
 
-// Initialize WebSocket
-const webSocketService = new WebSocketService("wss://your-websocket-url");
-
-
-
-
-// Define the ProductState interface
 interface ProductState {
   products: Product[];
   productsByTag: Record<string, Product[]>; // Products grouped by tag
-  loadingProductsByTag: Record<string, boolean>; // Loading state for products by tag
+  loadingProductsByTag: Record<string, boolean>;
   currentProduct: Product | null;
+  review: Review[],
+  productRatings: Record<string, number>; 
   relatedProducts: Product[];
-  categories: Array<{ title: string; subCategories?: string[] }>;
   tags: string[];
+  categories: Array<{ title: string; subCategories?: string[] }>;
   localizedPrices: Record<string, LocalizedPrice>; // Use the defined LocalizedPrice type
   tryOnData: Record<string, any>;
   shops: Shop[];
@@ -56,7 +64,7 @@ interface ProductState {
   selectedBrand: string;
   categoryType: "brands" | "shops"; // Limit to valid options
   topRatedProducts: Product[]; // Made non-optional
-  flashDeals: { product: Product; discount: number }[]; // Update type
+  flashDeals: Product[]; 
   featuredProducts: Product[]; // Made non-optional
   selectedCategory: string | null;
 
@@ -78,7 +86,6 @@ interface ProductState {
 }
 
 
-
 interface LocalizedPrice {
   buyerCurrency: string;
   sellerCurrency: string;
@@ -87,27 +94,31 @@ interface LocalizedPrice {
   sellerPrice: number;
 }
 
-// Initial state for product slice
 const initialState: ProductState = {
   products: [],
+  currentProduct: null,
+  totalPages: 0,
+  productRatings: {},
+  review: [],
+  loading: false,
+  error: null,
+  personalizedRecommendations: [],
+  relatedProducts: [],
+  tags: [],
+
+
   productsByTag: {}, // Initialize as an empty object
   loadingProductsByTag: {}, // Initialize as an empty object
-  currentProduct: null,
-  relatedProducts: [],
   categories: [],
-  tags: [],
   localizedPrices: {}, // Use an empty object for localized prices
   tryOnData: {}, // Initialize as an empty object
   shops: [],
   brands: [],
   colors: [],
-  loading: false,
   loadingProducts: false,
   loadingBrands: false,
   loadingCategories: false,
   loadingShops: false,
-  error: null,
-  totalPages: 0,
   newArrivals: [],
   selectedBrand: "",
   selectedCategory: null,
@@ -116,7 +127,6 @@ const initialState: ProductState = {
   flashDeals: [], // Initialize as an empty array
   featuredProducts: [], // Initialize as an empty array
   salesProducts: [], // Initialize as an empty array
-  personalizedRecommendations: [], // Initialize as an empty array
   filterOptions: {
     priceRange: [0, 1000], // Example default price range
     availability: true, // Default to true (in stock only)
@@ -129,352 +139,6 @@ const initialState: ProductState = {
   currentSegment: "B2C", // Default segment to "B2C"
 };
 
-
-
-
-export const fetchB2CProducts = createAsyncThunk(
-  "products/fetchB2CProducts",
-  async (_, thunkAPI) => {
-    try {
-      const response = await getProducts(undefined, 1, { segment: "B2C" });
-      return response.products;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-
-export const fetchB2BProducts = createAsyncThunk(
-  "products/fetchB2BProducts",
-  async (_, thunkAPI) => {
-    try {
-      const response = await getProducts(undefined, 1, { segment: "B2B" });
-      return response.products;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-export const fetchC2CProducts = createAsyncThunk(
-  "products/fetchC2CProducts",
-  async (_, thunkAPI) => {
-    try {
-      const response = await getProducts(undefined, 1, { segment: "C2C" });
-      return response.products;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-
-export const fetchSalesProducts = createAsyncThunk(
-  "products/fetchSalesProducts",
-  async (_, thunkAPI) => {
-    try {
-      const response = await getProducts(undefined, 1, { tag: "Sales" });
-      return response.products;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-export const fetchPersonalizedRecommendations = createAsyncThunk<
-  Product[],
-  { userId?: string } | undefined,
-  { rejectValue: string }
->("products/fetchPersonalizedRecommendations", async (args, thunkAPI) => {
-  try {
-    const userId = args?.userId || ""; // Default to an empty string
-    const response = await fetchPersonalizedRecommendationsAPI(userId);
-    return response; // Ensure API returns Product[]
-  } catch (error) {
-    return thunkAPI.rejectWithValue("Failed to fetch recommendations");
-  }
-});
-
-
-
-export const fetchFlashDeals = createAsyncThunk<
-  { product: Product; discount: number }[] // Expected return type
->("products/fetchFlashDeals", async (_, thunkAPI) => {
-  try {
-    const response = await axios.get("/api/flash-deals");
-    return response.data; // Assume API returns an array of { product, discount }
-  } catch (error) {
-    return thunkAPI.rejectWithValue("Failed to fetch flash deals");
-  }
-});
-
-
-
-export const fetchFilteredProducts = createAsyncThunk(
-  "products/fetchFilteredProducts",
-  async (
-    { filters, page }: { filters: Record<string, any>; page: number },
-    thunkAPI
-  ) => {
-    try {
-      const response = await getProducts(undefined, page, filters);
-      return response.products;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-
-// Async Thunk to fetch products by category
-export const fetchProductsByCategory = createAsyncThunk(
-  "products/fetchProductsByCategory",
-  async (
-    { categoryType, category }: { categoryType: string; category: string | null },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await getProductsByCategory(categoryType, category || "");
-      return response.products; // Adjust according to API structure
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch products");
-    }
-  }
-);
-
-
-
-export const fetchNewArrivals = createAsyncThunk(
-  "products/fetchNewArrivals",
-  async (_, thunkAPI) => {
-    try {
-      const response = await getProducts(undefined, 1, { tag: "New Arrivals" });
-      return response.products;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-
-
-export const fetchTopRatedProducts = createAsyncThunk(
-  "products/fetchTopRatedProducts",
-  async (_, thunkAPI) => {
-    try {
-      const response = await getProducts(undefined, 1, { tag: "Top Ratings" });
-      return response.products;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-export const fetchFeaturedProducts = createAsyncThunk(
-  "products/fetchFeaturedProducts",
-  async (_, thunkAPI) => {
-    try {
-      const response = await getProducts(undefined, 1, { tag: "Featured" });
-      return response.products; // Adjust based on the actual API response
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-
-
-export const fetchTags = createAsyncThunk(
-  "products/fetchTags",
-  async (_, thunkAPI) => {
-    try {
-      const response = await fetchTagsAPI();
-      return response.data; // Assuming the API returns an array of tags
-    } catch (error) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-// Thunks for async operations
-
-
-// Thunks for async operations
-export const fetchProducts = createAsyncThunk(
-  "products/fetchProducts",
-  async (
-    args: { page?: number; sellerId?: string; filters?: Record<string, any>; sort?: string } = {}, // Add vendorId
-    thunkAPI
-  ) => {
-    const { page = 1, sellerId, filters = {}, sort = "popularity" } = args; // Include vendorId
-    try {
-      const response = await getProducts(sellerId, page, filters, sort); // Pass vendorId to the API call
-      return { products: response.products, totalPages: response.totalPages };
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-
-
-
-
-
-
-
-
-
-
-export const fetchColors = createAsyncThunk("products/fetchColors", async (_, thunkAPI) => {
-  try {
-    return await fetchColorsAPI();
-  } catch (error) {
-    return thunkAPI.rejectWithValue(extractErrorMessage(error));
-  }
-});
-
-
-
-export const fetchLocalizedPrices = createAsyncThunk(
-  "products/fetchLocalizedPrices",
-  async ({ productId, buyerCurrency }: { productId: string; buyerCurrency: string }, thunkAPI) => {
-    try {
-      const response = await getLocalizedPricing(productId, buyerCurrency);
-      return { productId, priceData: response.data };
-    } catch (error) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-
-
-export const bulkUpdateProducts = createAsyncThunk(
-  "products/bulkUpdateProducts",
-  async (productData: Array<Partial<Product>>, thunkAPI) => {
-    try {
-      const response = await axios.put("/api/products/bulk", productData);
-      return response.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-export const fetchProductRating = createAsyncThunk(
-  "products/fetchProductRating",
-  async (productId: string, thunkAPI) => {
-    try {
-      const response = await getProductRating(productId);
-      return { productId, rating: response.data.rating };
-    } catch (error) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-export const addRating = createAsyncThunk(
-  "products/addRating",
-  async (
-    { productId, reviewData }: { productId: string; reviewData: Review },
-    thunkAPI
-  ) => {
-    try {
-      const response = await addProductRating(productId, reviewData);
-      return { productId, rating: response.data.rating };
-    } catch (error) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-
-export const addProduct = createAsyncThunk(
-  "products/addProduct",
-  async (productData: any, thunkAPI) => {
-    try {
-      const response = await createProduct(productData);
-      return response.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-export const editProduct = createAsyncThunk(
-  "products/editProduct",
-  async (
-    { productId, productData }: { productId: string; productData: any },
-    thunkAPI
-  ) => {
-    try {
-      const response = await apiUpdateProduct(productId, productData);
-      return response.data; // Return the updated product object
-    } catch (error) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-export const removeProduct = createAsyncThunk(
-  "products/removeProduct",
-  async (productId: string, thunkAPI) => {
-    try {
-      await deleteProduct(productId);
-      return productId;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-export const fetchRelatedProducts = createAsyncThunk(
-  "products/fetchRelatedProducts",
-  async (
-    { productId, filters = {}, page = 1 }: { productId: string; filters?: Record<string, any>; page?: number },
-    thunkAPI
-  ) => {
-    try {
-      // Construct query parameters dynamically
-      const queryParams = new URLSearchParams({
-        ...filters,
-        page: String(page),
-      });
-
-      const url = `/api/products/${productId}/related?${queryParams.toString()}`;
-
-      const response = await fetchRelatedProductsAPI(url);
-
-      // Handle cases where no related products are found
-      if (!response.data || response.data.length === 0) {
-        console.warn("No related products found.");
-        return [];
-      }
-
-      return response.data;
-    } catch (error) {
-      // Extract and return error message
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
-
-
-
-
-
-export const fetchShops = createAsyncThunk<Shop[], void, { rejectValue: string }>(
-  "products/fetchShops",
-  async (_, thunkAPI) => {
-    try {
-      return await fetchShopsAPI();
-    } catch (error) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
 
 // Helper function to validate and transform API response into the expected Product structure
 const transformProductResponse = (data: any): Product => {
@@ -503,6 +167,363 @@ const transformProductResponse = (data: any): Product => {
     ...data, // Include any additional fields dynamically
   };
 };
+// Async Thunks
+export const fetchProducts = createAsyncThunk(
+  "products/fetchProducts",
+  async (
+    { filters, page = 1 }: { filters: Partial<ProductFilters>; page?: number },
+    thunkAPI
+  ) => {
+    try {
+      // Merge filters with default values
+      const defaultFilters: ProductFilters = {
+        context: null,
+        buyerPrice: [0, Infinity],
+        sellerPrice: [0, Infinity],
+        availability: null,
+        selectedCategories: [],
+        ...filters,
+      };
+
+      // Ensure arguments are passed in correct order
+      return await getProducts(undefined, page, defaultFilters);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+
+
+export const fetchProductById = createAsyncThunk<Product, string>(
+  "products/fetchProductById",
+  async (id, thunkAPI) => {
+    try {
+      const response = await axios.get(`/api/products/${id}`);
+      return transformProductResponse(response.data); // Ensure correct Product structure
+    } catch (error) {
+      return thunkAPI.rejectWithValue(extractErrorMessage(error));
+    }
+  }
+);
+
+
+export const createProduct = createAsyncThunk(
+    "products/createProduct",
+    async (newProduct: Partial<Product>, thunkAPI) => {
+      try {
+        return await serviceCreateProduct(newProduct);
+      } catch (error: any) {
+        return thunkAPI.rejectWithValue(error.message);
+      }
+    }
+  );
+  
+  export const deleteProduct = createAsyncThunk(
+    "products/deleteProduct",
+    async (productId: string, thunkAPI) => {
+      try {
+        await serviceDeleteProduct(productId);
+        return productId; // Return the deleted product's ID
+      } catch (error: any) {
+        return thunkAPI.rejectWithValue(error.message);
+      }
+    }
+  );
+
+  // Async Thunks
+  export const getProductRating = createAsyncThunk<
+  { productId: string; rating: number },
+  string // Argument type (productId)
+>(
+  "products/getProductRating",
+  async (productId, thunkAPI) => {
+    try {
+      const response = await serviceGetProductRating(productId);
+    
+      if (typeof response === 'number') {
+        return { productId, rating: response }; // Handle number case
+      }
+    
+      // Assuming `response` is of type `Rating`, safely access its properties
+      return { productId, rating: response.average }; // Use `average` or other relevant property
+    } catch (error) {
+      return thunkAPI.rejectWithValue(extractErrorMessage(error));
+    }
+    
+    
+  }
+);
+
+  
+  export const addProductRating = createAsyncThunk<
+  { productId: string; rating: number }, // Expected return type
+  { productId: string; rating: number } // Arguments passed to thunk
+>(
+  "products/addProductRating",
+  async ({ productId, rating }, thunkAPI) => {
+    try {
+      const response = await serviceAddProductRating(productId, { rating });
+      return { productId, rating: response.rating };
+    } catch (error) {
+      return thunkAPI.rejectWithValue(extractErrorMessage(error));
+    }
+  }
+);
+
+  
+  
+  
+  export const getProductsByCategory = createAsyncThunk(
+    "products/getProductsByCategory",
+    async (category: string, thunkAPI) => {
+      try {
+        return await serviceGetProductsByCategory(category); // Pass only the category
+      } catch (error: any) {
+        return thunkAPI.rejectWithValue(error.message);
+      }
+    }
+  );
+  
+  
+  
+  
+
+
+// Async Thunks
+export const fetchPersonalizedRecommendations = createAsyncThunk(
+    "products/fetchPersonalizedRecommendations",
+    async (userId: string, thunkAPI) => {
+      try {
+        return await fetchPersonalizedRecommendationsAPI(userId);
+      } catch (error: any) {
+        return thunkAPI.rejectWithValue(error.message);
+      }
+    }
+  );
+  
+  export const fetchRelatedProducts = createAsyncThunk(
+    "products/fetchRelatedProducts",
+    async (productId: string, thunkAPI) => {
+      try {
+        return await fetchRelatedProductsAPI(productId);
+      } catch (error: any) {
+        return thunkAPI.rejectWithValue(error.message);
+      }
+    }
+  );
+  
+  export const fetchTags = createAsyncThunk(
+    "products/fetchTags",
+    async (_, thunkAPI) => {
+      try {
+        return await fetchTagsAPI();
+      } catch (error: any) {
+        return thunkAPI.rejectWithValue(error.message);
+      }
+    }
+  );
+
+  // Fetch Colors
+export const fetchColors = createAsyncThunk(
+  "products/fetchColors",
+  async (_, thunkAPI) => {
+    try {
+      return await fetchColorsAPI();
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+// Fetch Shops
+export const fetchShops = createAsyncThunk(
+  "products/fetchShops",
+  async (_, thunkAPI) => {
+    try {
+      return await fetchShopsAPI();
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+// Get Localized Pricing
+export const fetchLocalizedPricing = createAsyncThunk(
+  "products/fetchLocalizedPricing",
+  async (
+    { productId, buyerCurrency }: { productId: string; buyerCurrency: string },
+    thunkAPI
+  ) => {
+    try {
+      return await getLocalizedPricing(productId, buyerCurrency);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+// Update Product
+export const updateProduct = createAsyncThunk(
+  "products/updateProduct",
+  async (
+    { productId, productData }: { productId: string; productData: Partial<Product> },
+    thunkAPI
+  ) => {
+    try {
+      return await apiUpdateProduct(productId, productData);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+// Fetch Featured Products
+export const fetchFeaturedProducts = createAsyncThunk(
+  "products/fetchFeaturedProducts",
+  async (_, thunkAPI) => {
+    try {
+      return await fetchFeaturedProductsAPI();
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+
+
+
+export const fetchFlashDeals = createAsyncThunk(
+  "products/fetchFlashDeals",
+  async (_, thunkAPI) => {
+    try {
+      return await fetchProductsByTagAPI('flash-deal'); // Fetch only flash deals
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Failed to fetch flash deals");
+    }
+  }
+);
+
+
+
+
+
+// Fetch Products by Type
+export const fetchProductsByType = createAsyncThunk(
+  "products/fetchProductsByType",
+  async ({ type, filter }: { type: string; filter?: string }, thunkAPI) => {
+    try {
+      return await fetchProductsByTypeAPI(type, filter);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+
+export const fetchProductsByTag = createAsyncThunk<
+  { tag: string; products: Product[] },
+  { tag: string }
+>(
+  "products/fetchProductsByTag",
+  async ({ tag }, thunkAPI) => {
+    try {
+      // Attempt to fetch products from the backend
+      const response = await fetch(`/api/products?tag=${tag}`);
+      if (!response.ok) {
+        throw new Error(`Backend API returned ${response.status}`);
+      }
+      const data = await response.json();
+
+      // If backend returns empty, fallback to mock products
+      if (data.products.length === 0) {
+        console.warn(`Backend returned empty products for tag: ${tag}, falling back to mock data.`);
+        const { mockProducts } = await import("../../../mock/data/products");
+        const fallbackProducts = mockProducts.filter((product) => product.tag === tag);        
+        return { tag, products: fallbackProducts };
+      }
+
+      return { tag, products: data.products };
+    } catch (error) {
+      console.error(`Error fetching products from backend for tag: ${tag}`, error);
+
+      // Fallback to mock products on error
+      const { mockProducts } = await import("../../../mock/data/products");
+      const fallbackProducts = mockProducts.filter((product) => product.tag === tag);      
+      return { tag, products: fallbackProducts };
+    }
+  }
+);
+
+
+// Fetch Top-Rated Product
+
+export const fetchTopRatedProducts = createAsyncThunk<
+  Product[],
+  void,
+  { rejectValue: string }
+>("products/fetchTopRatedProducts", async (_, thunkAPI) => {
+  try {
+    const response = await fetch(`/api/products?topRated=true`);
+    if (!response.ok) {
+      throw new Error(`Backend API returned ${response.status}`);
+    }
+    const data = await response.json();
+
+    if (data.products.length === 0) {
+      console.warn("Backend returned empty top-rated products, falling back to mock data.");
+      const { mockTopRatedProducts } = await import("../../../mock/data/mockTopRatedProducts");
+      return mockTopRatedProducts;
+    }
+
+    return data.products;
+  } catch (error) {
+    console.error("Error fetching Top Rated Products:", error);
+    const { mockTopRatedProducts } = await import("../../../mock/data/mockTopRatedProducts");
+    return mockTopRatedProducts;
+  }
+});
+
+// Fetch New Arrivals
+export const fetchNewArrivals = createAsyncThunk(
+  "products/fetchNewArrivals",
+  async (_, thunkAPI) => {
+    try {
+      return await fetchNewArrivalsAPI();
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+// Fetch Products by Brand
+export const fetchProductsByBrand = createAsyncThunk(
+  "products/fetchProductsByBrand",
+  async (brand: string, thunkAPI) => {
+    try {
+      return await fetchProductsByBrandAPI(brand);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+// Fetch Products by Category
+export const fetchProductsByCategory = createAsyncThunk(
+  "products/fetchProductsByCategory",
+  async (
+    { categoryType, category }: { categoryType: "brands" | "shops"; category: string },
+    thunkAPI
+  ) => {
+    try {
+      const response = await fetchProductsByCategoryAPI(categoryType, category);
+      return response; // { categoryType, products: Product[] }
+    } catch (error) {
+      return thunkAPI.rejectWithValue(extractErrorMessage(error));
+    }
+  }
+);
+
 
 
 // Fetch product details by ID
@@ -520,36 +541,106 @@ export const fetchProductDetails = createAsyncThunk<Product, string>(
   }
 );
 
-
-
-
-// Update an existing product
-export const updateProduct = createAsyncThunk(
-  "products/updateProduct",
-  async (
-    { productId, productData }: { productId: string; productData: Partial<Product> },
-    thunkAPI
-  ) => {
+export const removeProduct = createAsyncThunk(
+  "products/removeProduct",
+  async (productId: string, thunkAPI) => {
     try {
-      // Call the API helper
-      const response = await apiUpdateProduct(productId, productData);
-      return response.data as Product; // Assume the API returns the updated product object
-    } catch (error) {
-      // Handle API errors gracefully
-      const err = error as AxiosError<{ message?: string }>;
-      const message =
-        err.response?.data?.message || err.message || "Failed to update product";
-      return thunkAPI.rejectWithValue(message);
+      return await removeProductAPI(productId);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
 
+// Define the thunk
+export const fetchProductRating = createAsyncThunk<
+  { productId: string; rating: Rating | number }, // Return type
+  string // Argument type (productId)
+>("products/fetchProductRating", async (productId, thunkAPI) => {
+  try {
+    // Call the service to fetch the rating
+    const response = await serviceGetProductRating(productId);
 
-export const fetchProductsByType = createAsyncThunk(
-  "product/fetchProductsByType",
-  async ({ type, filter }: { type: string; filter?: string }, thunkAPI) => {
+    // Validate the response and return the result
+    if (typeof response === "number" || (response && typeof response.average === "number")) {
+      return { productId, rating: response };
+    }
+
+    throw new Error("Invalid response structure");
+  } catch (error) {
+    // Handle errors
+    return thunkAPI.rejectWithValue(extractErrorMessage(error));
+  }
+});
+
+
+
+export const addRating = createAsyncThunk<
+  { productId: string; rating: number }, // Return type
+  { productId: string; reviewData: { rating: number; comment: string; userId: string } } // Input type
+>(
+  "products/addRating",
+  async ({ productId, reviewData }, thunkAPI) => {
     try {
-      const filters = filter ? { [type]: filter } : {};
+      const response = await serviceAddProductRating(productId, reviewData);
+      return { productId, rating: response.rating };
+    } catch (error) {
+      return thunkAPI.rejectWithValue(extractErrorMessage(error));
+    }
+  }
+);
+
+  
+
+export const fetchSalesProducts = createAsyncThunk(
+  "products/fetchSalesProducts",
+  async (_, thunkAPI) => {
+    try {
+      const filters: ProductFilters = {
+        context: null,
+        buyerPrice: [0, Infinity],
+        sellerPrice: [0, Infinity],
+        availability: null,
+        selectedCategories: [],
+        // Include any other properties relevant to your API logic
+      };
+      const response = await getProducts(undefined, 1, filters);
+      return response.products;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchLocalizedPrices = createAsyncThunk(
+  "products/fetchLocalizedPrices",
+  async ({ productId, buyerCurrency }: { productId: string; buyerCurrency: string }, thunkAPI) => {
+    try {
+      const response = await getLocalizedPricing(productId, buyerCurrency);
+      return { productId, priceData: response.data };
+    } catch (error) {
+      return thunkAPI.rejectWithValue(extractErrorMessage(error));
+    }
+  }
+);
+
+export const fetchB2CProducts = createAsyncThunk(
+  "products/fetchB2CProducts",
+  async (_, thunkAPI) => {
+    try {
+      const filters: ProductFilters = {
+        segment: "B2C",
+        context: "B2C",               // Use a valid value for context
+        buyerPrice: [0, Infinity],    // Provide a range for buyerPrice
+        sellerPrice: [0, Infinity],   // Provide a range for sellerPrice
+        availability: "inStock",      // Use a valid availability value
+        selectedCategories: [],       // Keep default as empty array
+        tags: [],                     // Optional: Additional filters
+        rating: [0, 5],               // Optional: Filter by rating range
+        brand: [],                    // Optional: Filter by brand
+        color: [],                    // Optional: Filter by color
+        size: [],                     // Optional: Filter by size
+      };
       const response = await getProducts(undefined, 1, filters);
       return response.products;
     } catch (error: any) {
@@ -558,47 +649,67 @@ export const fetchProductsByType = createAsyncThunk(
   }
 );
 
-export const fetchProductsByTag = createAsyncThunk(
-  "product/fetchProductsByTag",
-  async ({ tag }: { tag: string }, thunkAPI) => {
+
+export const fetchB2BProducts = createAsyncThunk(
+  "products/fetchB2BProducts",
+  async (_, thunkAPI) => {
     try {
-      const response = await getProducts(undefined, 1, { tag });
-      return { tag, products: response.products || [] };
+      const filters: ProductFilters = {
+        segment: "B2B",
+        context: "B2B",
+        buyerPrice: [0, Infinity],
+        sellerPrice: [0, Infinity],
+        availability: "inStock",
+        selectedCategories: [],
+        tags: [],
+        rating: [0, 5],
+        brand: [],
+        color: [],
+        size: [],
+      };
+      const response = await getProducts(undefined, 1, filters);
+      return response.products;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(extractErrorMessage(error));
     }
   }
 );
 
-export const fetchProductsByBrand = createAsyncThunk(
-  "products/fetchProductsByBrand",
-  async (brand: string, thunkAPI) => {
+
+export const fetchC2CProducts = createAsyncThunk(
+  "products/fetchC2CProducts",
+  async (_, thunkAPI) => {
     try {
-      const response = await getProducts(undefined, 1, brand ? { brand } : {});
-      return { products: response.products, brand };
+      const filters: ProductFilters = {
+        segment: "C2C",
+        context: "C2C",
+        buyerPrice: [0, Infinity],
+        sellerPrice: [0, Infinity],
+        availability: "inStock",
+        selectedCategories: [],
+        tags: [],
+        rating: [0, 5],
+        brand: [],
+        color: [],
+        size: [],
+      };
+      const response = await getProducts(undefined, 1, filters);
+      return response.products;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(extractErrorMessage(error));
     }
   }
 );
 
-export const fetchTryOnData = createAsyncThunk(
-  "products/fetchTryOnData",
-  async (productId: string, thunkAPI) => {
-    try {
-      const response = await axios.get(`/api/products/${productId}/tryon`);
-      return { productId, tryOnData: response.data };
-    } catch (error) {
-      return thunkAPI.rejectWithValue(extractErrorMessage(error));
-    }
-  }
-);
 
-// Product slice definition
+// Slice Definition
 const productSlice = createSlice({
   name: "products",
-  initialState, // Now correctly typed with ProductState
+  initialState,
   reducers: {
+    setCurrentProduct(state, action: PayloadAction<Product>) {
+      state.currentProduct = action.payload;
+    },
     clearProducts(state) {
       state.products = [];
       state.selectedCategory = null;
@@ -618,14 +729,391 @@ const productSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(updateProduct.fulfilled, (state, action) => {
-      const index = state.products.findIndex((p) => p.id === action.payload.id);
-      if (index !== -1) {
-        state.products[index] = { ...state.products[index], ...action.payload };
-      }
-    });
-    
     builder
+      .addCase(fetchProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<ProductResponse>) => {
+        state.loading = false;
+        state.products = action.payload.products;
+      })
+      .addCase(fetchProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    builder
+    .addCase(fetchProductById.fulfilled, (state, action: PayloadAction<Product>) => {
+      state.currentProduct = action.payload;
+    })
+      .addCase(fetchProductById.rejected, (state, action) => {
+        state.error = action.payload as string;
+      });
+
+      builder
+      .addCase(createProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createProduct.fulfilled, (state, action: PayloadAction<Product>) => {
+        state.loading = false;
+        state.products.push(action.payload); // Add the newly created product to the list
+      })
+      .addCase(createProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    builder
+      .addCase(deleteProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action: PayloadAction<string>) => {
+        state.loading = false;
+        state.products = state.products.filter((product) => product.id !== action.payload);
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+      builder
+      // Get Product Rating
+      .addCase(getProductRating.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getProductRating.fulfilled, (state, action) => {
+        state.productRatings[action.payload.productId] = action.payload.rating; // Assign the rating
+      })
+      .addCase(getProductRating.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Add Product Rating
+    builder
+      .addCase(addProductRating.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(addProductRating.fulfilled, (state, action) => {
+        const product = state.products.find((prod) => prod.id === action.payload.productId);
+        if (product) {
+          product.rating = action.payload.rating;
+        }
+      })
+      .addCase(addProductRating.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Get Products by Category
+    builder
+      .addCase(getProductsByCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(
+        getProductsByCategory.fulfilled,
+        (state, action: PayloadAction<ProductResponse>) => {
+          state.loading = false;
+          state.products = action.payload.products;
+          state.totalPages = action.payload.totalPages;
+        }
+      )
+      .addCase(getProductsByCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+      builder
+      .addCase(fetchPersonalizedRecommendations.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPersonalizedRecommendations.fulfilled, (state, action: PayloadAction<Product[]>) => {
+        state.loading = false;
+        state.personalizedRecommendations = action.payload;
+      })
+      .addCase(fetchPersonalizedRecommendations.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Related Products
+    builder
+      .addCase(fetchRelatedProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchRelatedProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
+        state.loading = false;
+        state.relatedProducts = action.payload;
+      })
+      .addCase(fetchRelatedProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Fetch Tags
+    builder
+      .addCase(fetchTags.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTags.fulfilled, (state, action: PayloadAction<string[]>) => {
+        state.loading = false;
+        state.tags = action.payload;
+      })
+      .addCase(fetchTags.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+      builder
+      .addCase(fetchProductsByTag.pending, (state, action) => {
+        const { tag } = action.meta.arg;
+        state.loadingProductsByTag[tag] = true;
+        state.error = null; // Reset error for this tag
+      })
+      .addCase(fetchProductsByTag.fulfilled, (state, action) => {
+        const { tag, products } = action.payload;
+        state.loadingProductsByTag[tag] = false;
+        state.productsByTag[tag] = products; // Store products (real or mock)
+        console.log(`Fulfilled action for tag: ${tag}, Products:`, products);
+      })
+      .addCase(fetchProductsByTag.rejected, (state, action) => {
+        const { tag } = action.meta.arg;
+        state.loadingProductsByTag[tag] = false;
+        state.error = action.payload as string; // Log error for debugging
+        console.warn(`Rejected action for tag: ${tag}. Error:`, action.payload);
+      });
+    
+    
+    
+      
+        // Fetch Colors
+        builder
+        .addCase(fetchColors.pending, (state) => {
+          state.loading = true;
+        })
+        .addCase(fetchColors.fulfilled, (state, action: PayloadAction<string[]>) => {
+          state.loading = false;
+          state.tags = action.payload; // Assuming tags hold color info
+        })
+        .addCase(fetchColors.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload as string;
+        });
+  
+      // Fetch Shops
+      builder
+        .addCase(fetchShops.pending, (state) => {
+          state.loading = true;
+        })
+        .addCase(fetchShops.fulfilled, (state, action: PayloadAction<string[]>) => {
+          state.loading = false;
+          state.tags = action.payload; // Assuming tags hold shop info
+        })
+        .addCase(fetchShops.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload as string;
+        });
+  
+      // Fetch Localized Pricing
+      builder
+        .addCase(fetchLocalizedPricing.pending, (state) => {
+          state.loading = true;
+        })
+        .addCase(
+          fetchLocalizedPricing.fulfilled,
+          (state, action: PayloadAction<{ productId: string; priceData: any }>) => {
+            state.loading = false;
+            // Assuming state has localized pricing structure
+            state.productRatings[action.payload.productId] = action.payload.priceData;
+          }
+        )
+        .addCase(fetchLocalizedPricing.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload as string;
+        });
+  
+      // Update Product
+      builder
+        .addCase(updateProduct.pending, (state) => {
+          state.loading = true;
+        })
+        .addCase(updateProduct.fulfilled, (state, action: PayloadAction<Product>) => {
+          state.loading = false;
+          const index = state.products.findIndex((p) => p.id === action.payload.id);
+          if (index >= 0) {
+            state.products[index] = action.payload;
+          }
+        })
+        .addCase(updateProduct.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload as string;
+        });
+     // Fetch Featured Products
+     builder
+     .addCase(fetchFeaturedProducts.pending, (state) => {
+       state.loading = true;
+     })
+     .addCase(fetchFeaturedProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
+       state.loading = false;
+       state.products = action.payload;
+     })
+     .addCase(fetchFeaturedProducts.rejected, (state, action) => {
+       state.loading = false;
+       state.error = action.payload as string;
+     });
+
+   // Fetch Flash Deals
+   builder
+   .addCase(fetchFlashDeals.pending, (state) => {
+     state.loading = true;
+     state.error = null;
+   })
+   builder.addCase(fetchFlashDeals.fulfilled, (state, action: PayloadAction<Product[]>) => {
+    state.loading = false;
+    state.flashDeals = action.payload; // Directly store Product[]
+  })
+  
+   .addCase(fetchFlashDeals.rejected, (state, action) => {
+     state.loading = false;
+     state.error = action.payload as string;
+   });
+ 
+
+   // Fetch Products by Type
+   builder
+     .addCase(fetchProductsByType.pending, (state) => {
+       state.loading = true;
+     })
+     .addCase(fetchProductsByType.fulfilled, (state, action: PayloadAction<Product[]>) => {
+       state.loading = false;
+       state.products = action.payload;
+     })
+     .addCase(fetchProductsByType.rejected, (state, action) => {
+       state.loading = false;
+       state.error = action.payload as string;
+     });
+     // Fetch Top-Rated Products
+     builder
+     .addCase(fetchTopRatedProducts.pending, (state) => {
+       state.loading = true;
+       state.error = null;
+     })
+     .addCase(fetchTopRatedProducts.fulfilled, (state, action) => {
+       state.loading = false;
+       state.topRatedProducts = action.payload;
+     })
+     .addCase(fetchTopRatedProducts.rejected, (state, action) => {
+       state.loading = false;
+       state.error = action.payload || "Failed to fetch top-rated products";
+     });
+
+   // Fetch New Arrivals
+   builder
+     .addCase(fetchNewArrivals.pending, (state) => {
+       state.loading = true;
+     })
+     .addCase(fetchNewArrivals.fulfilled, (state, action: PayloadAction<Product[]>) => {
+       state.loading = false;
+       state.products = action.payload;
+     })
+     .addCase(fetchNewArrivals.rejected, (state, action) => {
+       state.loading = false;
+       state.error = action.payload as string;
+     });
+
+   // Fetch Products by Brand
+   builder
+     .addCase(fetchProductsByBrand.pending, (state) => {
+       state.loading = true;
+     })
+     .addCase(fetchProductsByBrand.fulfilled, (state, action: PayloadAction<Product[]>) => {
+       state.loading = false;
+       state.products = action.payload;
+     })
+     .addCase(fetchProductsByBrand.rejected, (state, action) => {
+       state.loading = false;
+       state.error = action.payload as string;
+     });
+
+   // Fetch Products by Category
+   builder
+     .addCase(fetchProductsByCategory.pending, (state) => {
+       state.loading = true;
+     })
+     .addCase(fetchProductsByCategory.fulfilled, (state, action: PayloadAction<{ categoryType: string; products: Product[] }>) => {
+      state.loading = false;
+      state.products = action.payload.products;
+    })
+     .addCase(fetchProductsByCategory.rejected, (state, action) => {
+       state.loading = false;
+       state.error = action.payload as string;
+     });
+    
+      // Fetch Product Details
+    builder
+    .addCase(fetchProductDetails.pending, (state) => {
+      state.loading = true;
+    })
+    .addCase(fetchProductDetails.fulfilled, (state, action: PayloadAction<Product>) => {
+      state.loading = false;
+      state.currentProduct = action.payload;
+    })
+    .addCase(fetchProductDetails.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as string;
+    });
+
+  // Remove Product
+  builder
+    .addCase(removeProduct.pending, (state) => {
+      state.loading = true;
+    })
+    .addCase(removeProduct.fulfilled, (state, action: PayloadAction<string>) => {
+      state.loading = false;
+      state.products = state.products.filter((product) => product.id !== action.payload);
+    })
+    .addCase(removeProduct.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as string;
+    });
+    builder
+    .addCase(fetchProductRating.fulfilled, (state, action) => {
+      const product = state.products.find((prod) => prod.id === action.payload.productId);
+      if (product) {
+        product.rating = action.payload.rating; // Dynamically assign `number` or `Rating`
+      }
+    })
+      .addCase(addRating.fulfilled, (state, action) => {
+        const product = state.products.find((prod) => prod.id === action.payload.productId);
+        if (product) {
+          product.rating = action.payload.rating; // Handle `Rating` or `number`
+        }
+      });
+       builder
+          // Handle sales products
+          .addCase(fetchSalesProducts.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+          })
+          .addCase(fetchSalesProducts.fulfilled, (state, action) => {
+            state.salesProducts = action.payload;
+            state.loading = false;
+          })
+          .addCase(fetchSalesProducts.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload as string;
+          });
+    builder
+      .addCase(fetchLocalizedPrices.fulfilled, (state, action) => {
+        const { productId, priceData } = action.payload;
+        state.localizedPrices[productId] = priceData;
+      });
+        builder
       // B2C Products
       .addCase(fetchB2CProducts.fulfilled, (state, action) => {
         state.b2cProducts = action.payload;
@@ -636,318 +1124,34 @@ const productSlice = createSlice({
       })
       // C2C Products
       .addCase(fetchC2CProducts.fulfilled, (state, action) => {
-        state.c2cProducts = action.payload;
-      });
-
-    builder
-      // Handle sales products
-      .addCase(fetchSalesProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchSalesProducts.fulfilled, (state, action) => {
-        state.salesProducts = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchSalesProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
-
-    // Handle personalized recommendations
-    builder
-      .addCase(fetchPersonalizedRecommendations.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchPersonalizedRecommendations.fulfilled, (state, action) => {
-        state.personalizedRecommendations = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchPersonalizedRecommendations.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
-
-    // Handle flash deals
-    builder
-      .addCase(fetchFlashDeals.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchFlashDeals.fulfilled, (state, action) => {
-        state.flashDeals = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchFlashDeals.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
-
-    // Handle advanced filters
-    builder
-      .addCase(fetchFilteredProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchFilteredProducts.fulfilled, (state, action) => {
-        state.products = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchFilteredProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
-    builder
-      .addCase(fetchProductsByCategory.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchProductsByCategory.fulfilled, (state, action) => {
-        state.products = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchProductsByCategory.rejected, (state, action) => {
-        state.error = action.payload as string;
-        state.loading = false;
-      });
-    // Fetch products by brand
-    builder
-      .addCase(fetchProductsByBrand.pending, (state) => {
-        state.loadingProducts = true;
-        state.error = null;
-      })
-      .addCase(fetchProductsByBrand.fulfilled, (state, action) => {
-        state.products = action.payload.products;
-        state.selectedBrand = action.payload.brand;
-        state.loadingProducts = false;
-      })
-      .addCase(fetchProductsByBrand.rejected, (state, action) => {
-        state.error = action.payload as string;
-        state.loadingProducts = false;
-      });
-
-    builder
-      .addCase(fetchProductsByTag.pending, (state, action) => {
-        const { tag } = action.meta.arg;
-        state.loadingProductsByTag[tag] = true;
-        state.error = null;
-      })
-      .addCase(fetchProductsByTag.fulfilled, (state, action) => {
-        const { tag, products } = action.payload;
-        state.productsByTag[tag] = products;
-        state.loadingProductsByTag[tag] = false;
-      })
-      .addCase(fetchProductsByTag.rejected, (state, action) => {
-        const { tag } = action.meta.arg;
-        state.error = action.payload as string;
-        state.loadingProductsByTag[tag] = false;
-      });
-
-    builder
-      // Fetch Shops
-      .addCase(fetchShops.pending, (state) => {
-        state.loadingCategories = true;
-      })
-      .addCase(fetchShops.fulfilled, (state, action) => {
-        state.shops = action.payload;
-        state.loadingCategories = false;
-      })
-    builder.addCase(fetchShops.rejected, (state, action) => {
-      state.error = action.payload || null;
-      state.loadingCategories = false;
-    })
-
-
-
-
-    builder
-      // Top Rated Products
-      .addCase(fetchTopRatedProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchTopRatedProducts.fulfilled, (state, action) => {
-        state.topRatedProducts = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchTopRatedProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-
-
-
-    builder
-      .addCase(fetchFlashDeals.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchFlashDeals.fulfilled, (state, action) => {
-        state.flashDeals = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchFlashDeals.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
-    builder
-      .addCase(fetchFeaturedProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchFeaturedProducts.fulfilled, (state, action) => {
-        state.featuredProducts = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchFeaturedProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-
-    builder
-      .addCase(fetchTags.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchTags.fulfilled, (state, action) => {
-        state.loading = false;
-        state.tags = action.payload;
-      })
-      .addCase(fetchTags.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
-    builder
-      .addCase(fetchLocalizedPrices.fulfilled, (state, action) => {
-        const { productId, priceData } = action.payload;
-        state.localizedPrices[productId] = priceData;
-      })
-      .addCase(fetchTryOnData.fulfilled, (state, action) => {
-        const { productId, tryOnData } = action.payload;
-        state.tryOnData[productId] = tryOnData;
-      })
-      .addCase(bulkUpdateProducts.fulfilled, (state, action) => {
-        action.payload.forEach((updatedProduct: Product) => {
-          const index = state.products.findIndex((p) => p.id === updatedProduct.id);
-          if (index !== -1) {
-            state.products[index] = updatedProduct;
-          }
-        })
-      })
-      .addCase(bulkUpdateProducts.rejected, (state, action) => {
-        state.error = action.payload as string;
-      })
-
-    builder
-      .addCase(fetchProductDetails.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchProductDetails.fulfilled, (state, action) => {
-        state.loading = false;
-        state.currentProduct = action.payload;
-      })
-      .addCase(fetchProductDetails.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-
-
-      // Colors
-      .addCase(fetchColors.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchColors.fulfilled, (state, action: PayloadAction<string[]>) => {
-        state.loading = false;
-        state.colors = action.payload;
-      })
-      .addCase(fetchColors.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-    builder
-      .addCase(fetchShops.pending, (state) => {
-        state.loadingCategories = true;
-      })
-      .addCase(fetchShops.fulfilled, (state, action: PayloadAction<Shop[]>) => {
-        state.shops = action.payload;
-        state.loadingCategories = false;
-      })
-      .addCase(fetchShops.rejected, (state, action: PayloadAction<string | undefined>) => {
-        state.error = action.payload || "An error occurred";
-        state.loadingCategories = false;
-      });
-
-
-
-    builder
-      .addCase(fetchRelatedProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchRelatedProducts.fulfilled, (state, action) => {
-        state.loading = false;
-        state.relatedProducts = action.payload;
-      })
-      .addCase(fetchRelatedProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
-
-
-    builder
-      .addCase(fetchProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchProducts.fulfilled, (state, action) => {
-        state.loading = false;
-        state.products = action.payload.products;
-        state.totalPages = action.payload.totalPages;
-      })
-      .addCase(fetchProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string; // Set the error message in the state
-      })
-
-      .addCase(addProduct.fulfilled, (state, action) => {
-        state.products.push(action.payload);
-      })
-      .addCase(editProduct.fulfilled, (state, action) => {
-        const index = state.products.findIndex((product) => product.id === action.payload.id);
-        if (index !== -1) {
-          state.products[index] = action.payload;
-        }
-      })
-      .addCase(removeProduct.fulfilled, (state, action) => {
-        state.products = state.products.filter((product) => product.id !== action.payload);
-      });
-
-    builder
-      .addCase(fetchProductRating.fulfilled, (state, action) => {
-        const product = state.products.find((prod) => prod.id === action.payload.productId);
-        if (product) {
-          product.rating = action.payload.rating;
-        }
-      })
-      .addCase(addRating.fulfilled, (state, action) => {
-        const product = state.products.find((prod) => prod.id === action.payload.productId);
-        if (product) {
-          product.rating = action.payload.rating;
-        }
+       state.c2cProducts = action.payload;
       });
   },
 });
 
 // Selectors
+export const selectTopRatedProducts = (state: RootState) => ({
+  topRatedProducts: state.products.topRatedProducts,
+  loading: state.products.loading,
+  error: state.products.error,
+});
+
+export const selectFlashDeals = (state: RootState) => state.products.flashDeals;
+
 export const selectProductById = (state: RootState, id: string) =>
-  state.products.products.find((product) => product.id === id);
+  state.products.products.find((product: Product) => product.id === id);
 
 export const selectBuyerPrice = (state: RootState, id: string) => {
-  const product = state.products.products.find((product) => product.id === id);
+  const product = state.products.products.find(
+    (product: Product) => product.id === id
+  );
   return product?.buyerPrice || 0;
+};
+
+
+export const selectProductRating = (state: RootState, id: string): Rating | number | undefined => {
+  const product = state.products.products.find((prod) => prod.id === id);
+  return product?.rating;
 };
 
 export const selectProducts = (state: RootState) => state.products.products;
@@ -957,9 +1161,6 @@ export const selectSelectedCategory = (state: RootState) =>
 export const selectCurrentSegment = (state: RootState) =>
   state.products.currentSegment;
 
-// Selector to get flash deals from the state
-export const selectFlashDeals = (state: RootState) => state.products.flashDeals;
-
 // Selector to get personalized recommendations from the state
 export const selectPersonalizedRecommendations = (state: RootState) =>
   state.products.personalizedRecommendations;
@@ -968,9 +1169,5 @@ export const selectPersonalizedRecommendations = (state: RootState) =>
 export const { clearProducts } = productSlice.actions;
 
 export const { updateProductStock } = productSlice.actions;
-
+export const { setCurrentProduct } = productSlice.actions;
 export default productSlice.reducer;
-
-webSocketService.subscribe("product-update", (data: { productId: string; stock: number }) => {
-  productSlice.actions.updateProductStock(data);
-});

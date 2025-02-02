@@ -1,7 +1,18 @@
-import React, { useState, useRef } from 'react';
-import { BankAccountVerificationContainer, StyledInput } from './BankAccountVerificationContainer.styled';
-import { BankAccountVerification as BankAccountVerificationType  } from '../../../types/sharedTypes';
-
+import React, { useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  BankAccountVerificationContainer,
+  StyledInput,
+  StyledButton,
+  UploadButton,
+  ErrorMessage,
+  DragDropArea,
+  UploadIcon,
+  DragDropText,
+} from "./BankAccountVerificationContainer.styled";
+import { saveBankAccountDetailsThunk } from "../../../redux/slices/orders/paymentSlice";
+import { AppDispatch, RootState } from "../../../redux/store";
+import { BankAccountVerification as BankAccountVerificationType } from "../../../types/sharedTypes";
 
 interface BankAccountVerificationProps {
   data: BankAccountVerificationType;
@@ -10,45 +21,48 @@ interface BankAccountVerificationProps {
   onNext: () => void;
 }
 
-
 const BankAccountVerification: React.FC<BankAccountVerificationProps> = ({
   data,
   onUpdate,
   onNext,
 }) => {
-  // Local state for file
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, error } = useSelector((state: RootState) => state.payments);
   const [proofFile, setProofFile] = useState<File | null>(null);
-
-  // Error state for form fields
+  const [dragOver, setDragOver] = useState(false);
   const [errors, setErrors] = useState({
-    accountNumber: '',
-    bankName: '',
-    routingCode: '',
-    proofUpload: '',
+    accountNumber: "",
+    bankName: "",
+    routingCode: "",
+    proofUpload: "",
+    accountHolderName: "",
   });
 
-  // Regular expressions for validation
   const ibanRegex = /^[A-Z]{2}\d{2}[A-Z0-9 ]{12,30}$/;
 
-  // Validation function
   const validateInput = (field: string, value: string) => {
-    let errorMessage = '';
-    const sanitizedValue = value.replace(/\s+/g, ''); // Remove spaces before validation
+    let errorMessage = "";
+    const sanitizedValue = value.replace(/\s+/g, "");
 
     switch (field) {
-      case 'accountNumber':
+      case "accountHolderName":
+        if (!/^[A-Za-z\s]+$/.test(value)) {
+          errorMessage = "Account holder name can only contain letters and spaces.";
+        }
+        break;
+      case "accountNumber":
         if (!/^\d{8,20}$/.test(sanitizedValue)) {
-          errorMessage = 'Invalid account number. It should be between 8 and 20 digits.';
+          errorMessage = "Account number must be between 8 and 20 digits.";
         }
         break;
-      case 'bankName':
+      case "bankName":
         if (!/^[A-Za-z\s]{2,50}$/.test(value)) {
-          errorMessage = 'Invalid bank name. Only letters and spaces are allowed.';
+          errorMessage = "Bank name can only contain letters and spaces.";
         }
         break;
-      case 'routingCode':
+      case "routingCode":
         if (!ibanRegex.test(sanitizedValue)) {
-          errorMessage = 'Invalid IBAN format. Please enter a valid IBAN.';
+          errorMessage = "Invalid IBAN format.";
         }
         break;
       default:
@@ -56,99 +70,149 @@ const BankAccountVerification: React.FC<BankAccountVerificationProps> = ({
     }
 
     setErrors((prevErrors) => ({ ...prevErrors, [field]: errorMessage }));
-    return errorMessage === '';
+    return errorMessage === "";
   };
 
-  // Handle input changes for text fields
+  
+  
   const handleInputChange = (field: keyof BankAccountVerificationType, value: string) => {
     onUpdate({ [field]: value });
     validateInput(field, value);
   };
 
-  // Handle file upload
   const handleFileUpload = (file: File) => {
-    if (file && file.type.startsWith('image/')) {
-      setProofFile(file); // Store the actual file locally
+    if (file && file.type.startsWith("image/")) {
+      setProofFile(file);
       onUpdate({
         proofOfBankOwnership: {
           name: file.name,
           size: file.size,
           type: file.type,
+          lastModified: file.lastModified,
         },
       });
-      setErrors((prevErrors) => ({ ...prevErrors, proofUpload: '' }));
+      setErrors((prevErrors) => ({ ...prevErrors, proofUpload: "" }));
     } else {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        proofUpload: 'Please upload a valid image file.',
+        proofUpload: "Please upload a valid image file.",
       }));
     }
   };
 
-  // Reference for file input
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
 
-  // Trigger file upload
-  const triggerFileUpload = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+  const handleDragLeave = () => setDragOver(false);
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
+
+  const handleNext = async () => {
+    if (!data.accountNumber || !data.bankName || !data.routingCode || !proofFile) {
+      alert("Please complete all fields and upload the proof of ownership.");
+      return;
+    }
+
+    try {
+      const resultAction = await dispatch(
+        saveBankAccountDetailsThunk({ data, proofFile })
+      ).unwrap();
+
+      if (resultAction === "unverified") {
+        alert("Bank account submitted for verification.");
+        onNext(); // Proceed to the next step
+      }
+    } catch (err) {
+      console.error("Failed to save bank account details:", err);
+      alert("Failed to save bank account details. Please try again.");
     }
   };
 
   return (
     <BankAccountVerificationContainer>
-      <label>Bank Account Number</label>
+      <h1>Bank Account Verification</h1>
+      <p>Verify your bank account to receive payments securely.</p>
+      <label htmlFor="accountHolderName">Account Holder Name</label>
       <StyledInput
-        placeholder="12345678"
+        id="accountHolderName"
+        placeholder="Enter account holder name"
+        value={data.accountHolderName || ""}
+        onChange={(e) => handleInputChange("accountHolderName", e.target.value)}
+      />
+      {errors.accountHolderName && <ErrorMessage>{errors.accountHolderName}</ErrorMessage>}
+
+
+      <label htmlFor="accountNumber">Bank Account Number</label>
+      <StyledInput
+        id="accountNumber"
+        placeholder="Enter your account number"
         value={data.accountNumber}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          handleInputChange('accountNumber', e.target.value)
-        }
+        onChange={(e) => handleInputChange("accountNumber", e.target.value)}
       />
-      {errors.accountNumber && <p style={{ color: 'red' }}>{errors.accountNumber}</p>}
+      {errors.accountNumber && <ErrorMessage>{errors.accountNumber}</ErrorMessage>}
 
-      <label>Bank Name</label>
+      <label htmlFor="bankName">Bank Name</label>
       <StyledInput
-        placeholder="Bank Name"
+        id="bankName"
+        placeholder="Enter your bank name"
         value={data.bankName}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          handleInputChange('bankName', e.target.value)
-        }
+        onChange={(e) => handleInputChange("bankName", e.target.value)}
       />
-      {errors.bankName && <p style={{ color: 'red' }}>{errors.bankName}</p>}
+      {errors.bankName && <ErrorMessage>{errors.bankName}</ErrorMessage>}
 
-      <label>Routing/Sort Code/IBAN</label>
+      <label htmlFor="routingCode">Routing/Sort Code/IBAN</label>
       <StyledInput
-        placeholder="GB29 NWBK 6016 1331 9268 19" // Example format for IBAN
+        id="routingCode"
+        placeholder="Enter your routing code or IBAN"
         value={data.routingCode}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          handleInputChange('routingCode', e.target.value)
-        }
+        onChange={(e) => handleInputChange("routingCode", e.target.value)}
       />
-      {errors.routingCode && <p style={{ color: 'red' }}>{errors.routingCode}</p>}
+      {errors.routingCode && <ErrorMessage>{errors.routingCode}</ErrorMessage>}
 
-      <div>
-        <label>Upload Proof of Bank Account Ownership</label>
+      <p>
+      Upload a valid proof of ownership, such as a bank statement or a screenshot of your account details.
+      Accepted formats: JPG, PNG, PDF.
+    </p>
+      <DragDropArea
+        dragOver={dragOver}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        <UploadIcon>📁</UploadIcon>
+        <DragDropText>
+          Drag and drop your proof of ownership here or{" "}
+          <UploadButton onClick={() => document.getElementById("fileInput")?.click()}>
+            browse
+          </UploadButton>
+        </DragDropText>
         <input
           type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          style={{ display: 'none' }}
+          id="fileInput"
+          style={{ display: "none" }}
           onChange={(e) => {
             if (e.target.files && e.target.files[0]) {
               handleFileUpload(e.target.files[0]);
             }
           }}
         />
-        <button type="button" onClick={triggerFileUpload}>
-          Upload Proof
-        </button>
-        {errors.proofUpload && <p style={{ color: 'red' }}>{errors.proofUpload}</p>}
-      </div>
+      </DragDropArea>
+      {errors.proofUpload && <ErrorMessage>{errors.proofUpload}</ErrorMessage>}
+      {proofFile && <p>File uploaded: {proofFile.name}</p>}
 
-      <button type="button" onClick={onNext}>
-        Next
-      </button>
+      <StyledButton onClick={handleNext} disabled={loading}>
+        {loading ? "Submitting..." : "Next"}
+      </StyledButton>
+      {error && <ErrorMessage>{error}</ErrorMessage>}
     </BankAccountVerificationContainer>
   );
 };

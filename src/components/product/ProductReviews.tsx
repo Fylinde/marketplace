@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addRating, fetchProductRating } from "../../redux/slices/products/productSlice";
-import { RootState } from "../../redux/store";
-import type { AppDispatch } from "../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 import ProductReviewsContainer from "./styles/ProductReviews.styles";
 
 const ProductReviews: React.FC<{ productId: string }> = ({ productId }) => {

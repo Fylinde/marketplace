@@ -24,60 +24,60 @@ const menuConfig: MenuItem[] = [
   {
     title: "Overview",
     icon: "dashboard",
-    path: "/vendor/dashboard",
+    path: "/seller/dashboard",
   },
   {
     title: "Product Management",
     icon: "box",
     children: [
-      { title: "Product List", path: "/vendor/products" },
-      { title: "Add Product", path: "/vendor/add-product" },
-      { title: "Price & Promotion", path: "/vendor/price-and-promotion" },
-      { title: "Business Recommendations", path: "/vendor/business-recommendations" },
+      { title: "Product List", path: "/seller/products" },
+      { title: "Add Product", path: "/seller/add-product" },
+      { title: "Price & Promotion", path: "/seller/price-and-promotion" },
+      { title: "Business Recommendations", path: "/seller/business-recommendations" },
     ],
   },
   {
     title: "Order Management",
     icon: "shopping-cart",
     children: [
-      { title: "Order History", path: "/vendor/orders" },
-      { title: "Dispute Management", path: "/vendor/order-management/dispute-management" },
-      { title: "Return & Refund", path: "/vendor/order-management/return-and-refund" },
+      { title: "Order History", path: "/seller/orders" },
+      { title: "Dispute Management", path: "/seller/order-management/dispute-management" },
+      { title: "Return & Refund", path: "/seller/order-management/return-and-refund" },
     ],
   },
   {
     title: "Analytics",
     icon: "bar-chart",
     children: [
-      { title: "Analytics Dashboard", path: "/vendor/analytics" },
-      { title: "Performance Metrics", path: "/vendor/performance" },
+      { title: "Analytics Dashboard", path: "/seller/analytics" },
+      { title: "Performance Metrics", path: "/seller/performance" },
     ],
   },
   {
     title: "Shipping",
     icon: "truck",
     children: [
-      { title: "Shipping Management", path: "/vendor/shipping" },
-      { title: "Warehouse Manager", path: "/vendor/shipping/warehouse-manager" },
+      { title: "Shipping Management", path: "/seller/shipping" },
+      { title: "Warehouse Manager", path: "/seller/shipping/warehouse-manager" },
     ],
   },
   {
     title: "Billing & Payments",
     icon: "dollar",
     children: [
-      { title: "Billing Summary", path: "/vendor/billing" },
-      { title: "Payment History", path: "/vendor/payment-history" },
+      { title: "Billing Summary", path: "/seller/billing" },
+      { title: "Payment History", path: "/seller/payment-history" },
     ],
   },
   {
     title: "Account Settings",
     icon: "setting",
-    path: "/vendor/account-settings",
+    path: "/seller/account-settings",
   },
   {
     title: "Support",
     icon: "question-circle",
-    path: "/vendor/support",
+    path: "/seller/support",
   },
 ];
 

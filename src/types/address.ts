@@ -1,16 +1,34 @@
 export interface Address {
     fullName: string;
     email: string;
-    phone: string;
+    phoneNumber: string;
     addressLine1: string;
     addressLine2?: string;
     city: string;
     state: string;
-    zipCode: string;
     country: string;
-    street: string; // Add this field
-    postalCode: string; // Add this field
-    firstName: string; // Add this field
-    lastName: string; // Add this field
-    zip?: string; // Add `zip` as an optional field
-  }
+    street: string;
+    postalCode: string;
+    firstName: string;
+    lastName: string;
+    id?: string;
+    is_primary?: boolean;
+}
+  
+export interface AddressData {
+  phoneNumber: string;
+  postalCode: string;
+  street: string;
+  city: string;
+  state: string;
+  country: string; // Required field
+  fullName?: string;
+  email?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  is_primary?: boolean;
+}
+
+
+
+

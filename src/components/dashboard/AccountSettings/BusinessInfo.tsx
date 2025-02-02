@@ -1,8 +1,8 @@
 import React from "react";
-import TextField from "components/text-field/TextField";
-import Box from "components/Box";
-import Grid from "components/grid/Grid";
-import Button from "components/buttons/Button";
+import TextField from "../../../components/text-field/TextField";
+import Box from "../../../components/Box";
+import Grid from "../../../components/grid/Grid";
+import Button from "../../../components/buttons/Button";
 
 interface BusinessInfoProps {
   data: { businessName: string; taxId: string; hours: string };

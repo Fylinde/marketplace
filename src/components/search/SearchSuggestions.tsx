@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
-import { fetchSuggestions } from "@/redux/slices/utils/searchSlice";
-import { RootState } from "redux/store";
+import { useAppDispatch, useAppSelector } from "../../redux/reduxHooks";
+import { fetchSuggestions } from "../../redux/slices/utils/searchSlice";
+import { RootState } from "../../redux/store";
 import { debounce } from "lodash";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import Box from "components/Box";
-import FlexBox from "components/FlexBox";
-import Typography from "components/Typography";
-import Icon from "components/icon/Icon";
+import Box from "../../components/Box";
+import FlexBox from "../../components/FlexBox";
+import Typography from "../../components/Typography";
+import Icon from "../../components/icon/Icon";
 
 interface SearchSuggestionsProps {
   query: string;

@@ -1,16 +1,16 @@
 
-import Accordion from "components/accordion/Accordion";
-import AccordionHeader from "components/accordion/AccordionHeader";
-import Box from "components/Box";
-import Divider from "components/Divider";
-import Grid from "components/grid/Grid";
-import Header from "components/header/Header";
-import Icon from "components/icon/Icon";
-import MobileCategoryImageBox from "components/mobile-category-nav/MobileCategoryImageBox";
-import { MobileCategoryNavStyle } from "components/mobile-category-nav/MobileCategoryNavStyle";
-import MobileNavigationBar from "components/mobile-navigation/MobileNavigationBar";
-import Typography from "components/Typography";
-import navigations from "data/navigations";
+import Accordion from "../components/accordion/Accordion";
+import AccordionHeader from "../components/accordion/AccordionHeader";
+import Box from "../components/Box";
+import Divider from "../components/Divider";
+import Grid from "../components/grid/Grid";
+import Header from "../components/header/Header";
+import Icon from "../components/icon/Icon";
+import MobileCategoryImageBox from "../components/mobile-category-nav/MobileCategoryImageBox";
+import { MobileCategoryNavStyle } from "../components/mobile-category-nav/MobileCategoryNavStyle";
+import MobileNavigationBar from "../components/mobile-navigation/MobileNavigationBar";
+import Typography from "../components/Typography";
+import navigations from "../data/navigations";
 import { Link } from "react-router-dom";
 import React, { Fragment, useEffect, useState } from "react";
 

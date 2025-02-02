@@ -1,14 +1,14 @@
-import Avatar from "components/avatar/Avatar";
-import Card from "components/Card";
-import VendorAnalyticsChart from "components/dashboard/VendorAnalyticsChart";
-import FlexBox from "components/FlexBox";
-import Grid from "components/grid/Grid";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
-import VendorDashboardLayout from "components/layout/VendorDashboardLayout";
+import Avatar from "../../../components/avatar/Avatar";
+import Card from "../../../components/Card";
+import SellerAnalyticsChart from "../../../components/dashboard/SellerAnalyticsChart";
+import FlexBox from "../../../components/FlexBox";
+import Grid from "../../../components/grid/Grid";
+import DashboardPageHeader from "../../../components/layout/DashboardPageHeader";
+import SellerDashboardLayout from "@/components/layout/SellerDashboardLayout";
 import Typography, { H1, H5, Paragraph } from "components/Typography";
 import React from "react";
 
-const VendorDashboard = () => {
+const SellerDashboard = () => {
   return (
     <div>
       <DashboardPageHeader title="Dashboard" iconName="bag_filled" />
@@ -31,7 +31,7 @@ const VendorDashboard = () => {
         <Grid item lg={8} xs={12}>
           <Card p="20px 30px">
             <H5 mb="1.5rem">Sales</H5>
-            <VendorAnalyticsChart />
+            <SellerAnalyticsChart />
           </Card>
         </Grid>
 
@@ -63,7 +63,7 @@ const cardList = [
   {
     title: "Earnings (before taxes)",
     amount: "$30450.00",
-    subtitle: "after associated vendor fees",
+    subtitle: "after associated seller fees",
   },
   {
     title: "Your balance",
@@ -117,6 +117,6 @@ const topCountryList = [
   },
 ];
 
-VendorDashboard.layout = VendorDashboardLayout;
+SellerDashboard.layout = SellerDashboardLayout;
 
-export default VendorDashboard;
+export default SellerDashboard;

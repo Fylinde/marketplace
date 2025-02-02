@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import CombinedInformationFormWrapper from './CombinedInformationFormWrapper';
+import React, { useState, useEffect } from "react";
+import {
+  CombinedFormWrapper,
+  FormTitle,
+  FormGroup,
+  SubmitButton,
+} from "./CombinedInformationFormWrapper";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../../redux/store";
+import { updateRegistrationData } from "../../../redux/slices/auth/registrationSlice";
 
 interface CombinedInformationFormProps {
   data: {
@@ -8,7 +16,6 @@ interface CombinedInformationFormProps {
     businessName?: string;
     companyName?: string;
     companyRegistrationNumber?: string;
-    taxId?: string;
     countryOfIncorporation?: string;
     businessAddress?: string;
     phoneNumber?: string;
@@ -17,217 +24,190 @@ interface CombinedInformationFormProps {
     contactPersonLastName?: string;
     smsVerificationLanguage?: string;
     verificationMethod?: string;
+    businessIndustry?: string;
+    yearsInOperation?: number;
+    businessWebsite?: string;
+    altPhoneNumber?: string;
   };
-  onUpdate: (newData: Partial<CombinedInformationFormProps['data']>) => void;
+  onUpdate: (newData: Partial<CombinedInformationFormProps["data"]>) => void;
   onSubmit: () => void;
   onNext: () => void;
 }
 
-const CombinedInformationForm: React.FC<CombinedInformationFormProps> = ({ data, onUpdate, onSubmit, onNext }) => {
+const CombinedInformationForm: React.FC<CombinedInformationFormProps> = ({
+  data,
+  onUpdate,
+  onSubmit,
+  onNext,
+}) => {
+  const savedData = useSelector((state: RootState) => state.registration.sellerVerification);
   const [formData, setFormData] = useState({
-    businessLocation: '',
-    businessType: '',
-    businessName: '',
-    companyName: '',
-    companyRegistrationNumber: '',
-    taxId: '',
-    countryOfIncorporation: '',
-    businessAddress: '',
-    phoneNumber: '',
-    contactPersonFirstName: '',
-    contactPersonMiddleName: '',
-    contactPersonLastName: '',
-    smsVerificationLanguage: 'English',
-    verificationMethod: 'SMS',
+    businessLocation: data.businessLocation || savedData.businessLocation || "",
+    businessType: data.businessType || savedData.businessType || "",
+    businessName: data.businessName || savedData.businessName || "",
+    companyName: data.companyName || savedData.companyName || "",
+    companyRegistrationNumber: data.companyRegistrationNumber || savedData.companyRegistrationNumber || "",
+    countryOfIncorporation: data.countryOfIncorporation || savedData.countryOfIncorporation || "",
+    businessAddress: data.businessAddress || savedData.businessAddress || "",
+    phoneNumber: data.phoneNumber || savedData.phoneNumber || "",
+    contactPersonFirstName: data.contactPersonFirstName || savedData.contactPersonFirstName || "",
+    contactPersonMiddleName: data.contactPersonMiddleName || savedData.contactPersonMiddleName || "",
+    contactPersonLastName: data.contactPersonLastName || savedData.contactPersonLastName || "",
+    smsVerificationLanguage: data.smsVerificationLanguage || savedData.smsVerificationLanguage || "English",
+    verificationMethod: data.verificationMethod || savedData.verificationMethod || "SMS",
+    businessIndustry: data.businessIndustry || savedData.businessIndustry || "",
+    yearsInOperation: data.yearsInOperation || savedData.yearsInOperation || 0,
+    businessWebsite: data.businessWebsite || savedData.businessWebsite || "",
+    altPhoneNumber: data.altPhoneNumber || savedData.altPhoneNumber || "",
   });
 
-  // Sync formData with incoming props data when component mounts or data changes
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (data) {
       setFormData((prev) => ({ ...prev, ...data }));
     }
   }, [data]);
 
-  // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const updatedData = {
       ...formData,
       [e.target.name]: e.target.value,
     };
     setFormData(updatedData);
-    onUpdate(updatedData);  // Propagate the changes upwards
+    onUpdate(updatedData);
+    dispatch(updateRegistrationData({ [e.target.name]: e.target.value }));
   };
 
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('CombinedInformationForm submitted:', formData);
-    onSubmit();  // Call onSubmit to proceed
+    const requiredFields = ["businessLocation", "businessName"];
+    const missingFields = requiredFields.filter((field) => !formData[field as keyof typeof formData]);
+
+    if (missingFields.length > 0) {
+      alert(`Please fill in the required fields: ${missingFields.join(", ")}`);
+      return;
+    }
+
+    console.log("CombinedInformationForm submitted:", formData);
+    onSubmit();
+    onNext();
   };
 
   return (
-    <CombinedInformationFormWrapper>
-    <form onSubmit={handleSubmit} className="combined-form">
-      <h2>Business Information</h2>
+    <CombinedFormWrapper>
+      <form onSubmit={handleSubmit}>
+        <FormTitle>Business Information</FormTitle>
 
-      <div className="form-group">
-        <label>Business Location</label>
-        <select name="businessLocation" value={formData.businessLocation} onChange={handleChange}>
-          <option value="">Select Country</option>
-          <option value="US">United States</option>
-          <option value="UK">United Kingdom</option>
-          <option value="CA">Canada</option>
-          <option value="AU">Australia</option>
-          <option value="NL">Netherlands</option>
-          <option value="NG">Nigeria</option>
-        </select>
-      </div>
+        <FormGroup>
+          <label htmlFor="businessLocation">Business Location</label>
+          <select
+            id="businessLocation"
+            name="businessLocation"
+            value={formData.businessLocation}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select Country</option>
+            <option value="US">United States</option>
+            <option value="UK">United Kingdom</option>
+            <option value="CA">Canada</option>
+            <option value="AU">Australia</option>
+          </select>
+        </FormGroup>
 
-      <div className="form-group">
-        <label>Business Type</label>
-        <select name="businessType" value={formData.businessType} onChange={handleChange}>
-          <option value="">Select Business Type</option>
-          <option value="privately_owned">Privately-owned business</option>
-          <option value="public_company">Public company</option>
-          <option value="non_profit">Non-profit organization</option>
-        </select>
-      </div>
+        <FormGroup>
+          <label>Business Type</label>
+          <select name="businessType" value={formData.businessType} onChange={handleChange}>
+            <option value="">Select Business Type</option>
+            <option value="privately_owned">Privately-owned business</option>
+            <option value="public_company">Public company</option>
+            <option value="non_profit">Non-profit organization</option>
+          </select>
+        </FormGroup>
 
-      <div className="form-group">
-        <label>Business Name</label>
-        <input
-          type="text"
-          name="businessName"
-          placeholder="Business Name"
-          value={formData.businessName}
-          onChange={handleChange}
-        />
-      </div>
-
-      <h2>Company Information</h2>
-
-      <div className="form-group">
-        <label>Company Name</label>
-        <input
-          type="text"
-          name="companyName"
-          value={formData.companyName}
-          onChange={handleChange}
-          placeholder="Enter Company Name"
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Company Registration Number</label>
-        <input
-          type="text"
-          name="companyRegistrationNumber"
-          value={formData.companyRegistrationNumber}
-          onChange={handleChange}
-          placeholder="Enter Company Registration Number"
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Tax Identification Number (Tax ID)</label>
-        <input
-          type="text"
-          name="taxId"
-          value={formData.taxId}
-          onChange={handleChange}
-          placeholder="Enter Tax ID"
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Country of Incorporation</label>
-        <select
-          name="countryOfIncorporation"
-          value={formData.countryOfIncorporation}
-          onChange={handleChange}
-        >
-          <option value="">Select Country</option>
-          <option value="US">United States</option>
-          <option value="UK">United Kingdom</option>
-          <option value="CA">Canada</option>
-          <option value="AU">Australia</option>
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label>Business Address</label>
-        <input
-          type="text"
-          name="businessAddress"
-          value={formData.businessAddress}
-          onChange={handleChange}
-          placeholder="Enter Business Address"
-        />
-      </div>
-
-      <h2>Seller Information</h2>
-
-      <div className="form-group">
-        <label>Phone Number</label>
-        <input
-          type="tel"
-          name="phoneNumber"
-          value={formData.phoneNumber}
-          onChange={handleChange}
-          placeholder="+1 (555) 555-5555"
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Verification Method</label>
-        <select name="verificationMethod" value={formData.verificationMethod} onChange={handleChange}>
-          <option value="SMS">SMS</option>
-          <option value="Call">Call</option>
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label>SMS Verification Language</label>
-        <select name="smsVerificationLanguage" value={formData.smsVerificationLanguage} onChange={handleChange}>
-          <option value="English">English</option>
-          <option value="Spanish">Spanish</option>
-          <option value="French">French</option>
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label>Primary Contact Person</label>
-        <div className="name-group">
+        <FormGroup>
+          <label>Business Name</label>
           <input
             type="text"
-            name="contactPersonFirstName"
-            placeholder="First Name"
-            value={formData.contactPersonFirstName}
+            name="businessName"
+            placeholder="Business Name"
+            value={formData.businessName}
             onChange={handleChange}
           />
-          <input
-            type="text"
-            name="contactPersonMiddleName"
-            placeholder="Middle Name"
-            value={formData.contactPersonMiddleName}
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="contactPersonLastName"
-            placeholder="Last Name"
-            value={formData.contactPersonLastName}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
+        </FormGroup>
 
-      <div className="form-navigation">
-        <button type="button" onClick={onNext} className="next-button">Next</button>
-        <button type="submit" className="submit-btn">Submit</button>
-      </div>
+        <FormGroup>
+          <label>Business Industry</label>
+          <select name="businessIndustry" value={formData.businessIndustry} onChange={handleChange}>
+            <option value="">Select Industry</option>
+            <option value="retail">Retail</option>
+            <option value="technology">Technology</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="manufacturing">Manufacturing</option>
+          </select>
+        </FormGroup>
+
+        <FormGroup>
+          <label>Years in Operation</label>
+          <input
+            type="number"
+            name="yearsInOperation"
+            value={formData.yearsInOperation}
+            onChange={handleChange}
+            placeholder="Years in Operation"
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <label>Business Website (Optional)</label>
+          <input
+            type="url"
+            name="businessWebsite"
+            value={formData.businessWebsite}
+            onChange={handleChange}
+            placeholder="Enter Business Website"
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <label>Alternative Contact Number (Optional)</label>
+          <input
+            type="text"
+            name="altPhoneNumber"
+            value={formData.altPhoneNumber}
+            onChange={handleChange}
+            placeholder="Enter Alternative Contact Number"
+          />
+        </FormGroup>
+
+        <FormTitle>Company Information</FormTitle>
+
+        <FormGroup>
+          <label>Company Name</label>
+          <input
+            type="text"
+            name="companyName"
+            value={formData.companyName}
+            onChange={handleChange}
+            placeholder="Enter Company Name"
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <label>Company Registration Number</label>
+          <input
+            type="text"
+            name="companyRegistrationNumber"
+            value={formData.companyRegistrationNumber}
+            onChange={handleChange}
+            placeholder="Enter Company Registration Number"
+          />
+        </FormGroup>
+
+        <SubmitButton type="submit">Submit</SubmitButton>
       </form>
-      </CombinedInformationFormWrapper>
+    </CombinedFormWrapper>
   );
 };
 

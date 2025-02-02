@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { SpaceProps } from "styled-system";
-import Box from "components/Box";
-import Image from "components/Image";
+import Box from "../../components/Box";
+import Image from "../../components/Image";
 import Button from "../buttons/Button";
 import IconButton from "../buttons/IconButton";
 import FlexBox from "../FlexBox";

@@ -3,7 +3,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import checkoutService from "../../../services/checkoutService";
 import { Address } from "../../../types/address";
 import { validateDiscount } from "../../../utils/validationUtils";
-
+import { CartItem } from "../../../types/cartItem";
+import { DeliveryOption } from "../../../types/order";
 
 export interface PaymentMethod {
   cardType: string;
@@ -12,23 +13,6 @@ export interface PaymentMethod {
   cardHolderName: string;
 }
 
-export interface CartItem {
-  id: string;
-  name: string;
-  buyerPrice: number;
-  sellerPrice: number;
-  quantity: number;
-  discount?: number; // Add this field
-  image: string;
-}
-
-export interface DeliveryOption {
-  id: string; // Add this field
-  name: string;
-  price: number;
-  date: string;
-  time: string;
-}
 
 export interface CheckoutState {
   currentStep: number; // Tracks the current step of the checkout process
@@ -44,6 +28,8 @@ export interface CheckoutState {
   countryList: { label: string; value: string }[];
   error: string | null;
   currency: string; // Add this line
+  buyerCurrency: string;
+  sellerCurrency: string;
 }
 
 const initialState: CheckoutState = {
@@ -59,6 +45,8 @@ const initialState: CheckoutState = {
   countryList: [],
   error: null,
   currency: '',
+  buyerCurrency: '',
+  sellerCurrency: '',
 };
 
 // Utility Function to Calculate Totals

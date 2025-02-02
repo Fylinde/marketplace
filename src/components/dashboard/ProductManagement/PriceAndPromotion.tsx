@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Table, Button, Spin, Alert, Modal, Input, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "redux/store";
-import { fetchB2BPricing, updateB2BPricing } from "@/redux/slices/marketing/b2bSlice";
-import { fetchC2CListings, updateC2CListing } from "@/redux/slices/marketing/c2cSlice";
-import { getLocalizedText } from "utils/localizationUtils";
+import { AppDispatch, RootState } from "../../../redux/store";
+import { fetchB2BPricing, updateB2BPricing } from "../../../redux/slices/marketing/b2bSlice";
+import { fetchC2CListings, updateC2CListing } from "../../../redux/slices/marketing/c2cSlice";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 
 const { Option } = Select;
 

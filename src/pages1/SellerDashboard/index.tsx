@@ -43,13 +43,13 @@ const SellerDashboard: React.FC = () => {
   const breadcrumb = ["Home", "Seller Dashboard"];
 
   return (
-    <div className="vendor-dashboard">
+    <div className="seller-dashboard">
       {/* Optional: Header and Sidebar */}
       <DashboardHeader breadcrumb={breadcrumb} />
       <DashboardSidebar />
 
       <div className="dashboard-content">
-        <h1>Welcome to Vendor Dashboard</h1>
+        <h1>Welcome to Seller Dashboard</h1>
 
         {/* Exchange Rate Card */}
         <section>

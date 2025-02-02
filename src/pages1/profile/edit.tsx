@@ -1,15 +1,15 @@
 
-import Avatar from "components/avatar/Avatar";
-import Box from "components/Box";
-import Button from "components/buttons/Button";
-import { Card1 } from "components/Card1";
-import FlexBox from "components/FlexBox";
-import Grid from "components/grid/Grid";
-import Hidden from "components/hidden/Hidden";
-import Icon from "components/icon/Icon";
-import CustomerDashboardLayout from "components/layout/CustomerDashboardLayout";
-import DashboardPageHeader from "components/layout/DashboardPageHeader";
-import TextField from "components/text-field/TextField";
+import Avatar from "../../components/avatar/Avatar";
+import Box from "../../components/Box";
+import Button from "../../components/buttons/Button";
+import { Card1 } from "../../components/Card1";
+import FlexBox from "../../components/FlexBox";
+import Grid from "../../components/grid/Grid";
+import Hidden from "../../components/hidden/Hidden";
+import Icon from "../../components/icon/Icon";
+import CustomerDashboardLayout from "../../components/layout/CustomerDashboardLayout";
+import DashboardPageHeader from "../../components/layout/DashboardPageHeader";
+import TextField from "../../components/text-field/TextField";
 import { Formik } from "formik";
 import { Link } from "react-router-dom";
 import React from "react";

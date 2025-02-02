@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import Box from "components/Box";
-import Table from "components/table/Table";
-import Button from "components/buttons/Button";
-import Input from "components/input/Input";
+import Box from "../../../components/Box";
+import Table from "../../../components/table/Table";
+import Button from "../../../components/buttons/Button";
+import Input from "../../../components/input/Input";
 import { Select } from "antd"; // Correctly use `Select` from Ant Design
-import { getLocalizedText } from "@/utils/localizationUtils";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 
 interface RefundRule {
   id: string;

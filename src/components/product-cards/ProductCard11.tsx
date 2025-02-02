@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import Box from "components/Box";
-import FlexBox from "components/FlexBox";
-import LazyImage from "components/LazyImage";
-import Rating from "components/rating/Rating";
-import Button from "components/buttons/Button";
-import { H6, SemiSpan, Small } from "components/Typography";
+import Box from "../../components/Box";
+import FlexBox from "../../components/FlexBox";
+import LazyImage from "../../components/LazyImage";
+import Rating from "../../components/rating/Rating";
+import Button from "../../components/buttons/Button";
+import { H6, SemiSpan, Small } from "../../components/Typography";
 import ViewInSpaceButton from "../buttons/ViewInSpaceButton";
 
 

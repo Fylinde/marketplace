@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import exchangeRateService from "services/exchangeRateService";
+import exchangeRateService from "../../../services/exchangeRateService";
 
 // Types
 export interface ExchangeRate {

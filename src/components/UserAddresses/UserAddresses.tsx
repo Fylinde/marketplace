@@ -11,9 +11,9 @@ const UserAddresses: React.FC = () => {
     street: '',
     city: '',
     state: '',
-    postal_code: '',
+    postalCode: '',
     country: '',
-    phone_number: '',  // Add phone_number here
+    phoneNumber: '',  // Add phoneNumber here
   });
 
   // Get the userId from the Redux store
@@ -51,9 +51,9 @@ const UserAddresses: React.FC = () => {
         street: '',
         city: '',
         state: '',
-        postal_code: '',
+        postalCode: '',
         country: '',
-        phone_number: '',  // Add phone_number here   // Make phone_number optional
+        phoneNumber: '',  // Add phoneNumber here   // Make phoneNumber optional
       });
     } catch (error) {
       console.error("Error adding address:", error);
@@ -66,7 +66,7 @@ const UserAddresses: React.FC = () => {
       <ul>
         {addresses.map((address) => (
           <li key={address.id}>
-            {address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country}
+            {address.street}, {address.city}, {address.state}, {address.postalCode}, {address.country}
           </li>
         ))}
       </ul>
@@ -99,9 +99,9 @@ const UserAddresses: React.FC = () => {
         />
         <input
           type="text"
-          name="postal_code"
+          name="postalCode"
           placeholder="Postal Code"
-          value={newAddress.postal_code}
+          value={newAddress.postalCode}
           onChange={handleInputChange}
           required
         />
@@ -115,9 +115,9 @@ const UserAddresses: React.FC = () => {
         />
         <input
           type="text"
-          name="phone_number"
+          name="phoneNumber"
           placeholder="Phone Number"
-          value={newAddress.phone_number}
+          value={newAddress.phoneNumber}
           onChange={handleInputChange}
           required
         />

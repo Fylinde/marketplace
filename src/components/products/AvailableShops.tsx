@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "@/redux/reduxHooks";
-import { fetchShops } from "@/redux/slices/products/productSlice"; // Assume `fetchShops` is parameterless
+import { useAppDispatch, useAppSelector } from "../../redux/reduxHooks";
+import { fetchShops } from "../../redux/slices/products/productSlice";
 import Avatar from "../avatar/Avatar";
 import Box from "../Box";
 import Card from "../Card";
 import FlexBox from "../FlexBox";
 import Grid from "../grid/Grid";
 import { H3, H4, Paragraph } from "../Typography";
-import { Shop } from "../../types/shop"; // Ensure correct Shop type import
+import { Shop } from "../../types/shop";
 
 export interface AvailableShopsProps {
-  productId: string; // Ensure this matches the type passed
+  productId: string;
 }
 
 const AvailableShops: React.FC<AvailableShopsProps> = ({ productId }) => {
@@ -19,12 +19,12 @@ const AvailableShops: React.FC<AvailableShopsProps> = ({ productId }) => {
   const { shops, loading, error } = useAppSelector((state) => state.products);
 
   useEffect(() => {
-    // Dispatch fetchShops without arguments
     dispatch(fetchShops());
   }, [dispatch]);
 
-  // Filter shops by productId
-  const filteredShops = shops.filter((shop: Shop) => shop.products?.includes(productId));
+  const filteredShops = shops.filter((shop: Shop) =>
+    shop.products?.some((product) => product.id === productId)
+  );
 
   if (loading) {
     return (

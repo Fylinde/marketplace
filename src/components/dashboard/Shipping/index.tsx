@@ -6,9 +6,9 @@ import ShippingManagement from "./ShippingManagement";
 import ShippingSettings from "./ShippingSettings";
 import WarehouseManager from "./WarehouseManager";
 
-import { RootState, AppDispatch } from "@/redux/store"; // Adjust the path to your Redux store
-import { fetchShippingData, updateShippingSettings } from "@/redux/slices/logistics/shippingSlice";
-import { getLocalizedText } from "@/utils/localizationUtils";
+import { RootState, AppDispatch } from "../../../redux/store"; // Adjust the path to your Redux store
+import { fetchShippingData, updateShippingSettings } from "../../../redux/slices/logistics/shippingSlice";
+import { getLocalizedText } from "../../../utils/localizationUtils";
 
 const ShippingContainer = styled.div`
   padding: 20px;

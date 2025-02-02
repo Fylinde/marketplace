@@ -8,11 +8,11 @@ const RequestOTPForm: React.FC = () => {
   const [method, setMethod] = useState('email');
   const [contact, setContact] = useState('');
   const [carrierGateway, setCarrierGateway] = useState('');
-  
+
   const token = useSelector((state: RootState) => state.auth.access_token);
   const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
-  
+
   const authStatus = useSelector((state: RootState) => state.auth.status);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const RequestOTPForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!token) {
       console.error("Authorization token is missing.");
       return;
@@ -38,7 +38,7 @@ const RequestOTPForm: React.FC = () => {
     try {
       const payload: any = {};
       if (method === 'sms') {
-        payload.phone_number = contact;
+        payload.phoneNumber = contact;
         payload.carrier_gateway = carrierGateway;
       } else {
         payload.email = contact;
@@ -59,7 +59,7 @@ const RequestOTPForm: React.FC = () => {
       } else {
         console.error('Failed to send OTP', (error as Error).message);
       }
-    } 
+    }
   };
 
   return (

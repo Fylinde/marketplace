@@ -54,12 +54,15 @@ const ReturnAndRefund: React.FC<ReturnAndRefundProps> = ({ orderId }) => {
     try {
       // Step 1: Record the refund request
       const refundRequestResponse = await dispatch(
-        requestRefund({ orderId, reason: "Customer requested refund" })
+        requestRefund({ orderId, reason: getLocalizedText("customerRequestReason", "refundAutomation") })
       ).unwrap();
 
       // Step 2: Trigger refund payment
       const paymentResponse = await dispatch(
-        refundPaymentThunk({ paymentId: order.paymentId, currency: order.currency })
+        refundPaymentThunk({
+          paymentId: order.paymentId,
+          currency: order.buyerCurrency || order.currency || "USD", // Use buyerCurrency as primary, fallback to currency
+        })
       ).unwrap();
 
       if (paymentResponse.success) {
@@ -76,7 +79,6 @@ const ReturnAndRefund: React.FC<ReturnAndRefundProps> = ({ orderId }) => {
           getLocalizedText("refundFailed", "refundAutomation", { reason: paymentResponse.message || "unknown" })
         );
       }
-
     } catch (err) {
       setError(getLocalizedText("refundError", "refundAutomation"));
     } finally {
@@ -103,11 +105,11 @@ const ReturnAndRefund: React.FC<ReturnAndRefundProps> = ({ orderId }) => {
           </p>
           <p>
             <strong>{getLocalizedText("buyerPrice", "refundAutomation")}: </strong>
-            {formatCurrency(order.totalBuyerPrice || 0, order.buyerCurrency)}
+            {formatCurrency(order.totalBuyerPrice || 0, order.buyerCurrency || "USD")}
           </p>
           <p>
             <strong>{getLocalizedText("sellerPrice", "refundAutomation")}: </strong>
-            {formatCurrency(order.totalSellerPrice || 0, order.sellerCurrency)}
+            {formatCurrency(order.totalSellerPrice || 0, order.sellerCurrency || "USD")}
           </p>
           <p>
             <strong>{getLocalizedText("orderStatus", "refundAutomation")}: </strong>

@@ -3,10 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { saveVerificationDetails, selectVerificationDetails } from '../../redux/slices/auth/registrationSlice';
 import { useNavigate } from 'react-router-dom';
 import ProgressIndicator from './ProgressIndicator';
+import { convertFileMetadataToFile } from '../../utils/convertFileMetadataToFile ';
 import _ from 'lodash';
 import './VerificationForm.css';
 
-// Define the VerificationDetails type if not imported
+// Define the VerificationDetails type
 type VerificationDetails = {
   identityDocument: File | null;
   businessDocument: File | null;
@@ -20,26 +21,8 @@ type VerificationDetails = {
 };
 
 interface VerificationFormProps {
-  data: {
-    verificationMethod?: string;
-    phoneNumber?: string;
-    verificationLanguage?: string;
-    primaryContactFirstName?: string;
-    primaryContactMiddleName?: string;
-    primaryContactLastName?: string;
-    identityDocument?: File | null;
-    businessDocument?: File | null;
-  };
-  onUpdate: (updatedData: Partial<{
-    verificationMethod: string;
-    phoneNumber: string;
-    verificationLanguage: string;
-    primaryContactFirstName: string;
-    primaryContactMiddleName: string;
-    primaryContactLastName: string;
-    identityDocument: File | null;
-    businessDocument: File | null;
-  }>) => void;
+  data: VerificationDetails;
+  onUpdate: (updatedData: Partial<VerificationDetails>) => void;
   onNext: () => void;
 }
 
@@ -49,21 +32,23 @@ const VerificationForm: React.FC<VerificationFormProps> = ({ data, onUpdate, onN
 
   const savedVerificationDetails = useSelector(selectVerificationDetails);
 
-  const [additionalComments, setAdditionalComments] = useState(savedVerificationDetails?.additionalComments || '');
+  const processedDetails: VerificationDetails = {
+    ...savedVerificationDetails,
+    identityDocument: savedVerificationDetails?.identityDocument
+      ? convertFileMetadataToFile(savedVerificationDetails.identityDocument)
+      : null,
+    businessDocument: savedVerificationDetails?.businessDocument
+      ? convertFileMetadataToFile(savedVerificationDetails.businessDocument)
+      : null,
+  };
+
   useEffect(() => {
-    if (!_.isEqual(savedVerificationDetails, data)) {
-      onUpdate({
-        identityDocument: savedVerificationDetails.identityDocument,
-        businessDocument: savedVerificationDetails.businessDocument,
-        verificationMethod: savedVerificationDetails.verificationMethod || data.verificationMethod || '',
-        phoneNumber: savedVerificationDetails.phoneNumber || data.phoneNumber || '',
-        verificationLanguage: savedVerificationDetails.verificationLanguage || data.verificationLanguage || '',
-        primaryContactFirstName: savedVerificationDetails.primaryContactFirstName || data.primaryContactFirstName || '',
-        primaryContactMiddleName: savedVerificationDetails.primaryContactMiddleName || data.primaryContactMiddleName || '',
-        primaryContactLastName: savedVerificationDetails.primaryContactLastName || data.primaryContactLastName || '',
-      });
+    if (savedVerificationDetails && !_.isEqual(processedDetails, data)) {
+      onUpdate(processedDetails);
     }
-  }, [savedVerificationDetails, data]);
+  }, [processedDetails, data]);
+
+  const [additionalComments, setAdditionalComments] = useState(data.additionalComments || '');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -78,8 +63,7 @@ const VerificationForm: React.FC<VerificationFormProps> = ({ data, onUpdate, onN
     e.preventDefault();
 
     const formData: VerificationDetails = {
-      identityDocument: data.identityDocument || null,
-      businessDocument: data.businessDocument || null,
+      ...data,
       additionalComments,
     };
 
@@ -191,7 +175,9 @@ const VerificationForm: React.FC<VerificationFormProps> = ({ data, onUpdate, onN
         />
       </div>
 
-      <button type="submit" className="submit-button">Submit</button>
+      <button type="submit" className="submit-button">
+        Submit
+      </button>
     </form>
   );
 };

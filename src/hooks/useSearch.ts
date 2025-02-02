@@ -2,9 +2,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useCallback } from "react";
 import { fetchSuggestions, executeSearch } from "../redux/slices/utils/searchSlice";
-import { RootState } from "../redux/store";
 import { debounce } from "../utils/debounce";
-import type { AppDispatch } from '../redux/store';
+import type { AppDispatch, RootState } from '../redux/store';
 
 export const useSearch = () => {
   const dispatch = useDispatch<AppDispatch>();
