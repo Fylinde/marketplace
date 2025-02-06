@@ -6,8 +6,8 @@ import { theme } from "./utils/theme";
 import NavbarLayout from "./components/layout/NavbarLayout";
 import IndexPage from "pages1";
 import UserRegistrationParent from "./components/UserRegistrationParent/UserRegistrationParent";
-import IndividualSellerRegistration from "./components/ParentSellerRegistrationParent/IndividualSellerRegistration";
-import ProfessionalSellerRegistration from "./components/ParentSellerRegistrationParent/ProfessionalSellerRegistration";
+//import IndividualSellerRegistration from "./components/ParentSellerRegistrationParent/IndividualSellerRegistration";
+//import ProfessionalSellerRegistration from "./components/ParentSellerRegistrationParent/ProfessionalSellerRegistration";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import UserDashboard from "./components/UserDashboard/UserDashboard";
 import WelcomeScreen from "./components/Registration/WelcomeScreen";
@@ -15,6 +15,10 @@ import SellerDashboard from "./components/Seller/SellerDashboard";
 import { SearchProvider } from "./context/SearchContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import TypeSelectionPage from "./pages1/TypeSelectionPage";
+import ProfessionalSellerRegistrationRoutes from "./components/ParentSellerRegistrationParent/ProfessionalSellerRegistrationRoutes";
+import SellerAccountForm from "./components/Registration/CompanyForms/SellerAccountForm";
+import SellerEmailOrPhoneVerification from "./components/Registration/CompanyForms/SellerEmailOrPhoneVerification";
+
 
 // Lazy load Seller Dashboard modules for performance optimization
 const AccountSettings = React.lazy(() => import("./components/dashboard/AccountSettings"));
@@ -51,8 +55,12 @@ const App: React.FC = () => {
             <Route path="/" element={renderWithLayout(IndexPage)} />
             <Route path="/register/*" element={<UserRegistrationParent />} />
             <Route path="/register/type-selection" element={<TypeSelectionPage />} />
-            <Route path="/register/seller/individual/*" element={<IndividualSellerRegistration />} />
-            <Route path="/register/seller/professional/*" element={<ProfessionalSellerRegistration />} />
+            {/* <Route path="/register/seller/individual/*" element={<IndividualSellerRegistration />} /> */}
+            {/* Parent route for professional seller registration */}
+            <Route path="/register/seller/professional/*" element={<ProfessionalSellerRegistrationRoutes />}>
+                <Route path="account" element={<SellerAccountForm />} />
+                 <Route path="verify" element={<SellerEmailOrPhoneVerification />} />
+            </Route>
 
             <Route
               path="/user-dashboard"

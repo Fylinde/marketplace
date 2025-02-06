@@ -132,7 +132,20 @@ const CreateSellerAccount: React.FC<CreateSellerAccountProps> = ({
   
     try {
       console.log("[CreateSellerAccount] Dispatching account registration.");
-      const accountDetailsData: AccountDetails = { full_name, email, password };
+      const accountDetailsData: AccountDetails = {
+        full_name: "",
+        email: "",
+        phoneNumber: "",
+        password: "",
+        seller_type: "individual",  // ✅ Must be "individual" or "professional"
+        currency_code: "USD",         // ✅ Required
+        is_email_verified: false,     // ✅ Required (defaults to False)
+        is_phone_verified: false,     // ✅ Required (defaults to False)
+        profile_picture: null,        // ✅ Optional but explicitly sent as null
+        preferences: null,            // ✅ Optional but explicitly sent as null
+        verification_code: null,      // ✅ Optional but explicitly sent as null
+        verification_expiration: null //
+      };
   
       if (onSubmit) {
         onSubmit(accountDetailsData);

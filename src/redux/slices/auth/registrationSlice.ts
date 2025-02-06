@@ -153,7 +153,19 @@ const initialState: RegistrationState = {
   verificationDetails: undefined,
 
   // Account and Personal Details
-  accountDetails: { full_name: '', email: '', password: '' },
+  accountDetails: {
+    full_name: '',
+    email: '',
+    password: '',
+    seller_type: 'individual',
+    currency_code: "USD",
+    is_email_verified: false, 
+    is_phone_verified: false,
+    profile_picture: null,
+    preferences: null,
+    verification_code: null,
+    verification_expiration: null,
+  },
   contactDetails: {
     firstName: '',
     middleName: '',

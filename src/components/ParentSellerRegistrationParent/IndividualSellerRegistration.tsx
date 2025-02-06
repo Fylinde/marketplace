@@ -291,7 +291,7 @@ const IndividualSellerRegistration: React.FC = () => {
   return (
     <Routes>
       {/* Create Account */}
-      <Route
+      {/* <Route
         path="create-account"
         element={
           <SellerRegistrationLayout currentStep={currentStep}>
@@ -311,7 +311,7 @@ const IndividualSellerRegistration: React.FC = () => {
             />
           </SellerRegistrationLayout>
         }
-      />
+      /> */}
 
       {/* Verify Seller */}
       <Route

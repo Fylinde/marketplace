@@ -24,9 +24,19 @@ const CreateAccountStep: React.FC<StepProps> = ({ registrationData, updateStep }
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const accountDetails: AccountDetails = {
-    full_name: registrationData.full_name || "",
-    email: registrationData.email || "",
-    password: registrationData.password || "",
+ 
+    full_name: "",
+    email: "",
+    phoneNumber: "",
+    password: "",
+    seller_type: "individual",  // ✅ Must be "individual" or "professional"
+    currency_code: "USD",         // ✅ Required
+    is_email_verified: false,     // ✅ Required (defaults to False)
+    is_phone_verified: false,     // ✅ Required (defaults to False)
+    profile_picture: null,        // ✅ Optional but explicitly sent as null
+    preferences: null,            // ✅ Optional but explicitly sent as null
+    verification_code: null,      // ✅ Optional but explicitly sent as null
+    verification_expiration: null //
   };
 
   useEffect(() => {

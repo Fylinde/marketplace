@@ -15,6 +15,14 @@ export interface FileMetadata {
     email: string;
     password: string;
     phoneNumber?: string;
+    seller_type: "professional" | "individual";  // ✅ Must be "individual" or "professional"
+    currency_code: "USD",         // ✅ Required
+    is_email_verified: false,     // ✅ Required (defaults to False)
+    is_phone_verified: false,     // ✅ Required (defaults to False)
+    profile_picture: null,        // ✅ Optional but explicitly sent as null
+    preferences: null,            // ✅ Optional but explicitly sent as null
+    verification_code: null,      // ✅ Optional but explicitly sent as null
+    verification_expiration: null //
   }
 
 
@@ -189,7 +197,7 @@ export interface CompanyInformation {
 
   
   export interface SellerVerification {
-    email: string;
+    email?: string;
     emailOrPhone?: string;
     verificationCode: string;
     isVerified: boolean;
@@ -214,8 +222,10 @@ export interface CompanyInformation {
     yearsInOperation?: number;
     businessWebsite?: string;
     altPhoneNumber?: string;
+    loading?: string;
   }
   
+
   // IdentityVerificationInterface.ts
   export interface IdentityVerification {
     idType: 'Passport' | 'Driver’s License' | 'National ID' | '';
